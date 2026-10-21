@@ -20,7 +20,7 @@ const SignupSchema = z.object({
   password: z.string().min(4, "Password minimal 4 karakter"),
 });
 
-// POST /api/auth/signup — registrasi anggota baru.
+// POST /api/auth/signup - registrasi anggota baru.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => null);
@@ -35,17 +35,25 @@ export async function POST(req: NextRequest) {
     const settings = await getSettings();
 
     // Cek duplikat nama/nim/email.
+    // Nama dicocokkan tanparegarding huruf besar-kecil supaya dua akun dengan
+    // nama yang sama tapi beda kapital tidak bisa dibuat. Kalau sampai ada,
+    // login berbasis nama jadi ambigu.
     const existing = await db.anggota.findFirst({
       where: {
         OR: [
-          { nama: { equals: nama } },
+          { nama: { equals: nama, mode: "insensitive" } },
           ...(nim ? [{ nim: { equals: nim } }] : []),
           ...(email ? [{ email: { equals: email } }] : []),
         ],
       },
     });
     if (existing) {
-      const field = existing.nama === nama ? "nama" : existing.nim === nim ? "nim" : "email";
+      const field =
+        existing.nama.toLowerCase() === nama.toLowerCase()
+          ? "nama"
+          : existing.nim === nim
+            ? "nim"
+            : "email";
       return apiError("CONFLICT", `${field} sudah terdaftar. Gunakan data lain atau login.`, {
         fields: { [field]: `${field} sudah terdaftar` },
       });
