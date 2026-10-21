@@ -71,6 +71,16 @@ Semua endpoint di `src/app/api/` mengikuti kontrak `api-response` (terklasifikas
 
 - Mobile horizontal overflow 1px pada viewport 375px: ditambahkan `overflow-x: hidden` pada `html` dan `body` di `globals.css`.
 
+### Added — Dark/Light Mode Enhancement
+
+- **ThemeToggle di login page**: sebelumnya toggle tema (Terang/Gelap/Sistem) hanya ada di admin shell dan member shell. Sekarang tersedia di pojok kanan atas panel form login, agar user bisa memilih tema sebelum masuk.
+- **Dark mode terverifikasi penuh** via Agent Browser: login page, 9 view admin, 6 view anggota, mobile 375px — semua render dengan benar di dark mode. CSS variables tiga lapis (primitive → semantic → component) memastikan konsistensi warna di kedua mode.
+- **Script verifikasi dark mode** (`scripts/dark-mode-verify.sh`, `scripts/dark-mode-final.sh`): test end-to-end dark/light toggle di semua shell dan view.
+
+### Fixed — Bug
+
+- **ENCRYPTION_KEY tidak dikonfigurasi**: signup anggota gagal dengan `INTERNAL_ERROR` "ENCRYPTION_KEY tidak dikonfigurasi dengan benar." karena `crypto.ts` butuh 64 hex chars yang belum ada di `.env`. Diperbaiki: generate key dev, tambahkan ke `.env.example` dengan dokumentasi (`openssl rand -hex 32`).
+
 ### Security
 
 - **Menghapus `.env` dari git tracking** — file berisi `JWT_SECRET`, `ADMIN_PASSWORD`, `DATABASE_URL` sebelumnya ter-commit. Dihapus via `git rm --cached .env` (file lokal tetap ada). Dibuat `.env.example` dengan placeholder.
