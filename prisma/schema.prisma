@@ -1,19 +1,19 @@
-// HTN Legacy — Prisma Schema
+// HTN Legacy - Prisma Schema
 // Model data sesuai ARCHITECTURE.md bagian "Model Data":
 // Anggota, Struk, Transaksi, Settings, AuditLog.
 //
-// Catatan adaptasi: dokumen menyebut Neon PostgreSQL, namun sandbox
-// hanya mendukung SQLite. Struktur model dipertahankan persis; tipe
-// data disesuaikan ke ekivalen SQLite (String untuk tanggal/periode,
-// Int untuk nominal).
+// Database: PostgreSQL Neon sesuai SPEC.md bagian "Stack dan Environment".
+// `DATABASE_URL` dipakai Prisma Client saat runtime (Neon pooler),
+// `DIRECT_URL` dipakai perintah migrate (koneksi direct).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 /// Anggota organisasi.
