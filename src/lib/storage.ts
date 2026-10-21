@@ -1,4 +1,4 @@
-// HTN Legacy — Storage Adapter
+// HTN Legacy - Storage Adapter
 // Sesuai ARCHITECTURE.md: Supabase Storage menyimpan gambar receipt dan barcode.
 // Database hanya menyimpan path object. UI menerima signed URL.
 //
@@ -85,6 +85,18 @@ export const ALLOWED_RECEIPT_TYPES = [
 
 export const MAX_RECEIPT_SIZE = 5 * 1024 * 1024; // 5 MB
 
+/**
+ * Pemetaan MIME type ke ekstensi file yang aman dipakai di nama file.
+ * Tanpa peta ini, "image/svg+xml" menghasilkan file ".svg+xml" yang tidak
+ * dikenali browser saat diunduh.
+ */
+const MIME_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/svg+xml": "svg",
+};
+
 export function validateReceiptFile(
   contentType: string,
   size: number
@@ -110,13 +122,18 @@ export function validateReceiptFile(
 /**
  * Generate nama file unik untuk receipt.
  * Format: struk/{YYYY-MM}/{uuid}.{ext}
+ *
+ * Ekstensi diambil dari MIME type dengan pemetaan khusus. Subtype MIME
+ * bisa mengandung karakter yang tidak aman untuk nama file, misalnya
+ * "image/svg+xml" yang tanpa tratamento menghasilkan file ".svg+xml".
  */
 export function generateStrukPath(
   periodeBulan: string,
   contentType: string
 ): string {
-  const ext = contentType.split("/")[1] ?? "jpg";
-  const filename = `${randomUUID()}.${ext}`;
+  const ext = MIME_EXTENSIONS[contentType] ?? contentType.split("/")[1] ?? "jpg";
+  const safeExt = ext.replace(/[^a-z0-9]/gi, "") || "bin";
+  const filename = `${randomUUID()}.${safeExt}`;
   return `struk/${periodeBulan}/${filename}`;
 }
 
@@ -126,5 +143,6 @@ export function generateStrukPath(
  */
 export function generateBarcodePath(ext: string): string {
   const ts = Date.now();
-  return `assets/barcode-${ts}.${ext}`;
+  const safeExt = ext.replace(/[^a-z0-9]/gi, "") || "bin";
+  return `assets/barcode-${ts}.${safeExt}`;
 }
