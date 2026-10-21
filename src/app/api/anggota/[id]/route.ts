@@ -10,10 +10,11 @@ import {
 import { isAdmin, getMemberSession } from "@/lib/auth";
 import { encryptPassword, verifyPassword } from "@/lib/crypto";
 import { getSettings } from "@/lib/settings";
+import { deleteFile } from "@/lib/storage";
 
 type Params = { params: Promise<{ id: string }> };
 
-// GET /api/anggota/[id] — detail anggota.
+// GET /api/anggota/[id] - detail anggota.
 // Anggota hanya bisa melihat dirinya sendiri; Admin bisa melihat semua.
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
@@ -65,7 +66,7 @@ const UpdateSchema = z.object({
   currentPassword: z.string().optional(),
 });
 
-// PATCH /api/anggota/[id] — update anggota.
+// PATCH /api/anggota/[id] - update anggota.
 // Admin bisa update semua field. Anggota hanya bisa update profil & password sendiri.
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
@@ -131,6 +132,37 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (admin && statusBayar !== undefined) data.statusBayar = statusBayar;
     if (password) data.passwordEnc = encryptPassword(password);
 
+    // Cek duplikat nama dan NIM/email. Tanpa cek ini, anggota bisa mengubah
+    // namanya menjadi nama anggota lain, dan login berbasis nama jadi ambigu.
+    if (nama !== undefined || nim !== undefined || email !== undefined) {
+      const dup = await db.anggota.findFirst({
+        where: {
+          id: { not: id },
+          OR: [
+            ...(nama !== undefined
+              ? [{ nama: { equals: nama, mode: "insensitive" as const } }]
+              : []),
+            ...(nim !== undefined && nim ? [{ nim: { equals: nim } }] : []),
+            ...(email !== undefined && email ? [{ email: { equals: email } }] : []),
+          ],
+        },
+        select: { nama: true, nim: true, email: true },
+      });
+      if (dup) {
+        const field =
+          nama !== undefined && dup.nama.toLowerCase() === nama.toLowerCase()
+            ? "nama"
+            : nim !== undefined && dup.nim === nim
+              ? "nim"
+              : "email";
+        return apiError(
+          "CONFLICT",
+          `${field} sudah dipakai anggota lain. Gunakan nilai lain.`,
+          { fields: { [field]: `${field} sudah dipakai anggota lain` } }
+        );
+      }
+    }
+
     try {
       const updated = await db.anggota.update({
         where: { id },
@@ -144,6 +176,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           statusBayar: true,
           periodeBerjalan: true,
           catatan: true,
+          // `createdAt` wajib ikut dikembalikan. Client memakai
+          // `setProfil(json.data)` setelah simpan, jadi bila field ini tidak
+          // dikirim, tanggal bergabung anggota berubah jadi kosong.
+          createdAt: true,
         },
       });
 
@@ -171,7 +207,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   }
 }
 
-// DELETE /api/anggota/[id] — hapus anggota (Admin only).
+// DELETE /api/anggota/[id] - hapus anggota (Admin only).
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
@@ -192,19 +228,55 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     }
 
     const nama = anggota.nama;
+
+    // Ambil path file receipt milik anggota ini sebelum dihapus. Record
+    // `Struk` terhapus otomatis karena relasi memakai onDelete Cascade,
+    // jadi file di storage harus ikut dibersihkan agar tidak menyisakan
+    // file yatim yang tidak pernah dibersihkan.
+    const strukList = await db.struk.findMany({
+      where: { anggotaId: id },
+      select: { filePath: true },
+    });
+
     await db.anggota.delete({ where: { id } });
+
+    // Hapus file receipt di luar transaksi database (node M1 pada
+    // ARCHITECTURE.md). Kegagalan hapus file tidak boleh memblokir
+    // penghapusan anggota, tapi harus dicatat untuk pembersihan manual.
+    const storageErrors: string[] = [];
+    for (const s of strukList) {
+      try {
+        await deleteFile(s.filePath);
+      } catch (storageErr) {
+        storageErrors.push(s.filePath);
+        console.error(
+          "[STORAGE_ERROR] Gagal menghapus file receipt saat hapus anggota",
+          JSON.stringify({
+            requestId: `cleanup-anggota-${Date.now()}`,
+            category: "STORAGE_ERROR",
+            filePath: s.filePath,
+            anggotaId: id,
+            message: "File yatim perlu dibersihkan manual.",
+            cause:
+              storageErr instanceof Error ? storageErr.message : String(storageErr),
+            timestamp: new Date().toISOString(),
+          })
+        );
+      }
+    }
 
     await db.auditLog.create({
       data: {
         aksi: "DELETE_ANGGOTA",
         actorNama: "Bendahara",
-        deskripsi: `Menghapus anggota: ${nama}.`,
+        deskripsi: `Menghapus anggota: ${nama}.${storageErrors.length > 0 ? ` Catatan: ${storageErrors.length} file receipt gagal dihapus dan perlu pembersihan manual.` : ""}`,
         refType: "Anggota",
         refId: id,
+        detail: storageErrors.length > 0 ? `storageErrors=${JSON.stringify(storageErrors)}` : null,
       },
     });
 
-    return apiSuccess({ deleted: true });
+    return apiSuccess({ deleted: true, storageCleanupErrors: storageErrors });
   } catch (err) {
     return apiUnexpected(err);
   }
