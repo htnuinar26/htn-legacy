@@ -15,21 +15,22 @@ Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
 Sumber: audit 2026-10-21, temuan CRITICAL #1, HIGH #9, #10, #11, #12, dan utang
 teknis konfigurasi.
 
-- [ ] Ubah `prisma/schema.prisma` dari `provider = "sqlite"` ke `provider = "postgresql"`
+- [x] Ubah `prisma/schema.prisma` dari `provider = "sqlite"` ke `provider = "postgresql"`
       (lingkungan `.env` sudah menunjuk Neon PostgreSQL, sehingga seluruh endpoint DB
       kini gagal dengan `PrismaClientInitializationError`).
-- [ ] Tambahkan `prisma/migrations/0000_init/migration.sql` untuk PostgreSQL dan
-      jalankan migrasi ke Neon.
-- [ ] Hapus `typescript.ignoreBuildErrors: true` dari `next.config.ts` supaya build
+- [x] Tambahkan migration Prisma untuk PostgreSQL: baseline schema legacy Neon
+      (ditandai sudah diterapkan tanpa dijalankan ulang) plus migration transformasi
+      yang memetakan kolom lama dengan rename sehingga data tetap utuh.
+- [x] Hapus `typescript.ignoreBuildErrors: true` dari `next.config.ts` supaya build
       benar-benar gagal bila ada error tipe.
-- [ ] Aktifkan `reactStrictMode: true` di `next.config.ts`.
-- [ ] Exclude `examples` di `tsconfig.json` supaya `bunx tsc --noEmit` kembali hijau.
-- [ ] Hapus sisa scaffold `examples/websocket/frontend.tsx` dan `examples/websocket/server.ts`.
-- [ ] Ganti script `build` di `package.json` agar lintas platform (hapus `cp -r`).
-- [ ] Tambah `scripts/copy-standalone.mjs` sesuai rujukan `ARCHITECTURE.md`.
-- [ ] Tambahkan `public/storage` ke `.gitignore` dan keluarkan file receipt yang
+- [x] Aktifkan `reactStrictMode: true` di `next.config.ts`.
+- [x] Exclude `examples` di `tsconfig.json` supaya `bunx tsc --noEmit` kembali hijau.
+- [x] Hapus sisa scaffold `examples/websocket/frontend.tsx` dan `examples/websocket/server.ts`.
+- [x] Ganti script `build` di `package.json` agar lintas platform (hapus `cp -r`).
+- [x] Tambah `scripts/copy-standalone.mjs` sesuai rujukan `ARCHITECTURE.md`.
+- [x] Tambahkan `public/storage` ke `.gitignore` dan keluarkan file receipt yang
       sudah telekomit dari index git.
-- [ ] Perbaiki `.env.example`: `DATABASE_URL` sandbox yang salah path, plus env var
+- [x] Perbaiki `.env.example`: `DATABASE_URL` sandbox yang salah path, plus env var
       yang belum tercantum (`NEXT_PUBLIC_INSTANCE_NAME`, `SUPABASE_SECRET_KEY`,
       `SUPABASE_STORAGE_BUCKET`, `DEBUG_MW`).
 
