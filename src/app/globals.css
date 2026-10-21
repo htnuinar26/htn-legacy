@@ -164,6 +164,9 @@
   }
   html {
     -webkit-text-size-adjust: 100%;
+    /* Cegah horizontal overflow 1px di mobile akibat sub-pixel rounding.
+       Container utama memakai max-w-* yang sudah aman; pengaman di root. */
+    overflow-x: hidden;
   }
   body {
     background-color: var(--bg-base);
@@ -172,6 +175,7 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
   /* Tabular numerals for financial data */
   .tabular-nums {
