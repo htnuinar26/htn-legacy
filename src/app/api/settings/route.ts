@@ -1,12 +1,20 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
+import { db } from "@/lib/db";
 import { apiSuccess, apiError, apiUnexpected, classifyPrismaError } from "@/lib/api-response";
-import { isAdmin } from "@/lib/auth";
+import { isAdmin, requireMemberOrAdmin } from "@/lib/auth";
 import { getSettings, updateSettings } from "@/lib/settings";
+import { getSignedUrl } from "@/lib/storage";
 
-// GET /api/settings — ambil settings global (publik untuk anggota, edit admin).
+// GET /api/settings - ambil settings global.
+// Dapat diakses anggota (nominal iuran, deadline, kontak pengurus, barcode)
+// dan Admin. Tanpa session, request DITOLAK: kontak pengurus dan barcode
+// adalah data internal organisasi.
 export async function GET() {
   try {
+    const guard = await requireMemberOrAdmin();
+    if (!guard.ok) return guard.response;
+
     const settings = await getSettings();
     return apiSuccess({
       nominalIuran: settings.nominalIuran,
@@ -14,6 +22,10 @@ export async function GET() {
       deadlineTanggal: settings.deadlineTanggal,
       waPengurus: settings.waPengurus,
       barcodePath: settings.barcodePath,
+      // Path objek storage BUKAN URL yang bisa dibuka browser. Selalu
+      // kirimkan URL siap pakai supaya client tidak memakai path mentah
+      // sebagai atribut src (menghasilkan 404 atau error next/image).
+      barcodeUrl: settings.barcodePath ? getSignedUrl(settings.barcodePath) : null,
       namaOrganisasi: settings.namaOrganisasi,
     });
   } catch (err) {
@@ -41,7 +53,7 @@ const UpdateSettingsSchema = z.object({
   namaOrganisasi: z.string().min(1).optional(),
 });
 
-// PATCH /api/settings — update settings global (Admin only).
+// PATCH /api/settings - update settings global (Admin only).
 // nominalIuran WAJIB lewat RupiahInput di client.
 export async function PATCH(req: NextRequest) {
   try {
@@ -82,12 +94,32 @@ export async function PATCH(req: NextRequest) {
 
     try {
       const updated = await updateSettings(data);
+
+      // Perubahan settings wajib tercatat di audit log, sama seperti
+      // upload barcode. Tanpa ini, jejak audit Settings tidak lengkap.
+      const changed = Object.keys(data).join(", ");
+      await db.auditLog.create({
+        data: {
+          aksi: "UPDATE_SETTINGS",
+          actorNama: "Bendahara",
+          deskripsi: `Memperbarui settings organisasi: ${changed}.`,
+          refType: "Settings",
+          refId: updated.id,
+          detail: `perubahan=${changed}`,
+        },
+      });
+
       return apiSuccess({
         nominalIuran: updated.nominalIuran,
         periodeBerjalan: updated.periodeBerjalan,
         deadlineTanggal: updated.deadlineTanggal,
         waPengurus: updated.waPengurus,
         namaOrganisasi: updated.namaOrganisasi,
+        // barcodePath sengaja ikut dikembalikan. Client memakai
+        // `setSettings(json.data)` setelah simpan, jadi bila field ini tidak
+        // dikirim, barcode yang sudah terunggah akan hilang dari tampilan.
+        barcodePath: updated.barcodePath,
+        barcodeUrl: updated.barcodePath ? getSignedUrl(updated.barcodePath) : null,
       });
     } catch (dbErr) {
       const classified = classifyPrismaError(dbErr);
