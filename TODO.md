@@ -1,87 +1,164 @@
-# TODO — HTN Legacy
+# TODO - HTN Legacy
 
-Daftar sisa pekerjaan, catatan teknis, dan item yang perlu ditindaklanjuti.
+Ruang kerja tunggal untuk pekerjaan yang direncanakan. Struktur file ini punya tiga
+bagian tetap, berurutan: **Active plans**, **Deferred work**, **Known Issues**.
 
-## Status Saat Ini (2026-10-21)
+Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
+`src/`, `prisma/schema.prisma`, dan skrip build/test).
 
-### ✅ Selesai & Terverifikasi
+---
 
-- [x] Foundation: design system tiga lapis, splash screen, dark mode, komponen bersama (`RupiahInput`, `api-response`).
-- [x] Auth: signup anggota, login anggota (nama+password), login admin, logout, session JWT httpOnly.
-- [x] Semua 9 view Admin: Dashboard, Anggota, Review Struk, Generator Struk, Kas, Import Data, Audit Log, Laporan, Settings.
-- [x] Semua 6 view Anggota: Beranda, Struk Iuran, Kas Organisasi, Daftar Anggota, Barcode Pembayaran, Profil Saya.
-- [x] Semua API endpoint sesuai SPEC.md dengan kontrak `api-response` terklasifikasi + `requestId`.
-- [x] Prisma schema: `Anggota`, `Struk`, `Transaksi`, `Settings`, `AuditLog`.
-- [x] Storage adapter (local file untuk sandbox, interface siap Supabase).
-- [x] **Bug #1 dicegah**: `RupiahInput` tanpa `step`/`pattern`, nilai `10000` diterima.
-- [x] **Bug #2 dicegah**: `/api/admin/struk-generator` mengembalikan 200/400/403/409 dengan detail, bukan 500.
-- [x] Regression test (`scripts/regression-test.sh`) lulus: nominal 10000 → struk APPROVED → transaksi MASUK → status LUNAS.
-- [x] UI verification (`scripts/ui-verify.sh`) lulus: semua view render, no console errors, no page errors.
-- [x] Mobile responsive (375px) tanpa horizontal overflow.
-- [x] `bun run lint` bersih.
-- [x] `bunx tsc --noEmit` bersih untuk `src/`.
-- [x] `.env` dihapus dari git tracking; `.env.example` dibuat.
+## Active plans
 
-### ⚠️ Perlu Tindak Lanjut
+### PR #1 - `fix/production-config` - Konfigurasi produksi dan gate validasi
 
-#### Prioritas Tinggi (Produksi)
+Sumber: audit 2026-10-21, temuan CRITICAL #1, HIGH #9, #10, #11, #12, dan utang
+teknis konfigurasi.
 
-- [ ] **Unggah AGENTS.md** ke repository. Saat ini proses Git/PR/Issue tidak bisa mengikuti AGENTS.md sepenuhnya karena dokumen tidak tersedia. Konvensi standar digunakan sebagai pengganti.
-- [ ] **Ganti JWT_SECRET** di produksi dengan string acak minimal 32 byte. Saat ini pakai dev secret.
-- [ ] **Ganti ADMIN_PASSWORD** di produksi. Saat ini pakai `admin-htn-legacy-2026` (dev).
-- [ ] **Migrasi database ke Neon PostgreSQL**: ubah `DATABASE_URL` dan `DIRECT_URL` di `.env` produksi. Struktur Prisma schema sudah kompatibel (tinggal ganti provider di `schema.prisma` dari `sqlite` ke `postgresql` dan sesuaikan tipe field tanggal/periode jika perlu).
-- [ ] **Aktifkan Supabase Storage**: isi `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_BUCKET` di `.env` produksi. Ganti implementasi `src/lib/storage.ts` dari `LocalFileStorage` ke `SupabaseStorage` (interface sudah disiapkan).
-- [ ] **Set `NODE_ENV=production`** dan `secure: true` untuk cookie di produksi (saat ini `secure: process.env.NODE_ENV === "production"`).
+- [ ] Ubah `prisma/schema.prisma` dari `provider = "sqlite"` ke `provider = "postgresql"`
+      (lingkungan `.env` sudah menunjuk Neon PostgreSQL, sehingga seluruh endpoint DB
+      kini gagal dengan `PrismaClientInitializationError`).
+- [ ] Tambahkan `prisma/migrations/0000_init/migration.sql` untuk PostgreSQL dan
+      jalankan migrasi ke Neon.
+- [ ] Hapus `typescript.ignoreBuildErrors: true` dari `next.config.ts` supaya build
+      benar-benar gagal bila ada error tipe.
+- [ ] Aktifkan `reactStrictMode: true` di `next.config.ts`.
+- [ ] Exclude `examples` di `tsconfig.json` supaya `bunx tsc --noEmit` kembali hijau.
+- [ ] Hapus sisa scaffold `examples/websocket/frontend.tsx` dan `examples/websocket/server.ts`.
+- [ ] Ganti script `build` di `package.json` agar lintas platform (hapus `cp -r`).
+- [ ] Tambah `scripts/copy-standalone.mjs` sesuai rujukan `ARCHITECTURE.md`.
+- [ ] Tambahkan `public/storage` ke `.gitignore` dan keluarkan file receipt yang
+      sudah telekomit dari index git.
+- [ ] Perbaiki `.env.example`: `DATABASE_URL` sandbox yang salah path, plus env var
+      yang belum tercantum (`NEXT_PUBLIC_INSTANCE_NAME`, `SUPABASE_SECRET_KEY`,
+      `SUPABASE_STORAGE_BUCKET`, `DEBUG_MW`).
 
-#### Prioritas Sedang
+### PR #2 - `fix/api-authorization` - Otorisasi endpoint dan klasifikasi error API
 
-- [ ] **Test interaksi shadcn Select di Agent Browser**: dropdown anggota di Generator Struk sulit diklik via automation (CDP box model error pada option). Form berfungsi manual (terverifikasi via API). Tambahkan test E2E dengan Playwright jika diperlukan.
-- [ ] **Seed data**: tambahkan script `prisma/seed.ts` untuk data demo (5 anggota saat ini dibuat manual via API).
-- [ ] **Rate limiting** pada endpoint auth (login/signup/admin-login) untuk mencegah brute force.
-- [ ] **CSRF protection** untuk state-changing endpoints (saat ini andal sameSite=lax).
-- [ ] **Audit log coverage**: verifikasi semua aksi admin (create/update/delete anggota, approve/reject struk, create/delete transaksi, update settings) tercatat di AuditLog.
+Sumber: audit 2026-10-21, temuan CRITICAL #2, #3, #4, HIGH #5, #6, dan MEDIUM
+#20, #22, #23, #24, dan beberapa gugusan API.
 
-#### Prioritas Rendah
+- [ ] `GET /api/transaksi`: wajib session anggota atau Admin (kini 200 tanpa login).
+- [ ] `GET /api/anggota`: wajib session anggota atau Admin (kini 200 tanpa login).
+- [ ] `GET /api/settings`: wajib session anggota atau Admin (kini 200 tanpa login).
+- [ ] `POST /api/struk/[id]/verify` jalur reject: bungkus klasifikasi error Prisma
+      agar P2002 jadi `CONFLICT` dengan pesan spesifik, bukan 500 generik.
+- [ ] `POST /api/struk/[id]/verify`: terima `nominal` null secara eksplisit agar
+      fallback `struk.nominal ?? settings.nominalIuran` terpakai.
+- [ ] `POST /api/struk/[id]/verify`: ikutkan `alasanReject` pada audit log reject.
+- [ ] `GET /api/laporan`: hitung status lunas/belum/tertunggak sesuai periode terpilih.
+- [ ] `GET /api/admin/audit-log`: validasi `limit` dan `offset` agar tidak negatif.
+- [ ] `POST /api/struk/upload`: kategori error rate limit disinkronkan dengan status 429.
+- [ ] `POST /api/auth/login`: pencocokan nama tahan huruf besar-kecil.
+- [ ] `POST /api/settings/barcode`: batas ukuran file, tolak SVG, kembalikan URL.
+- [ ] `PATCH /api/settings`: tambahkan audit log `UPDATE_SETTINGS`.
+- [ ] `PATCH /api/anggota/[id]`: cek duplikat nama dan kembalikan `createdAt`.
+- [ ] `POST /api/anggota`: simpan field `catatan`.
+- [ ] `POST /api/admin/struk-generator`: kembalikan URL file struk manual.
+- [ ] `DELETE /api/anggota/[id]`: bersihkan file receipt yang terlantar di storage.
+- [ ] `GET /api/settings` dan `POST /api/settings/barcode`: kembalikan `barcodeUrl`
+      hasil `getSignedUrl`, bukan path objek mentah.
 
-- [ ] **Loading skeleton** pada view yang fetch data (saat ini pakai spinner sederhana).
-- [ ] **Empty state illustration** untuk list kosong (struk, transaksi, audit log).
-- [ ] **Keyboard shortcut** untuk navigasi antar view admin.
-- [ ] **Export laporan ke PDF/Excel** (saat ini laporan hanya tampil di UI).
-- [ ] **PWA support** (manifest, service worker) untuk akses offline.
+### PR #3 - `fix/ui-input-and-views` - Input nominal, periode, dan tampilan rusak
 
-### 🔍 Catatan Teknis
+Sumber: audit 2026-10-21, temuan HIGH #7, #8, MEDIUM #13 sampai #32, dan LOW
+terkait em-dash, target sentuh, dan fokus drawer.
 
-#### Dev Server Sandbox
+- [ ] `src/components/ui/rupiah-input.tsx`: perbaiki pengalian nominal saat digit
+      disisipkan di tengah nilai terformat, dan batasi nilai maksimum.
+- [ ] `src/components/views/admin/kas-view.tsx`: dropdown periode tidak pernah kosong,
+      tampilkan error per-field `periodeBulan`, cegah double submit, perbesar target sentuh.
+- [ ] `src/components/views/member/kas-view.tsx`: dropdown periode tidak pernah kosong,
+      reset state error setiap reload.
+- [ ] `src/components/views/admin/struk-review-view.tsx`: kirim `nominal` yang valid.
+- [ ] `src/components/views/admin/struk-generator-view.tsx`: pakai URL file dari server,
+      validasi client memakai Zod, buang em-dash.
+- [ ] `src/components/views/admin/settings-view.tsx`: pakai `barcodeUrl`, pertahankan
+      `barcodePath` setelah simpan, tambahkan state pending upload, buang em-dash.
+- [ ] `src/components/views/admin/anggota-view.tsx`: asosiasi label, cegah double
+      submit, perbaiki teks konfirmasi hapus.
+- [ ] `src/components/views/admin/import-view.tsx`: parser CSV handle tanda kutip,
+      tampilkan pesan error per baris, perbaiki komentar urutan kolom.
+- [ ] `src/components/views/admin/laporan-view.tsx`: export CSV sertakan receipt
+      approved, escape tanda kutip, unduhan andal.
+- [ ] `src/components/views/admin/audit-log-view.tsx`: tambah paginasi dan aksi
+      hapus transaksi sesuai `ARCHITECTURE.md`.
+- [ ] `src/components/views/admin/dashboard-view.tsx`: buang em-dash.
+- [ ] `src/components/views/member/barcode-view.tsx`: pakai `barcodeUrl`, normalisasi
+      nomor WhatsApp ke format internasional.
+- [ ] `src/components/views/member/profil-view.tsx`: asosiasi label, tampilkan error
+      per-field password, pertahankan `createdAt`, gunakan label status.
+- [ ] `src/components/views/member/beranda-view.tsx`: Tukar ikon tren pemasukan/pengeluaran.
+- [ ] `src/components/views/member/struk-view.tsx`: tampilkan error per-field periode.
+- [ ] `src/components/views/member/daftar-view.tsx`: bedakan state kosong dan hasil pencarian kosong.
+- [ ] `src/components/views/login-view.tsx`: asosiasi label, reset error saat ganti mode,
+      kembalikan state loading pada jalur sukses.
+- [ ] `src/components/shells/admin-shell.tsx` dan `src/components/shells/member-shell.tsx`:
+      target sentuh 44px, focus trap dan Escape pada drawer, cek hasil logout.
+- [ ] `src/components/theme-toggle.tsx`: target sentuh 44px.
+- [ ] `src/lib/format.ts`: samakan perhitungan periode dengan `Asia/Bangkok`, perbaiki
+      `buildWaLink` agar nomor lokal dinormalisasi.
+- [ ] `src/lib/storage.ts`: perbaiki ekstensi `image/svg+xml` menjadi `svg`.
+- [ ] `src/lib/api-response.ts`: tambahkan kategori `RATE_LIMIT_ERROR` yang konsisten.
 
-Dev server Next.js di sandbox ini **tidak stabil** — process background mati setiap ~30-60 detik antar perintah bash (SIGTERM dari sandbox manager). Untuk verifikasi lengkap, gunakan `scripts/regression-test.sh` dan `scripts/ui-verify.sh` yang menjalankan semua tes dalam satu sesi bash. Watchdog di `.zscripts/watchdog-dev.sh` dapat diaktifkan untuk restart otomatis.
+### PR #4 - `docs/sync-and-debt` - Sinkronisasi dokumentasi dan utang teknis
 
-#### Routing SPA
+Sumber: audit 2026-10-21, LOW dan temuan dokumentasi.
 
-Sandbox constraint: user hanya bisa melihat route `/`. Seluruh aplikasi di-render sebagai SPA dengan client-side view management (`src/lib/nav-store.ts`). Tidak ada route Next.js lain. Semua "halaman" adalah komponen view yang di-switch berdasarkan state nav store.
+- [ ] Pindahkan `PRD.md`, `SPEC.md`, `ARCHITECTURE.md`, `DESIGN.md` ke root repository
+      sesuai `AGENTS.md` bagian Documentation Rules, dan hapus duplikat di `upload/`.
+- [ ] Perbarui seluruh rujukan dokumen di `TODO.md`, `CHANGELOG.md`,
+      `docs/review/CODE_REVIEW.md`, dan `worklog.md`.
+- [ ] Sinkronkan `docs/SPEC.md` soal atribut `pattern` pada `RupiahInput`.
+- [ ] Perbarui `CHANGELOG.md` dengan entri versi baru.
+- [ ] Perbarui `worklog.md` dan `docs/review/CODE_REVIEW.md`.
+- [ ] Normalisasi em-dash di seluruh file yang disentuh.
+- [ ] Catat rotasi secret dan pembersihan git history sebagai Known Issue.
 
-#### Storage Path
+---
 
-File receipt di sandbox disimpan di `public/storage/` dan disajikan langsung via static serving. Path disimpan di `Struk.filePath` sebagai relative path. Di produksi dengan Supabase, `filePath` menyimpan object key di bucket.
+## Deferred work
 
-#### Password Anggota
+Pekerjaan yang sudah dibahas dan disepakati tetapi **belum** boleh mulai pada
+rentang PR di atas.
 
-Password anggota dienkripsi AES-256-GCM (`src/lib/crypto.ts`) menggunakan `ENCRYPTION_KEY` dari env. Untuk sandbox, key di-generate dari JWT_SECRET. Di produksi, gunakan key terpisah yang di-rotate berkala.
+- [ ] Implementasi adapter Supabase Storage di `src/lib/storage.ts`. Kontrak
+  interface sudah siap dan lingkungan sudah punya kredensial, tetapi penggantian
+  adapter bukan bagian dari 32 temuan audit dan waved secara manual.
+- [ ] Pembersihan git history untuk secret lama (`JWT_SECRET`, `ENCRYPTION_KEY`,
+  `ADMIN_PASSWORD`) di commit `dfa0935` dan `88d6f99`, lalu rotasi nilainya di Neon
+  dan Supabase. Butuh keputusan pemilik proyek karena merusak history.
+- [ ] Rate limiting pada endpoint auth (`/api/auth/login`, `/api/auth/signup`,
+  `/api/auth/admin-login`). Wajib untuk produksi, belum ada di audit ini.
+- [ ] Proteksi CSRF untuk endpoint yang mengubah state. Saat ini mengandalkan
+  `sameSite=lax`.
+- [ ] Script seed data anggota di `prisma/seed.ts`. Script ada di `scripts/seed.ts`
+  tetapi belum dipakai sebagai seed Prisma.
+- [ ] Ekspor laporan ke PDF dan Excel.
+- [ ] PWA support (manifest dan service worker).
+- [ ] Loading skeleton dan empty state illustration pada view yang mengambil data.
+- [ ] Pintasan keyboard untuk navigasi antar view Admin.
 
-### 📋 Checklist Regresi Wajib (dari SPEC.md)
+---
 
-Sebelum melaporkan fitur nominal atau receipt generator selesai, verifikasi eksplisit:
+## Known Issues
 
-- [x] **Input nominal menerima `10000`** tanpa native validation error. Bukti: `RupiahInput` `type=text inputMode=numeric pattern=null step=null`, `validity.valid=true`.
-- [x] **POST `/api/admin/struk-generator` tidak mengembalikan 500 tanpa detail**. Bukti: HTTP 200 sukses / 400 validasi / 409 konflik / 403 auth, semua dengan `requestId`.
-- [x] **Response error memiliki `category` dan `requestId`**. Bukti: `{"success":false,"error":{"category":"...","message":"...","requestId":"uuid"}}`.
-- [x] **Tidak ada `<input type="number">` untuk nominal uang**. Bukti: `grep -r 'type="number"' src/` → hanya di komentar larangan.
-- [x] **Transaksi DB atomik** (struk + transaksi + status anggota dalam satu transaksi). Bukti: POST struk-generator sukses → struk APPROVED + transaksi MASUK + anggota LUNAS, semua konsisten.
-
-### 🔗 Link
-
-- Spec dokumen: `upload/PRD.md`, `upload/ARCHITECTURE.md`, `upload/SPEC.md`, `upload/DESIGN.md`
-- Worklog: `worklog.md`
-- Changelog: `CHANGELOG.md`
-- Code review: `docs/review/CODE_REVIEW.md`
-- Regression test: `scripts/regression-test.sh`
-- UI verification: `scripts/ui-verify.sh`
+- Data receipt yang terlanjur tidak konsisten di database (misal anggota yang punya
+  receipt `REJECTED` ganda pada periode sama, atau anggota tanpa receipt aktif
+  periode berjalan) belum diperbaiki. Keputusan pemilik proyek: perbaiki kode dulu,
+  data menyusul lewat script terpisah dengan backup penuh.
+- Roti secret: `JWT_SECRET`, `ENCRYPTION_KEY`, dan `ADMIN_PASSWORD` versi lama masih
+  ada di history git. Wajib dirotasi sebelum deploy produksi.
+- `src/lib/storage.ts` masih memakai local file storage. Berkas receipt dan barcode
+  disajikan sebagai path publik di bawah `/storage`, belum signed URL seperti
+  kontrak `ARCHITECTURE.md`. Sudah ada di Deferred work.
+- Aplikasi masih memakai routing SPA di route `/` (`src/lib/nav-store.ts`). URL view
+  tidak bisa dibagikan dan tidak ada route `App Router` per halaman seperti daftar
+  di `ARCHITECTURE.md`.
+- Adapter storage lokal menulis ke `public/storage`, yang ikut terbawa ke build
+  standalone. Pada produksi dengan Supabase, berkas receipt tidak boleh diletakkan
+  di direktori publik.
+- `next.config.ts` masih memakai `output: "standalone"` tanpa konfigurasi rewrite
+  untuk route API, jadi deployment standalone perlu diverifikasi ulang.
+- Tidak ada unit test framework. Yang ada hanya skrip shell `scripts/regression-test.sh`
+  dan `scripts/ui-verify.sh` yang bergantung pada Agent Browser.
