@@ -12,6 +12,7 @@ import { getSettings } from "@/lib/settings";
 import {
   uploadFile,
   generateStrukPath,
+  getSignedUrl,
 } from "@/lib/storage";
 
 const GeneratorSchema = z.object({
@@ -142,7 +143,7 @@ export async function POST(req: NextRequest) {
             data: {
               tipe: "MASUK",
               nominal: nominalFinal,
-              keterangan: `Struk manual ${periode} — ${anggota.nama}${catatan ? ` (${catatan})` : ""}`,
+              keterangan: `Struk manual ${periode} - ${anggota.nama}${catatan ? ` (${catatan})` : ""}`,
               periodeBulan: periode,
               anggotaId,
               strukId: struk.id,
@@ -179,6 +180,11 @@ export async function POST(req: NextRequest) {
         nominal: nominalFinal,
         periodeBulan: periode,
         anggotaNama: anggota.nama,
+        // URL file struk manual siap pakai. Client tidak boleh menebak
+        // path object dari strukId, karena nama file di storage adalah
+        // UUID, bukan id database.
+        fileUrl: getSignedUrl(uploaded.path),
+        filePath: uploaded.path,
       });
     } catch (txErr) {
       const classified = classifyPrismaError(txErr);
@@ -203,7 +209,7 @@ export async function POST(req: NextRequest) {
 }
 
 // Helper: bangun SVG sederhana sebagai placeholder file struk manual.
-// Bukan OCR/AI — hanya dokumen statis yang merepresentasikan receipt manual.
+// Bukan OCR/AI - hanya dokumen statis yang merepresentasikan receipt manual.
 function buildManualReceiptSvg(
   nama: string,
   periode: string,
@@ -218,7 +224,7 @@ function buildManualReceiptSvg(
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="280" viewBox="0 0 480 280">
   <rect width="480" height="280" fill="#faf9f6"/>
   <rect x="0" y="0" width="480" height="56" fill="#4a0e16"/>
-  <text x="24" y="36" font-family="Plus Jakarta Sans, sans-serif" font-size="20" font-weight="800" fill="#ffffff">HTN Legacy — Struk Manual</text>
+  <text x="24" y="36" font-family="Plus Jakarta Sans, sans-serif" font-size="20" font-weight="800" fill="#ffffff">HTN Legacy - Struk Manual</text>
   <text x="24" y="96" font-family="Plus Jakarta Sans, sans-serif" font-size="14" fill="#787774">Anggota</text>
   <text x="24" y="118" font-family="Plus Jakarta Sans, sans-serif" font-size="18" font-weight="700" fill="#111111">${escape(nama)}</text>
   <text x="24" y="150" font-family="Plus Jakarta Sans, sans-serif" font-size="14" fill="#787774">Periode</text>
