@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { apiSuccess, apiError, apiUnexpected } from "@/lib/api-response";
 import { isAdmin } from "@/lib/auth";
 
-// GET /api/admin/audit-log — daftar audit log (Admin only).
+// GET /api/admin/audit-log - daftar audit log (Admin only).
 // Query: ?limit=50&offset=0&aksi=APPROVE_STRUK
 export async function GET(req: NextRequest) {
   try {
@@ -17,8 +17,15 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const limit = Math.min(parseInt(searchParams.get("limit") ?? "50", 10) || 50, 200);
-    const offset = parseInt(searchParams.get("offset") ?? "0", 10) || 0;
+    // Validasi limit dan offset. Nilai negatif membuat Prisma memakai
+    // `take` negatif yang berarti "ambil dari belakang", bukan error, jadi
+    // hasilnya membingungkan. Nilai tidak valid dibuang ke default.
+    const rawLimit = Number.parseInt(searchParams.get("limit") ?? "50", 10);
+    const rawOffset = Number.parseInt(searchParams.get("offset") ?? "0", 10);
+    const limit = Number.isFinite(rawLimit)
+      ? Math.min(Math.max(rawLimit, 1), 200)
+      : 50;
+    const offset = Number.isFinite(rawOffset) ? Math.max(rawOffset, 0) : 0;
     const aksi = searchParams.get("aksi");
 
     const where = aksi ? { aksi } : {};
