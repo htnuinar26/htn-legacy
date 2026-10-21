@@ -10,7 +10,7 @@ const LoginSchema = z.object({
   password: z.string().min(1, "Password wajib diisi"),
 });
 
-// POST /api/auth/login — login anggota berdasar nama + password per aksi.
+// POST /api/auth/login - login anggota berdasar nama + password per aksi.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => null);
@@ -23,8 +23,10 @@ export async function POST(req: NextRequest) {
 
     const { nama, password } = parsed.data;
 
+    // Pencocokan nama tahan huruf besar-kecil. Login memakai nama (bukan NIM)
+    // supaya anggota dengan NIM kosong atau duplikat tetap bisa masuk.
     const anggota = await db.anggota.findFirst({
-      where: { nama: { equals: nama } },
+      where: { nama: { equals: nama, mode: "insensitive" } },
     });
 
     if (!anggota) {
