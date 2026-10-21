@@ -7,7 +7,7 @@ import {
   apiUnexpected,
   classifyPrismaError,
 } from "@/lib/api-response";
-import { isAdmin } from "@/lib/auth";
+import { isAdmin, requireMemberOrAdmin } from "@/lib/auth";
 
 const CreateSchema = z.object({
   tipe: z.enum(["MASUK", "KELUAR"], {
@@ -24,9 +24,14 @@ const CreateSchema = z.object({
   anggotaId: z.string().nullable().optional(),
 });
 
-// GET /api/transaksi?bulan=YYYY-MM — daftar transaksi + ringkasan + saldo.
+// GET /api/transaksi?bulan=YYYY-MM - daftar transaksi + ringkasan + saldo.
+// Route ini dapat diakses anggota (untuk melihat kas organisasi) dan Admin.
+// Tanpa session, request DITOLAK: data kas tidak boleh bocor ke tamu.
 export async function GET(req: NextRequest) {
   try {
+    const guard = await requireMemberOrAdmin();
+    if (!guard.ok) return guard.response;
+
     const { searchParams } = new URL(req.url);
     const bulan = searchParams.get("bulan");
 
@@ -94,7 +99,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/transaksi — catat transaksi manual (Admin).
+// POST /api/transaksi - catat transaksi manual (Admin).
 // nominal WAJIB integer positif, tanpa batasan step/kelipatan.
 export async function POST(req: NextRequest) {
   try {
