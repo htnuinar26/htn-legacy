@@ -1,9 +1,18 @@
-// HTN Legacy — API Response Helper
+// HTN Legacy - API Response Helper
 // Kontrak error handling terklasifikasi sesuai ARCHITECTURE.md
 // bagian "Standar Error Handling API (Wajib)".
 //
 // Setiap Route Handler di src/app/api/** WAJIB memakai helper ini.
 // Dilarang membuat bentuk response error sendiri.
+
+import { z } from "zod";
+
+// Zod v4: aktifkan locale Indonesia supaya pesan validasi yang diteruskan
+// ke client selalu dalam Bahasa Indonesia. ARCHITECTURE.md mensyaratkan
+// pesan error ke client bersifat spesifik dan dalam Bahasa Indonesia.
+// Skema yang punya pesan kustom (mis. "Nominal harus lebih dari 0") tetap
+// memakai pesan tersebut, locale hanya menutupi pesan bawaan Zod.
+z.config(z.locales.id());
 
 export type ApiErrorCategory =
   | "VALIDATION_ERROR"
