@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Loader2, LogIn, UserPlus, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type Mode = "login" | "signup" | "admin";
 
@@ -84,7 +85,11 @@ export function LoginView() {
       </div>
 
       {/* Panel kanan — form */}
-      <div className="flex flex-1 items-center justify-center p-6 sm:p-12">
+      <div className="relative flex flex-1 items-center justify-center p-6 sm:p-12">
+        {/* Theme toggle di pojok kanan atas panel form */}
+        <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+          <ThemeToggle />
+        </div>
         <div className="w-full max-w-md">
           {/* Logo mobile */}
           <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
