@@ -16,10 +16,43 @@ import {
 } from "@/lib/storage";
 import { recentPeriods, MAX_RECEIPT_MONTHS } from "@/lib/format";
 
-// Rate limit sederhana in-memory per anggotaId.
+// Rate limit sederhana in-memory.
+// Kunci memakai kombinasi IP dan anggotaId. Kalau kuncinya hanya anggotaId,
+// siapa pun bisa memblokir upload anggota lain hanya dengan mengirim
+// request atas nama anggota itu. Kombinasi ini mencegah lockout yang
+// disengaja, sekaligus tetap membatasi percobaan dari satu sumber.
 const uploadAttempts = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 menit
+
+/** IP client dari header proxy, dipakai sebagai bagian kunci rate limit. */
+function getClientIp(req: NextRequest): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const first = forwarded.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  return req.headers.get("x-real-ip") ?? "unknown";
+}
+
+/**
+ * Tambah dan periksa hitungan rate limit.
+ * Mengembalikan sisa detik yang harus ditunggu bila batas terlampaui,
+ * atau null bila request boleh diproses.
+ */
+function checkRateLimit(key: string): number | null {
+  const now = Date.now();
+  const rec = uploadAttempts.get(key);
+  if (rec && now < rec.resetAt) {
+    if (rec.count >= RATE_LIMIT_MAX) {
+      return Math.ceil((rec.resetAt - now) / 1000);
+    }
+    rec.count += 1;
+  } else {
+    uploadAttempts.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+  }
+  return null;
+}
 
 // POST /api/struk/upload
 // Alur lengkap sesuai ARCHITECTURE.md "Alur Receipt Anggota":
@@ -95,20 +128,21 @@ export async function POST(req: NextRequest) {
     }
 
     // --- 3. Rate limit check ---
-    const now = Date.now();
-    const rec = uploadAttempts.get(anggotaId);
-    if (rec && now < rec.resetAt) {
-      if (rec.count >= RATE_LIMIT_MAX) {
-        const retrySec = Math.ceil((rec.resetAt - now) / 1000);
-        return apiError(
-          "VALIDATION_ERROR",
-          `Terlalu banyak percobaan upload. Coba lagi dalam ${retrySec} detik.`,
-          { status: 429, fields: { _: `Rate limit terlampaui, tunggu ${retrySec}s` } }
-        );
-      }
-      rec.count += 1;
-    } else {
-      uploadAttempts.set(anggotaId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    // Urutan mengikuti ARCHITECTURE.md "Alur Receipt Anggota": rate limit
+    // dicek lebih dulu, lalu verifikasi password.
+    const clientIp = getClientIp(req);
+    const waitSec =
+      checkRateLimit(`ip:${clientIp}`) ??
+      checkRateLimit(`ip:${clientIp}:anggota:${anggotaId}`);
+    if (waitSec !== null) {
+      return apiError(
+        "VALIDATION_ERROR",
+        `Terlalu banyak percobaan upload dari sumber ini. Coba lagi dalam ${waitSec} detik.`,
+        {
+          status: 429,
+          fields: { _: `Rate limit terlampaui, tunggu ${waitSec} detik` },
+        }
+      );
     }
 
     // --- 4. Verifikasi password anggota ---
