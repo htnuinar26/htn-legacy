@@ -1,0 +1,131 @@
+// HTN Legacy — Prisma Schema
+// Model data sesuai ARCHITECTURE.md bagian "Model Data":
+// Anggota, Struk, Transaksi, Settings, AuditLog.
+//
+// Catatan adaptasi: dokumen menyebut Neon PostgreSQL, namun sandbox
+// hanya mendukung SQLite. Struktur model dipertahankan persis; tipe
+// data disesuaikan ke ekivalen SQLite (String untuk tanggal/periode,
+// Int untuk nominal).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Anggota organisasi.
+model Anggota {
+  id            String   @id @default(cuid())
+  nama          String
+  nim           String?  @unique
+  email         String?  @unique
+  telepon       String?
+  // Password terenkripsi AES-256-GCM (base64). Lihat lib/crypto.ts.
+  passwordEnc   String
+  // Periode berjalan format YYYY-MM.
+  periodeBerjalan String
+  // LUNAS | BELUM_LUNAS | TERTUNGGAK
+  statusBayar   String   @default("BELUM_LUNAS")
+  // Catatan khusus (mis. deadline khusus).
+  catatan       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  struk         Struk[]
+  transaksi     Transaksi[]
+
+  @@index([periodeBerjalan])
+  @@index([statusBayar])
+}
+
+/// Receipt pembayaran iuran.
+model Struk {
+  id            String   @id @default(cuid())
+  anggotaId     String
+  anggota       Anggota  @relation(fields: [anggotaId], references: [id], onDelete: Cascade)
+  // Periode receipt format YYYY-MM.
+  periodeBulan  String
+  // Path object di storage (bukan URL).
+  filePath      String
+  // PENDING | APPROVED | REJECTED
+  status        String   @default("PENDING")
+  nominal       Int?
+  catatan       String?
+  // ANGGOTA_UPLOAD | ADMIN_MANUAL
+  sumber        String   @default("ANGGOTA_UPLOAD")
+  alasanReject  String?
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  transaksi     Transaksi?
+
+  @@unique([anggotaId, periodeBulan, status])
+  @@index([periodeBulan])
+  @@index([status])
+}
+
+/// Transaksi kas (pemasukan/pengeluaran historis).
+model Transaksi {
+  id            String   @id @default(cuid())
+  // MASUK | KELUAR
+  tipe          String
+  nominal       Int
+  keterangan    String?
+  // Periode format YYYY-MM.
+  periodeBulan  String
+  anggotaId     String?
+  anggota       Anggota? @relation(fields: [anggotaId], references: [id], onDelete: SetNull)
+  strukId       String?  @unique
+  struk         Struk?   @relation(fields: [strukId], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([periodeBulan])
+  @@index([tipe])
+  @@index([anggotaId])
+}
+
+/// Settings global organisasi.
+model Settings {
+  id            String   @id @default(cuid())
+  // Key tunggal agar hanya satu baris settings aktif.
+  key           String   @unique @default("global")
+  nominalIuran  Int      @default(10000)
+  // Periode berjalan format YYYY-MM.
+  periodeBerjalan String
+  // Tanggal deadline per bulan (1-31).
+  deadlineTanggal Int    @default(10)
+  // Nomor WhatsApp pengurus untuk link wa.me manual.
+  waPengurus    String?
+  // Path object barcode di storage.
+  barcodePath   String?
+  namaOrganisasi String  @default("HTN Legacy")
+  updatedAt     DateTime @updatedAt
+}
+
+/// Audit log aksi Admin.
+model AuditLog {
+  id            String   @id @default(cuid())
+  // Tipe aksi: APPROVE_STRUK | REJECT_STRUK | CREATE_TRANSAKSI |
+  // DELETE_TRANSAKSI | CREATE_STRUK_MANUAL | UPDATE_ANGGOTA |
+  // DELETE_ANGGOTA | UPDATE_SETTINGS | IMPORT_ANGGOTA | RESET_SIKLUS
+  aksi          String
+  actorId       String?
+  actorNama     String?
+  // Deskripsi siap baca.
+  deskripsi     String
+  // Referensi entitas terkait (JSON string).
+  refType       String?
+  refId         String?
+  detail        String?
+  createdAt     DateTime @default(now())
+
+  @@index([aksi])
+  @@index([refType, refId])
+  @@index([createdAt])
+}

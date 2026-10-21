@@ -1,0 +1,351 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* =========================================================================
+   HTN Legacy — Design System (Minimalist Editorial)
+   Three-layer token architecture: Primitive → Semantic → Component
+   Colors derived from HTN Legacy logo (maroon + gold).
+   ========================================================================= */
+
+@theme inline {
+  --color-background: var(--bg-base);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-jakarta);
+  --font-mono: var(--font-jakarta);
+
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
+
+  --color-primary: var(--accent-primary);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--surface-alt);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--surface-alt);
+  --color-muted-foreground: var(--ink-muted);
+  --color-accent: var(--surface-alt);
+  --color-accent-foreground: var(--ink);
+  --color-destructive: var(--status-tertunggak);
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: var(--border-default);
+  --color-input: var(--border-default);
+  --color-ring: var(--accent-primary);
+
+  --color-sidebar: var(--surface);
+  --color-sidebar-foreground: var(--ink-soft);
+  --color-sidebar-primary: var(--accent-primary);
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: var(--surface-alt);
+  --color-sidebar-accent-foreground: var(--ink);
+  --color-sidebar-border: var(--border-default);
+  --color-sidebar-ring: var(--accent-primary);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+/* ---------- Primitive (raw values, never used directly in components) ---------- */
+:root {
+  --maroon-900: #2c080d;
+  --maroon-700: #4a0e16;
+  --maroon-500: #6b1420;
+  --maroon-100: #f5e3e5;
+
+  --gold-700: #9c7a2f;
+  --gold-500: #c9a24b;
+  --gold-300: #e3c988;
+  --gold-100: #faf3e0;
+
+  --neutral-ink: #111111;
+  --neutral-ink-soft: #2f3437;
+  --neutral-muted: #787774;
+  --neutral-bone: #faf9f6;
+  --neutral-bone-alt: #f7f6f3;
+  --neutral-border: #eaeaea;
+  --neutral-white: #ffffff;
+
+  --green-500: #4ade80;
+  --green-100: #d9ffe6;
+  --red-500: #ff4d4d;
+  --red-100: #ffe0e0;
+  --amber-500: #fbbf24;
+  --amber-100: #fff4d1;
+
+  /* ---------- Semantic (light theme) ---------- */
+  --bg-base: var(--neutral-bone);
+  --surface: var(--neutral-white);
+  --surface-alt: var(--neutral-bone-alt);
+  --ink: var(--neutral-ink);
+  --ink-soft: var(--neutral-ink-soft);
+  --ink-muted: var(--neutral-muted);
+  --border-default: var(--neutral-border);
+
+  --accent-primary: var(--maroon-700);
+  --accent-primary-strong: var(--maroon-900);
+  --accent-primary-soft: var(--maroon-100);
+  --accent-secondary: var(--gold-500);
+  --accent-secondary-soft: var(--gold-100);
+
+  --status-lunas: var(--green-500);
+  --status-lunas-bg: var(--green-100);
+  --status-tertunggak: var(--red-500);
+  --status-tertunggak-bg: var(--red-100);
+  --status-pending: var(--amber-500);
+  --status-pending-bg: var(--amber-100);
+  --status-approved: var(--green-500);
+  --status-approved-bg: var(--green-100);
+  --status-rejected: var(--red-500);
+  --status-rejected-bg: var(--red-100);
+
+  --row-stripe-bg: color-mix(in srgb, var(--accent-primary) 5%, var(--surface));
+
+  /* ---------- Component tokens ---------- */
+  --button-primary-bg: var(--accent-primary);
+  --button-primary-hover: color-mix(in srgb, var(--accent-primary) 85%, black);
+  --button-danger-bg: var(--status-tertunggak);
+  --sidebar-item-active-bg: var(--accent-primary);
+  --summary-icon-bg: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+  --focus-ring: 0 0 0 3px var(--accent-primary-soft);
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --radius: 12px;
+}
+
+/* ---------- Semantic (dark theme) ---------- */
+.dark {
+  --bg-base: #171717;
+  --surface: #1f1f1f;
+  --surface-alt: #262626;
+  --ink: #f5f5f4;
+  --ink-soft: #e5e5e4;
+  --ink-muted: #a8a7a4;
+  --border-default: #333333;
+
+  --accent-primary: var(--gold-500);
+  --accent-primary-strong: var(--gold-300);
+  --accent-primary-soft: rgba(201, 162, 75, 0.14);
+  --accent-secondary: var(--maroon-500);
+  --accent-secondary-soft: rgba(107, 20, 32, 0.22);
+
+  --status-lunas: #4ade80;
+  --status-lunas-bg: #123b26;
+  --status-tertunggak: #ff6b6b;
+  --status-tertunggak-bg: #451a1a;
+  --status-pending: #fbbf24;
+  --status-pending-bg: #4a3506;
+  --status-approved: #4ade80;
+  --status-approved-bg: #123b26;
+  --status-rejected: #ff6b6b;
+  --status-rejected-bg: #451a1a;
+
+  --row-stripe-bg: color-mix(in srgb, var(--accent-primary) 8%, var(--surface));
+
+  --button-primary-bg: var(--accent-primary);
+  --button-primary-hover: color-mix(in srgb, var(--accent-primary) 85%, black);
+  --button-danger-bg: var(--status-tertunggak);
+  --sidebar-item-active-bg: var(--accent-primary);
+  --summary-icon-bg: color-mix(in srgb, var(--accent-primary) 16%, transparent);
+  --focus-ring: 0 0 0 3px var(--accent-primary-soft);
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+@layer base {
+  * {
+    border-color: var(--border-default);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background-color: var(--bg-base);
+    color: var(--ink);
+    font-family: var(--font-jakarta), Inter, system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* Tabular numerals for financial data */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ---------- Utility component classes ---------- */
+@layer components {
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .summary-card__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--summary-icon-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .summary-card__value {
+    font-size: 28px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    line-height: 1.15;
+  }
+  .summary-card__label {
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+
+  .card-editorial {
+    background: var(--surface);
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .status-badge__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  .rupiah-input {
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 12px 14px 12px 38px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ink);
+    width: 100%;
+  }
+  .rupiah-input:focus-visible {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: var(--focus-ring);
+  }
+  .rupiah-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .table-zebra tbody tr:nth-child(even) {
+    background: var(--row-stripe-bg);
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 150ms ease;
+    min-height: 44px;
+  }
+  .sidebar-item:hover {
+    background: var(--surface-alt);
+  }
+  .sidebar-item--active {
+    background: var(--sidebar-item-active-bg);
+    color: #ffffff;
+  }
+  .sidebar-item--active:hover {
+    background: var(--sidebar-item-active-bg);
+  }
+
+  .input-editorial {
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    padding: 10px 12px;
+    font-size: 14px;
+    width: 100%;
+  }
+  .input-editorial:focus-visible {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: var(--focus-ring);
+  }
+}
+
+/* ---------- Splash screen animation ---------- */
+@keyframes splash-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+@keyframes splash-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.splash-progress-bar {
+  animation: splash-progress 1s ease-out forwards;
+}
+.splash-fade-out {
+  animation: splash-fade-out 250ms ease-out forwards;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .splash-progress-bar {
+    width: 100% !important;
+    animation: none !important;
+  }
+}
+
+/* ---------- Scrollbar styling ---------- */
+.scroll-area-custom {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) transparent;
+}
+.scroll-area-custom::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-area-custom::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-area-custom::-webkit-scrollbar-thumb {
+  background-color: var(--border-default);
+  border-radius: 4px;
+}
+.scroll-area-custom::-webkit-scrollbar-thumb:hover {
+  background-color: var(--ink-muted);
+}
