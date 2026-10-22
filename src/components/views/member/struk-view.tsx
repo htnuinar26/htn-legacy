@@ -66,7 +66,7 @@ export function StrukView({
     try {
       const res = await fetch(`/api/anggota/${member.anggotaId}/struk`);
       const json = await res.json();
-      if (json.success) setList(json.data);
+      if (json.success) setList(Array.isArray(json.data) ? json.data : []);
       else setListError(json.error?.message ?? "Gagal memuat riwayat struk.");
     } catch {
       setListError("Gagal terhubung ke server.");
