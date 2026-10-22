@@ -51,7 +51,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     return apiSuccess(anggota);
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/anggota/[id]");
   }
 }
 
@@ -200,10 +200,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       const classified = classifyPrismaError(dbErr);
       return apiError(classified.category, classified.message, {
         cause: dbErr,
+        endpoint: "/api/anggota/[id]",
       });
     }
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/anggota/[id]");
   }
 }
 
@@ -253,6 +254,7 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
           "[STORAGE_ERROR] Gagal menghapus file receipt saat hapus anggota",
           JSON.stringify({
             requestId: `cleanup-anggota-${Date.now()}`,
+            endpoint: "/api/anggota/[id]",
             category: "STORAGE_ERROR",
             filePath: s.filePath,
             anggotaId: id,
@@ -278,6 +280,6 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
 
     return apiSuccess({ deleted: true, storageCleanupErrors: storageErrors });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/anggota/[id]");
   }
 }
