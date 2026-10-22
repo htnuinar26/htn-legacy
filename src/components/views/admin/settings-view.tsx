@@ -107,7 +107,7 @@ export function SettingsView() {
         description="Konfigurasi global organisasi: nominal iuran, periode, deadline, dan kontak."
       />
 
-      <form onSubmit={handleSave} className="space-y-6">
+      <form noValidate onSubmit={handleSave} className="space-y-6">
         <Card>
           <CardHeader title="Iuran & Periode" description="Nominal iuran bulanan dan periode berjalan" />
           <div className="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2">
