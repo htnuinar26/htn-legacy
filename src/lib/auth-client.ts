@@ -1,6 +1,6 @@
 "use client";
 
-// HTN Legacy — Client-side auth helpers
+// HTN Legacy - Client-side auth helpers
 // Versi client yang memanggil endpoint /api/auth/session.
 // (lib/auth.ts memakai next/headers → server-only.)
 
