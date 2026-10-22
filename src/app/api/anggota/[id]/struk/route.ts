@@ -4,7 +4,7 @@ import { apiSuccess, apiError, apiUnexpected } from "@/lib/api-response";
 import { getMemberSession, isAdmin } from "@/lib/auth";
 import { getSignedUrl } from "@/lib/storage";
 
-// GET /api/anggota/[id]/struk — riwayat receipt milik anggota.
+// GET /api/anggota/[id]/struk - riwayat receipt milik anggota.
 // Anggota hanya bisa melihat riwayatnya sendiri; Admin bisa melihat semua.
 export async function GET(
   _req: NextRequest,
