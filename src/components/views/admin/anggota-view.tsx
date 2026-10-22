@@ -225,23 +225,33 @@ export function AnggotaView() {
       </Card>
 
       {showForm && (
-        <AnggotaForm
-          editing={editing}
-          onClose={() => setShowForm(false)}
-          onSaved={() => {
-            setShowForm(false);
-            load();
-          }}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-200">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowForm(false)} aria-hidden="true" />
+          <div className="relative z-10 animate-in fade-in-0 zoom-in-95 duration-200">
+            <AnggotaForm
+              editing={editing}
+              onClose={() => setShowForm(false)}
+              onSaved={() => {
+                setShowForm(false);
+                load();
+              }}
+            />
+          </div>
+        </div>
       )}
 
       {deleteTarget && (
-        <DeleteDialog
-          anggota={deleteTarget}
-          deleting={deleting}
-          onCancel={() => setDeleteTarget(null)}
-          onConfirm={handleDelete}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-200">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setDeleteTarget(null)} aria-hidden="true" />
+          <div className="relative z-10 animate-in fade-in-0 zoom-in-95 duration-200">
+            <DeleteDialog
+              anggota={deleteTarget}
+              deleting={deleting}
+              onCancel={() => setDeleteTarget(null)}
+              onConfirm={handleDelete}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
@@ -311,13 +321,13 @@ function AnggotaForm({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-200">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
       <div
         role="dialog"
         aria-modal="true"
         aria-label={editing ? "Edit anggota" : "Tambah anggota"}
-        className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto scroll-area-custom rounded-xl bg-[var(--surface)] shadow-[var(--shadow-modal)]"
+        className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto scroll-area-custom rounded-xl bg-[var(--surface)] shadow-[var(--shadow-modal)] animate-in fade-in-0 zoom-in-95 duration-200"
       >
         <div className="flex items-center justify-between border-b border-[var(--border-default)] px-5 py-4">
           <h2 className="text-base font-bold text-[var(--ink)]">
