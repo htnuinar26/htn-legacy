@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     });
 
     return apiSuccess(
-      Promise.all(strukList.map(async (s) => ({
+      await Promise.all(strukList.map(async (s) => ({
         id: s.id,
         anggotaId: s.anggotaId,
         anggotaNama: s.anggota.nama,
