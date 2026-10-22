@@ -80,8 +80,12 @@ export function StrukGeneratorView() {
     fetch("/api/admin/struk-generator/anggota")
       .then((r) => r.json())
       .then((json) => {
-        if (json.success) {
-          setData(json.data);
+        if (json.success && json.data && typeof json.data === "object") {
+          const nextData = {
+            ...json.data,
+            anggota: Array.isArray(json.data.anggota) ? json.data.anggota : [],
+          };
+          setData(nextData);
           setNominal(json.data.nominalIuran);
         } else setLoadError(json.error?.message ?? "Gagal memuat data.");
       })
@@ -135,7 +139,12 @@ export function StrukGeneratorView() {
       // Refresh daftar anggota (yang baru dibuat struknya tidak lagi tersedia).
       const refresh = await fetch("/api/admin/struk-generator/anggota");
       const rjson = await refresh.json();
-      if (rjson.success) setData(rjson.data);
+      if (rjson.success && rjson.data && typeof rjson.data === "object") {
+        setData({
+          ...rjson.data,
+          anggota: Array.isArray(rjson.data.anggota) ? rjson.data.anggota : [],
+        });
+      }
       setSelectedAnggota("");
       setCatatan("");
     } catch {
