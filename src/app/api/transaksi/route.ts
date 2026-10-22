@@ -8,6 +8,7 @@ import {
   classifyPrismaError,
 } from "@/lib/api-response";
 import { isAdmin, requireMemberOrAdmin } from "@/lib/auth";
+import { getSettings } from "@/lib/settings";
 
 const CreateSchema = z.object({
   tipe: z.enum(["MASUK", "KELUAR"], {
@@ -16,7 +17,10 @@ const CreateSchema = z.object({
   nominal: z
     .number()
     .int("Nominal harus bilangan bulat")
-    .positive("Nominal harus lebih dari 0"),
+    .positive("Nominal harus lebih dari 0")
+    // Kolom `nominal` bertipe Int (32 bit) di PostgreSQL. Tanpa batas atas,
+    // nilai di atas 2.147.483.647 lolos validasi lalu gagal saat disimpan.
+    .max(2_000_000_000, "Nominal maksimal 2.000.000.000"),
   keterangan: z.string().optional(),
   periodeBulan: z
     .string()
@@ -93,6 +97,10 @@ export async function GET(req: NextRequest) {
       ringkasanPerPeriode: periodeList,
       saldo,
       saldoPeriode,
+      // Periode berjalan yang dikonfigurasi Admin di Settings. Client
+      // memakai ini supaya halaman kas terbuka pada periode resmi organisasi,
+      // bukan bulan kalender.
+      periodeBerjalan: (await getSettings()).periodeBerjalan,
     });
   } catch (err) {
     return apiUnexpected(err);
