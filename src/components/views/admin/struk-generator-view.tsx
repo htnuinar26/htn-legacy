@@ -180,15 +180,29 @@ export function StrukGeneratorView() {
               Status: APPROVED · Transaksi MASUK tercatat atomik.
             </p>
           </div>
-          <a
-            href={result.fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[var(--status-lunas)]/40 px-3 py-2 text-xs font-medium text-[var(--status-lunas)] hover:bg-white/20"
-          >
-            <Download className="h-3.5 w-3.5" />
-            Lihat
-          </a>
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <a
+              href={result.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-lg border border-[var(--status-lunas)]/40 px-3 py-2 text-xs font-medium text-[var(--status-lunas)] hover:bg-white/20"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Lihat PNG
+            </a>
+            <a
+              href={result.fileUrl}
+              download={`struk-${result.strukId}.png`}
+              className="text-xs font-medium text-[var(--status-lunas)] hover:underline"
+            >
+              Unduh PNG
+            </a>
+          </div>
+          <img
+            src={result.fileUrl}
+            alt={`Preview struk ${result.anggotaNama}`}
+            className="mt-3 max-h-64 w-full rounded-md border border-[var(--status-lunas)]/30 object-contain"
+          />
         </div>
       )}
 
