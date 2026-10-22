@@ -164,3 +164,21 @@ Ringkasan review perubahan console log autentikasi:
 - `CHANGELOG.md`, `TODO.md`, dan `worklog.md` mencatat cakupan serta hasil validasi. Konflik signup 409 tetap dipertahankan sesuai kontrak API.
 - Typecheck, lint, build, scan tidak adanya lazy loading, dan `git diff --check` telah lulus. Tidak ada migration database atau perubahan environment variable.
 ```
+
+---
+
+## PR baru - UI/UX Autentikasi Dark Mode
+
+**PR:** menunggu nomor PR
+**Repo:** htnuinar26/htn-legacy
+**Status:** [ ] belum dicopas
+
+```text
+Ringkasan review perubahan UI/UX autentikasi:
+
+- `src/components/views/login-view.tsx` tetap menjadi sumber shared untuk Masuk, Daftar, dan Admin. Hero light tetap maroon, sedangkan dark memakai token netral `--auth-hero-bg`.
+- `src/app/globals.css` menambah token component `auth-hero-*` dan `input-placeholder` tanpa primitive hex baru. Kontras hero, deskripsi, motto, copyright, placeholder, dan teks sekunder diperkuat melalui token semantic.
+- `src/components/theme-toggle.tsx` tetap menjaga pola mounted check, menambahkan `suppressHydrationWarning`, target sentuh 44px, dan focus-visible ring; komponen ini juga dipakai oleh shell Admin dan Anggota sehingga perubahan berlaku konsisten.
+- Tab auth dan tombol submit memiliki focus-visible ring, radius tombol submit 6px, label input tetap terasosiasi, dan tidak ada perubahan logic submit atau validasi.
+- Typecheck, lint, build, scan shared component/token/hex/lazy-loading, dan `git diff --check` telah lulus. Risiko residual visual hanya memerlukan pengecekan manual pada device nyata di breakpoint 360px, 640px, 768px, dan 1024px.
+```
