@@ -182,9 +182,9 @@ export function BerandaView({
                         }}
                       >
                         {t.tipe === "MASUK" ? (
-                          <TrendingDown className="h-4 w-4" />
-                        ) : (
                           <TrendingUp className="h-4 w-4" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4" />
                         )}
                       </div>
                       <div className="min-w-0">

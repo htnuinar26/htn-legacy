@@ -18,6 +18,42 @@ type Row = {
   statusBayar?: "LUNAS" | "BELUM_LUNAS" | "TERTUNGGAK";
 };
 
+/**
+ * Parser CSV yang menangani tanda kutip.
+ *
+ * `split(",")` saja merusak data yang wajar. Baris seperti
+ * `"Budi, Santoso",pass123,...` akan terpecah menjadi beberapa kolom,
+ * sehingga nama dan password ikut terpotong dan anggota tersimpan dengan
+ * data yang salah, tanpa error apa pun.
+ */
+function parseCsvLine(line: string): string[] {
+  const cells: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      // Tanda kutip ganda di dalam sel berarti karakter kutip literal.
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+    if (char === "," && !inQuotes) {
+      cells.push(current.trim());
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+  cells.push(current.trim());
+  return cells;
+}
+
 export function ImportView() {
   const [text, setText] = useState("");
   const [importing, setImporting] = useState(false);
@@ -28,6 +64,7 @@ export function ImportView() {
   const [result, setResult] = useState<{
     created: number;
     skipped: number;
+    failures: string[];
   } | null>(null);
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -43,14 +80,15 @@ export function ImportView() {
     setError(null);
     setResult(null);
 
-    // Parse CSV sederhana: nama,nim,email,telepon,password,statusBayar
+    // Parse CSV dengan dukungan tanda kutip.
+    // Urutan kolom: nama,password,nim,email,telepon,statusBayar
     const lines = text.trim().split("\n");
     const rows: Row[] = [];
     const errors: string[] = [];
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line || line.startsWith("#")) continue;
-      const cols = line.split(",").map((c) => c.trim());
+      const cols = parseCsvLine(line);
       if (cols.length < 2) {
         errors.push(`Baris ${i + 1}: format tidak valid (minimal nama,password)`);
         continue;
@@ -80,6 +118,7 @@ export function ImportView() {
 
     let created = 0;
     let skipped = 0;
+    const failures: string[] = [];
     for (const row of rows) {
       try {
         const res = await fetch("/api/anggota", {
@@ -88,14 +127,23 @@ export function ImportView() {
           body: JSON.stringify(row),
         });
         const json = await res.json();
-        if (json.success) created++;
-        else skipped++;
+        if (json.success) {
+          created++;
+        } else {
+          skipped++;
+          // Simpan alasan kegagalan per baris. Tanpa ini, Admin hanya
+          // melihat jumlah "N dilewati" tanpa tahu baris mana dan kenapa.
+          failures.push(
+            `${row.nama}: ${json.error?.message ?? "Gagal disimpan."}`
+          );
+        }
       } catch {
         skipped++;
+        failures.push(`${row.nama}: tidak dapat menghubungi server.`);
       }
     }
 
-    setResult({ created, skipped });
+    setResult({ created, skipped, failures });
     setText("");
     setImporting(false);
   }
@@ -145,13 +193,23 @@ export function ImportView() {
           {result && (
             <div className="flex items-start gap-3 rounded-lg border border-[var(--status-lunas)]/30 bg-[var(--status-lunas-bg)] px-4 py-3">
               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[var(--status-lunas)]" />
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm font-semibold text-[var(--status-lunas)]">
                   Import selesai
                 </p>
                 <p className="text-sm text-[var(--status-lunas)]/90">
                   {result.created} anggota dibuat, {result.skipped} dilewati (duplikat/error).
                 </p>
+                {result.failures.length > 0 && (
+                  <ul className="mt-2 list-disc space-y-0.5 pl-5 text-xs text-[var(--status-lunas)]/80">
+                    {result.failures.slice(0, 10).map((f, i) => (
+                      <li key={i}>{f}</li>
+                    ))}
+                    {result.failures.length > 10 && (
+                      <li>dan {result.failures.length - 10} baris lain.</li>
+                    )}
+                  </ul>
+                )}
               </div>
             </div>
           )}
@@ -181,7 +239,8 @@ Ahmad Yani,pass789,,ahmad@mail.com,,TERTUNGGAK`}
             <li>• Baris diawali <code className="rounded bg-[var(--surface-alt)] px-1">#</code> diabaikan (komentar).</li>
             <li>• <strong className="text-[var(--ink)]">nama</strong> dan <strong className="text-[var(--ink)]">password</strong> wajib; kolom lain opsional.</li>
             <li>• <strong className="text-[var(--ink)]">statusBayar</strong>: LUNAS, BELUM_LUNAS, atau TERTUNGGAK.</li>
-            <li>• Baris dengan nama/nim/email duplikat akan dilewati.</li>
+            <li>• Nama atau nilai yang mengandung koma ditulis di dalam tanda kutip, misalnya <code className="rounded bg-[var(--surface-alt)] px-1">"Budi, Santoso"</code>.</li>
+            <li>• Baris dengan nama/nim/email duplikat akan dilewati, dan alasannya ditampilkan setelah import.</li>
           </ul>
         </div>
       </Card>

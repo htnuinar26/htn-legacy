@@ -17,7 +17,7 @@ const VerifySchema = z.object({
   // tidak mengisi nominal secara manual. Null diperlakukan sama seperti
   // tidak dikirim, sehingga fallback ke nominal receipt atau nominal iuran
   // tetap terpakai.
-  nominal: z.number().int().positive().nullable().optional(),
+  nominal: z.number().int().positive().max(2_000_000_000, "Nominal maksimal 2.000.000.000").nullable().optional(),
 });
 
 // POST /api/struk/[id]/verify

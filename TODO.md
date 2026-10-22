@@ -70,42 +70,48 @@ Sumber: audit 2026-10-21, temuan CRITICAL #2, #3, #4, HIGH #5, #6, dan MEDIUM
 Sumber: audit 2026-10-21, temuan HIGH #7, #8, MEDIUM #13 sampai #32, dan LOW
 terkait em-dash, target sentuh, dan fokus drawer.
 
-- [ ] `src/components/ui/rupiah-input.tsx`: perbaiki pengalian nominal saat digit
-      disisipkan di tengah nilai terformat, dan batasi nilai maksimum.
-- [ ] `src/components/views/admin/kas-view.tsx`: dropdown periode tidak pernah kosong,
+- [x] `src/components/ui/rupiah-input.tsx`: pulihkan posisi caret supaya nominal bisa
+      diedit di tengah nilai terformat, dan batasi nilai maksimum sesuai kolom database.
+- [x] `src/components/views/admin/kas-view.tsx`: dropdown periode tidak pernah kosong,
       tampilkan error per-field `periodeBulan`, cegah double submit, perbesar target sentuh.
-- [ ] `src/components/views/member/kas-view.tsx`: dropdown periode tidak pernah kosong,
+- [x] `src/components/views/member/kas-view.tsx`: dropdown periode tidak pernah kosong,
       reset state error setiap reload.
-- [ ] `src/components/views/admin/struk-review-view.tsx`: kirim `nominal` yang valid.
-- [ ] `src/components/views/admin/struk-generator-view.tsx`: pakai URL file dari server,
+- [x] `src/components/views/admin/struk-review-view.tsx`: kirim `nominal` hanya bila diisi.
+- [x] `src/components/views/admin/struk-generator-view.tsx`: pakai URL file dari server,
       validasi client memakai Zod, buang em-dash.
-- [ ] `src/components/views/admin/settings-view.tsx`: pakai `barcodeUrl`, pertahankan
+- [x] `src/components/views/admin/settings-view.tsx`: pakai `barcodeUrl`, pertahankan
       `barcodePath` setelah simpan, tambahkan state pending upload, buang em-dash.
-- [ ] `src/components/views/admin/anggota-view.tsx`: asosiasi label, cegah double
+- [x] `src/components/views/admin/anggota-view.tsx`: asosiasi label, cegah double
       submit, perbaiki teks konfirmasi hapus.
-- [ ] `src/components/views/admin/import-view.tsx`: parser CSV handle tanda kutip,
+- [x] `src/components/views/admin/import-view.tsx`: parser CSV handle tanda kutip,
       tampilkan pesan error per baris, perbaiki komentar urutan kolom.
-- [ ] `src/components/views/admin/laporan-view.tsx`: export CSV sertakan receipt
+- [x] `src/components/views/admin/laporan-view.tsx`: export CSV sertakan receipt
       approved, escape tanda kutip, unduhan andal.
-- [ ] `src/components/views/admin/audit-log-view.tsx`: tambah paginasi dan aksi
+- [x] `src/components/views/admin/audit-log-view.tsx`: tambah paginasi dan aksi
       hapus transaksi sesuai `ARCHITECTURE.md`.
-- [ ] `src/components/views/admin/dashboard-view.tsx`: buang em-dash.
-- [ ] `src/components/views/member/barcode-view.tsx`: pakai `barcodeUrl`, normalisasi
+- [x] `src/components/views/admin/dashboard-view.tsx`: buang em-dash.
+- [x] `src/components/views/member/barcode-view.tsx`: pakai `barcodeUrl`, normalisasi
       nomor WhatsApp ke format internasional.
-- [ ] `src/components/views/member/profil-view.tsx`: asosiasi label, tampilkan error
+- [x] `src/components/views/member/profil-view.tsx`: asosiasi label, tampilkan error
       per-field password, pertahankan `createdAt`, gunakan label status.
-- [ ] `src/components/views/member/beranda-view.tsx`: Tukar ikon tren pemasukan/pengeluaran.
-- [ ] `src/components/views/member/struk-view.tsx`: tampilkan error per-field periode.
-- [ ] `src/components/views/member/daftar-view.tsx`: bedakan state kosong dan hasil pencarian kosong.
-- [ ] `src/components/views/login-view.tsx`: asosiasi label, reset error saat ganti mode,
+- [x] `src/components/views/member/beranda-view.tsx`: Tukar ikon tren pemasukan/pengeluaran.
+- [x] `src/components/views/member/struk-view.tsx`: tampilkan error per-field periode.
+- [x] `src/components/views/member/daftar-view.tsx`: bedakan state kosong dan hasil pencarian kosong.
+- [x] `src/components/views/login-view.tsx`: asosiasi label, reset error saat ganti mode,
       kembalikan state loading pada jalur sukses.
-- [ ] `src/components/shells/admin-shell.tsx` dan `src/components/shells/member-shell.tsx`:
+- [x] `src/components/shells/admin-shell.tsx` dan `src/components/shells/member-shell.tsx`:
       target sentuh 44px, focus trap dan Escape pada drawer, cek hasil logout.
-- [ ] `src/components/theme-toggle.tsx`: target sentuh 44px.
-- [ ] `src/lib/format.ts`: samakan perhitungan periode dengan `Asia/Bangkok`, perbaiki
+- [x] `src/components/theme-toggle.tsx`: target sentuh 44px.
+- [x] `src/lib/format.ts`: samakan perhitungan periode dengan `Asia/Bangkok`, perbaiki
       `buildWaLink` agar nomor lokal dinormalisasi.
-- [ ] `src/lib/storage.ts`: perbaiki ekstensi `image/svg+xml` menjadi `svg`.
-- [ ] `src/lib/api-response.ts`: tambahkan kategori `RATE_LIMIT_ERROR` yang konsisten.
+- [x] `src/hooks/use-modal-focus.ts`: trap fokus, tombol Escape, dan kunci scroll
+      untuk drawer dan dialog.
+- [x] `src/components/blocks/ui.tsx`: pertahankan baris baru pada pesan error multi-baris.
+- [x] Batas maksimum nominal ditambahkan di server pada `POST /api/transaksi`,
+      `PATCH /api/settings`, `POST /api/admin/struk-generator`, dan `POST /api/struk/[id]/verify`.
+- [x] Kategori `RATE_LIMIT_ERROR` tidak dipakai. `ARCHITECTURE.md` menetapkan tujuh
+      kategori yang eksklusif, sehingga rate limit memakai `VALIDATION_ERROR` dengan
+      status HTTP 429 yang eksplisit.
 
 ### PR #4 - `docs/sync-and-debt` - Sinkronisasi dokumentasi dan utang teknis
 

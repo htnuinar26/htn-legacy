@@ -48,6 +48,7 @@ export function AnggotaView() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Anggota | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Anggota | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
      
@@ -82,7 +83,8 @@ export function AnggotaView() {
   }, [q, list]);
 
   async function handleDelete() {
-    if (!deleteTarget) return;
+    if (!deleteTarget || deleting) return;
+    setDeleting(true);
     try {
       const res = await fetch(`/api/anggota/${deleteTarget.id}`, {
         method: "DELETE",
@@ -96,6 +98,8 @@ export function AnggotaView() {
       load();
     } catch {
       alert("Gagal terhubung ke server.");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -111,7 +115,7 @@ export function AnggotaView() {
               setEditing(null);
               setShowForm(true);
             }}
-            className="flex h-10 items-center gap-2 rounded-lg bg-[var(--button-primary-bg)] px-4 text-sm font-semibold text-white hover:bg-[var(--button-primary-hover)]"
+            className="flex h-11 items-center gap-2 rounded-lg bg-[var(--button-primary-bg)] px-4 text-sm font-semibold text-white hover:bg-[var(--button-primary-hover)]"
           >
             <Plus className="h-4 w-4" />
             Tambah Anggota
@@ -130,7 +134,7 @@ export function AnggotaView() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Cari nama, NIM, email..."
-                className="input-editorial h-9 w-56 pl-9 text-sm"
+                className="input-editorial h-11 w-56 pl-9 text-sm"
                 aria-label="Cari anggota"
               />
             </div>
@@ -197,7 +201,7 @@ export function AnggotaView() {
                               setEditing(a);
                               setShowForm(true);
                             }}
-                            className="flex h-9 w-9 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--surface-alt)] hover:text-[var(--ink)]"
+                            className="flex h-11 w-11 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--surface-alt)] hover:text-[var(--ink)]"
                           >
                             <Pencil className="h-4 w-4" />
                           </button>
@@ -205,7 +209,7 @@ export function AnggotaView() {
                             type="button"
                             aria-label={`Hapus ${a.nama}`}
                             onClick={() => setDeleteTarget(a)}
-                            className="flex h-9 w-9 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--status-tertunggak-bg)] hover:text-[var(--status-tertunggak)]"
+                            className="flex h-11 w-11 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--status-tertunggak-bg)] hover:text-[var(--status-tertunggak)]"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -234,6 +238,7 @@ export function AnggotaView() {
       {deleteTarget && (
         <DeleteDialog
           anggota={deleteTarget}
+          deleting={deleting}
           onCancel={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
         />
@@ -322,15 +327,16 @@ function AnggotaForm({
             type="button"
             aria-label="Tutup"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--surface-alt)]"
+            className="flex h-11 w-11 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--surface-alt)]"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4 p-5">
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-[var(--ink)]">Nama Lengkap *</label>
+            <label htmlFor="anggota-nama" className="block text-sm font-medium text-[var(--ink)]">Nama Lengkap *</label>
             <input
+              id="anggota-nama"
               type="text"
               value={nama}
               onChange={(e) => setNama(e.target.value)}
@@ -345,8 +351,9 @@ function AnggotaForm({
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-[var(--ink)]">NIM</label>
+              <label htmlFor="anggota-nim" className="block text-sm font-medium text-[var(--ink)]">NIM</label>
               <input
+                id="anggota-nim"
                 type="text"
                 value={nim}
                 onChange={(e) => setNim(e.target.value)}
@@ -359,8 +366,9 @@ function AnggotaForm({
               )}
             </div>
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-[var(--ink)]">Email</label>
+              <label htmlFor="anggota-email" className="block text-sm font-medium text-[var(--ink)]">Email</label>
               <input
+                id="anggota-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -375,8 +383,9 @@ function AnggotaForm({
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-[var(--ink)]">WhatsApp</label>
+              <label htmlFor="anggota-telepon" className="block text-sm font-medium text-[var(--ink)]">WhatsApp</label>
               <input
+                id="anggota-telepon"
                 type="tel"
                 value={telepon}
                 onChange={(e) => setTelepon(e.target.value)}
@@ -385,10 +394,11 @@ function AnggotaForm({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-[var(--ink)]">
+              <label htmlFor="anggota-status" className="block text-sm font-medium text-[var(--ink)]">
                 Status Bayar
               </label>
               <select
+                id="anggota-status"
                 value={statusBayar}
                 onChange={(e) => setStatusBayar(e.target.value)}
                 className="input-editorial h-11"
@@ -400,10 +410,11 @@ function AnggotaForm({
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-[var(--ink)]">
+            <label htmlFor="anggota-password" className="block text-sm font-medium text-[var(--ink)]">
               Password {editing ? "(kosongkan jika tidak diubah)" : "*"}
             </label>
             <input
+              id="anggota-password"
               type="text"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -419,8 +430,9 @@ function AnggotaForm({
             )}
           </div>
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-[var(--ink)]">Catatan</label>
+            <label htmlFor="anggota-catatan" className="block text-sm font-medium text-[var(--ink)]">Catatan</label>
             <textarea
+              id="anggota-catatan"
               value={catatan}
               onChange={(e) => setCatatan(e.target.value)}
               rows={2}
@@ -455,10 +467,12 @@ function AnggotaForm({
 
 function DeleteDialog({
   anggota,
+  deleting,
   onCancel,
   onConfirm,
 }: {
   anggota: Anggota;
+  deleting: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
@@ -474,21 +488,26 @@ function DeleteDialog({
         <h2 className="text-base font-bold text-[var(--ink)]">Hapus Anggota?</h2>
         <p className="mt-2 text-sm text-[var(--ink-muted)]">
           Anda akan menghapus <strong className="text-[var(--ink)]">{anggota.nama}</strong>.
-          Semua struk dan transaksi terkait juga akan dihapus. Aksi ini tidak dapat dibatalkan.
+          Receipt milik anggota ini dan file gambarnya ikut terhapus. Transaksi kas
+          tetap tersimpan sebagai histori tanpa rujukan anggota. Aksi ini tidak
+          dapat dibatalkan.
         </p>
         <div className="mt-5 flex justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="h-10 rounded-lg border border-[var(--border-default)] px-4 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-alt)]"
+            disabled={deleting}
+            className="h-11 rounded-lg border border-[var(--border-default)] px-4 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-alt)] disabled:opacity-50"
           >
             Batal
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="h-10 rounded-lg bg-[var(--button-danger-bg)] px-4 text-sm font-semibold text-white hover:brightness-95"
+            disabled={deleting}
+            className="flex h-11 items-center gap-2 rounded-lg bg-[var(--button-danger-bg)] px-4 text-sm font-semibold text-white hover:brightness-95 disabled:opacity-50"
           >
+            {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Hapus
           </button>
         </div>

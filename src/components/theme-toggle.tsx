@@ -19,7 +19,7 @@ export function ThemeToggle() {
     // Placeholder untuk hindari hydration mismatch.
     return (
       <div className="flex items-center gap-1 rounded-lg border border-[var(--border-default)] p-1">
-        <div className="h-7 w-7" />
+        <div className="h-11 w-11" />
       </div>
     );
   }
@@ -46,7 +46,8 @@ export function ThemeToggle() {
           title={label}
           onClick={() => setTheme(value)}
           className={cn(
-            "flex h-7 w-7 items-center justify-center rounded-md transition-colors",
+            // Target sentuh minimal 44x44 px sesuai DESIGN.md bagian Button.
+            "flex h-11 w-11 items-center justify-center rounded-md transition-colors",
             theme === value
               ? "bg-[var(--accent-primary)] text-white"
               : "text-[var(--ink-muted)] hover:bg-[var(--surface-alt)]"

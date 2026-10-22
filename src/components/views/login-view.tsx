@@ -46,7 +46,7 @@ export function LoginView() {
       });
       const json = await res.json();
       if (!json.success) {
-        setError(json.error?.message ?? "Gagal masuk.");
+        setError(json.error?.message ?? "Gagal masuk. Periksa kembali data Anda.");
         if (json.error?.fields) setFieldErrors(json.error.fields);
         setLoading(false);
         return;
@@ -54,14 +54,25 @@ export function LoginView() {
       window.dispatchEvent(new Event("htn-session-changed"));
       router.refresh();
     } catch {
-      setError("Gagal terhubung ke server. Periksa koneksi Anda.");
+      setError(
+        "Tidak dapat menghubungi server. Periksa koneksi Anda lalu coba lagi."
+      );
       setLoading(false);
     }
   }
 
+  // Ganti mode membersihkan error dari mode sebelumnya, supaya pesan gagal
+  // login tidak tetap menempel di form pendaftaran.
+  function switchMode(next: "login" | "signup" | "admin") {
+    setMode(next);
+    setError(null);
+    setFieldErrors({});
+    setLoading(false);
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-[var(--bg-base)] lg:flex-row">
-      {/* Panel kiri — branding (desktop) */}
+      {/* Panel kiri - branding (desktop) */}
       <div className="relative hidden flex-col justify-between bg-[var(--accent-primary-strong)] p-12 text-white lg:flex lg:w-1/2">
         <div className="flex items-center gap-3">
           <Image src="/logo.svg" alt="HTN Legacy" width={48} height={48} />
@@ -84,7 +95,7 @@ export function LoginView() {
         </p>
       </div>
 
-      {/* Panel kanan — form */}
+      {/* Panel kanan - form */}
       <div className="relative flex flex-1 items-center justify-center p-6 sm:p-12">
         {/* Theme toggle di pojok kanan atas panel form */}
         <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
@@ -108,19 +119,19 @@ export function LoginView() {
           <div className="mb-6 flex gap-1 rounded-lg border border-[var(--border-default)] bg-[var(--surface)] p-1">
             <ModeButton
               active={mode === "login"}
-              onClick={() => setMode("login")}
+              onClick={() => switchMode("login")}
               icon={LogIn}
               label="Masuk"
             />
             <ModeButton
               active={mode === "signup"}
-              onClick={() => setMode("signup")}
+              onClick={() => switchMode("signup")}
               icon={UserPlus}
               label="Daftar"
             />
             <ModeButton
               active={mode === "admin"}
-              onClick={() => setMode("admin")}
+              onClick={() => switchMode("admin")}
               icon={ShieldCheck}
               label="Admin"
             />
@@ -140,6 +151,7 @@ export function LoginView() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode !== "admin" && (
               <Field
+                id="login-nama"
                 label="Nama Lengkap"
                 value={nama}
                 onChange={setNama}
@@ -152,6 +164,7 @@ export function LoginView() {
             {mode === "signup" && (
               <>
                 <Field
+                  id="login-nim"
                   label="NIM (opsional)"
                   value={nim}
                   onChange={setNim}
@@ -159,6 +172,7 @@ export function LoginView() {
                   placeholder="Nomor induk mahasiswa"
                 />
                 <Field
+                  id="login-email"
                   label="Email (opsional)"
                   type="email"
                   value={email}
@@ -168,6 +182,7 @@ export function LoginView() {
                   autoComplete="email"
                 />
                 <Field
+                  id="login-telepon"
                   label="Nomor WhatsApp (opsional)"
                   value={telepon}
                   onChange={setTelepon}
@@ -178,6 +193,7 @@ export function LoginView() {
             )}
 
             <Field
+              id="login-password"
               label={mode === "admin" ? "Password Admin" : "Password"}
               type="password"
               value={password}
@@ -238,6 +254,7 @@ function ModeButton({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
         active
           ? "bg-[var(--accent-primary)] text-white"
@@ -258,6 +275,7 @@ function Field({
   placeholder,
   type = "text",
   autoComplete,
+  id,
 }: {
   label: string;
   value: string;
@@ -266,13 +284,16 @@ function Field({
   placeholder?: string;
   type?: string;
   autoComplete?: string;
+  id: string;
 }) {
+  const errorId = `${id}-error`;
   return (
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-[var(--ink)]">
+      <label htmlFor={id} className="block text-sm font-medium text-[var(--ink)]">
         {label}
       </label>
       <input
+        id={id}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -280,9 +301,10 @@ function Field({
         autoComplete={autoComplete}
         className="input-editorial h-11"
         aria-invalid={!!error}
+        aria-describedby={error ? errorId : undefined}
       />
       {error && (
-        <p role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">
+        <p id={errorId} role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">
           {error}
         </p>
       )}

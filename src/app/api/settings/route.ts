@@ -38,6 +38,7 @@ const UpdateSettingsSchema = z.object({
     .number({ message: "Nominal iuran wajib diisi" })
     .int("Nominal iuran harus bilangan bulat")
     .positive("Nominal iuran harus lebih dari 0")
+    .max(2_000_000_000, "Nominal iuran maksimal 2.000.000.000")
     .optional(),
   periodeBerjalan: z
     .string()

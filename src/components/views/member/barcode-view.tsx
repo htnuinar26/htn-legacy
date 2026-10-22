@@ -10,6 +10,7 @@ import {
   LoadingState,
   ErrorBanner,
 } from "@/components/blocks/ui";
+import { buildWaLink } from "@/lib/format";
 
 type Settings = {
   nominalIuran: number;
@@ -17,6 +18,7 @@ type Settings = {
   deadlineTanggal: number;
   waPengurus: string | null;
   barcodePath: string | null;
+  barcodeUrl: string | null;
   namaOrganisasi: string;
 };
 
@@ -57,7 +59,7 @@ export function BarcodeView() {
             <>
               <div className="rounded-xl border border-[var(--border-default)] bg-white p-4">
                 <Image
-                  src={settings.barcodePath}
+                  src={settings.barcodeUrl ?? settings.barcodePath}
                   alt="Barcode pembayaran iuran"
                   width={240}
                   height={240}
@@ -65,7 +67,7 @@ export function BarcodeView() {
                 />
               </div>
               <a
-                href={settings.barcodePath}
+                href={settings.barcodeUrl ?? settings.barcodePath}
                 download
                 className="flex items-center gap-2 rounded-lg border border-[var(--border-default)] px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-alt)]"
               >
@@ -95,9 +97,10 @@ export function BarcodeView() {
           <CardHeader title="Hubungi Pengurus" description="Untuk pertanyaan seputar pembayaran" />
           <div className="p-5">
             <a
-              href={`https://wa.me/${settings.waPengurus.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+              href={buildWaLink(
+                settings.waPengurus,
                 "Halo, saya ingin bertanya tentang pembayaran iuran."
-              )}`}
+              )}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-4 py-2.5 text-sm font-semibold text-white hover:brightness-95"

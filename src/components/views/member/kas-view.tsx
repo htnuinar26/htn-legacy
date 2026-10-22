@@ -38,17 +38,27 @@ type KasData = {
   }>;
   saldo: number;
   saldoPeriode: number | null;
+  periodeBerjalan: string;
 };
 
 export function KasView() {
-  const [bulan, setBulan] = useState(currentPeriod());
+  // Periode yang dipilih anggota. Null berarti anggota belum memilih, jadi
+  // yang dipakai adalah periode berjalan dari server. Nilai ini diturunkan,
+  // bukan disimpan lewat effect, supaya tidak ada setState di dalam effect.
+  const [bulanDipilih, setBulanDipilih] = useState<string | null>(null);
   const [data, setData] = useState<KasData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{ message: string; requestId?: string } | null>(null);
 
+  const bulan = bulanDipilih ?? data?.periodeBerjalan ?? currentPeriod();
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
+    // Reset error setiap reload. Kalau tidak, banner error dari percobaan
+    // sebelumnya tetap tampil walaupun reload berikutnya berhasil, karena
+    // pengecekan `error` dilakukan sebelum pengecekan `data`.
+    setError(null);
     fetch(`/api/transaksi?bulan=${bulan}`)
       .then((r) => r.json())
       .then((json) => {
@@ -59,6 +69,18 @@ export function KasView() {
       .finally(() => setLoading(false));
   }, [bulan]);
 
+  // `ringkasanPerPeriode` hanya berisi periode yang punya transaksi, jadi
+  // periode berjalan dan periode yang dipilih harus ditambahkan sendiri.
+  // Tanpa itu dropdown bisa tampil kosong dan periode berjalan tidak
+  // bisa dipilih.
+  const periodeOptions = Array.from(
+    new Set([
+      ...(data?.ringkasanPerPeriode ?? []).map((r) => r.periode),
+      bulan,
+      data?.periodeBerjalan ?? currentPeriod(),
+    ])
+  ).sort((a, b) => b.localeCompare(a));
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -67,13 +89,13 @@ export function KasView() {
         action={
           <select
             value={bulan}
-            onChange={(e) => setBulan(e.target.value)}
-            className="input-editorial h-10 w-auto"
+            onChange={(e) => setBulanDipilih(e.target.value)}
+            className="input-editorial h-11 w-auto"
             aria-label="Pilih periode"
           >
-            {(data?.ringkasanPerPeriode ?? []).map((r) => (
-              <option key={r.periode} value={r.periode}>
-                {formatPeriodLong(r.periode)}
+            {periodeOptions.map((p) => (
+              <option key={p} value={p}>
+                {formatPeriodLong(p)}
               </option>
             ))}
           </select>

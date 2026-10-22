@@ -48,15 +48,22 @@ type KasData = {
   }>;
   saldo: number;
   saldoPeriode: number | null;
+  periodeBerjalan: string;
 };
 
 export function AdminKasView() {
-  const [bulan, setBulan] = useState(currentPeriod());
+  // Periode yang dipilih Admin. Null berarti Admin belum memilih, jadi
+  // yang dipakai adalah periode berjalan dari server. Nilai ini diturunkan,
+  // bukan disimpan lewat effect, supaya tidak ada setState di dalam effect.
+  const [bulanDipilih, setBulanDipilih] = useState<string | null>(null);
   const [data, setData] = useState<KasData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{ message: string; requestId?: string } | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Transaksi | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const bulan = bulanDipilih ?? data?.periodeBerjalan ?? currentPeriod();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -78,7 +85,8 @@ export function AdminKasView() {
   }, [load]);
 
   async function handleDelete() {
-    if (!deleteTarget) return;
+    if (!deleteTarget || deleting) return;
+    setDeleting(true);
     try {
       const res = await fetch(`/api/transaksi/${deleteTarget.id}`, {
         method: "DELETE",
@@ -97,11 +105,25 @@ export function AdminKasView() {
       load();
     } catch {
       alert("Gagal terhubung ke server.");
+    } finally {
+      setDeleting(false);
     }
   }
 
   const masuk = data?.ringkasanPerPeriode.find((r) => r.periode === bulan)?.masuk ?? 0;
   const keluar = data?.ringkasanPerPeriode.find((r) => r.periode === bulan)?.keluar ?? 0;
+
+  // Daftar periode pilihan. `ringkasanPerPeriode` hanya berisi periode
+  // yang punya transaksi, jadi periode berjalan dan periode yang sedang
+  // dipilih harus ditambahkan sendiri. Tanpa itu dropdown bisa kosong dan
+  // periode berjalan tidak bisa dipilih.
+  const periodeOptions = Array.from(
+    new Set([
+      ...(data?.ringkasanPerPeriode ?? []).map((r) => r.periode),
+      bulan,
+      data?.periodeBerjalan ?? currentPeriod(),
+    ])
+  ).sort((a, b) => b.localeCompare(a));
 
   return (
     <div className="space-y-6">
@@ -112,7 +134,7 @@ export function AdminKasView() {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="flex h-10 items-center gap-2 rounded-lg bg-[var(--button-primary-bg)] px-4 text-sm font-semibold text-white hover:bg-[var(--button-primary-hover)]"
+            className="flex h-11 items-center gap-2 rounded-lg bg-[var(--button-primary-bg)] px-4 text-sm font-semibold text-white hover:bg-[var(--button-primary-hover)]"
           >
             <Plus className="h-4 w-4" />
             Catat Transaksi
@@ -132,13 +154,13 @@ export function AdminKasView() {
           action={
             <select
               value={bulan}
-              onChange={(e) => setBulan(e.target.value)}
-              className="input-editorial h-9 w-auto text-sm"
+              onChange={(e) => setBulanDipilih(e.target.value)}
+              className="input-editorial h-11 w-auto text-sm"
               aria-label="Pilih periode"
             >
-              {(data?.ringkasanPerPeriode ?? [{ periode: bulan, masuk: 0, keluar: 0, saldo: 0 }]).map((r) => (
-                <option key={r.periode} value={r.periode}>
-                  {formatPeriodLong(r.periode)}
+              {periodeOptions.map((p) => (
+                <option key={p} value={p}>
+                  {formatPeriodLong(p)}
                 </option>
               ))}
             </select>
@@ -203,7 +225,7 @@ export function AdminKasView() {
                           type="button"
                           aria-label="Hapus transaksi"
                           onClick={() => setDeleteTarget(t)}
-                          className="flex h-9 w-9 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--status-tertunggak-bg)] hover:text-[var(--status-tertunggak)]"
+                          className="flex h-11 w-11 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--status-tertunggak-bg)] hover:text-[var(--status-tertunggak)]"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -231,6 +253,7 @@ export function AdminKasView() {
       {deleteTarget && (
         <DeleteTransaksiDialog
           transaksi={deleteTarget}
+          deleting={deleting}
           onCancel={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
         />
@@ -314,7 +337,7 @@ function TransaksiForm({
             type="button"
             aria-label="Tutup"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--surface-alt)]"
+            className="flex h-11 w-11 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--surface-alt)]"
           >
             <X className="h-5 w-5" />
           </button>
@@ -381,8 +404,19 @@ function TransaksiForm({
               onChange={(e) => setPeriodeBulan(e.target.value)}
               placeholder="YYYY-MM"
               pattern="\d{4}-\d{2}"
+              aria-invalid={!!error?.fields?.periodeBulan}
+              aria-describedby={error?.fields?.periodeBulan ? "kas-periode-error" : undefined}
               className="input-editorial h-11"
             />
+            {error?.fields?.periodeBulan ? (
+              <p
+                id="kas-periode-error"
+                role="alert"
+                className="text-xs font-medium text-[var(--status-tertunggak)]"
+              >
+                {error.fields.periodeBulan}
+              </p>
+            ) : null}
           </div>
 
           {error && <ErrorBanner message={error.message} requestId={error.requestId} />}
@@ -412,10 +446,12 @@ function TransaksiForm({
 
 function DeleteTransaksiDialog({
   transaksi,
+  deleting,
   onCancel,
   onConfirm,
 }: {
   transaksi: Transaksi;
+  deleting: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
@@ -444,15 +480,18 @@ function DeleteTransaksiDialog({
           <button
             type="button"
             onClick={onCancel}
-            className="h-10 rounded-lg border border-[var(--border-default)] px-4 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-alt)]"
+            disabled={deleting}
+            className="h-11 rounded-lg border border-[var(--border-default)] px-4 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-alt)] disabled:opacity-50"
           >
             Batal
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="h-10 rounded-lg bg-[var(--button-danger-bg)] px-4 text-sm font-semibold text-white hover:brightness-95"
+            disabled={deleting}
+            className="flex h-11 items-center gap-2 rounded-lg bg-[var(--button-danger-bg)] px-4 text-sm font-semibold text-white hover:brightness-95 disabled:opacity-50"
           >
+            {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Hapus
           </button>
         </div>

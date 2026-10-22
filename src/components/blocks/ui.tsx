@@ -115,7 +115,7 @@ export function ErrorBanner({
       role="alert"
       className="rounded-lg border border-[var(--status-tertunggak)]/30 bg-[var(--status-tertunggak-bg)] px-4 py-3"
     >
-      <p className="text-sm font-medium text-[var(--status-tertunggak)]">
+      <p className="whitespace-pre-line text-sm font-medium text-[var(--status-tertunggak)]">
         {message}
       </p>
       {requestId && (

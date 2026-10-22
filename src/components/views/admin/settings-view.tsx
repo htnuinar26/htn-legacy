@@ -18,6 +18,7 @@ type Settings = {
   deadlineTanggal: number;
   waPengurus: string | null;
   barcodePath: string | null;
+  barcodeUrl: string | null;
   namaOrganisasi: string;
 };
 
@@ -32,6 +33,7 @@ export function SettingsView() {
   const [waPengurus, setWaPengurus] = useState("");
   const [namaOrganisasi, setNamaOrganisasi] = useState("HTN Legacy");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<{
     message: string;
     fields?: Record<string, string>;
@@ -83,7 +85,10 @@ export function SettingsView() {
         });
         return;
       }
-      setSettings(json.data);
+      // Gabungkan dengan state lama supaya `barcodePath` dan `barcodeUrl`
+      // tidak hilang dari tampilan. Response PATCH hanya memuat sebagian
+      // field settings, jadi `setSettings(json.data)` menimpa seluruh state.
+      setSettings({ ...settings, ...json.data });
       setSuccess(true);
     } catch {
       setError({ message: "Gagal terhubung ke server." });
@@ -204,12 +209,13 @@ export function SettingsView() {
               </label>
               {settings.barcodePath ? (
                 <div className="flex items-center gap-4">
-                  { }
-                  <img
-                    src={settings.barcodePath}
-                    alt="Barcode"
-                    className="h-24 w-24 rounded-lg border border-[var(--border-default)] bg-white p-1"
-                  />
+                  {settings.barcodeUrl ? (
+                    <img
+                      src={settings.barcodeUrl}
+                      alt="Barcode"
+                      className="h-24 w-24 rounded-lg border border-[var(--border-default)] bg-white p-1"
+                    />
+                  ) : null}
                   <p className="text-sm text-[var(--ink-muted)]">
                     Barcode saat ini sudah diunggah. Ganti dengan upload file baru.
                   </p>
@@ -220,26 +226,45 @@ export function SettingsView() {
                 </p>
               )}
               <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--surface-alt)] px-4 py-2.5 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface)]">
-                <Upload className="h-4 w-4" />
-                Upload Barcode
+                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {uploading ? "Mengunggah..." : "Upload Barcode"}
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
+                  disabled={uploading}
                   className="hidden"
                   onChange={async (e) => {
-                    const f = e.target.files?.[0];
+                    const input = e.target;
+                    const f = input.files?.[0];
                     if (!f) return;
-                    const formData = new FormData();
-                    formData.append("file", f);
-                    const res = await fetch("/api/settings/barcode", {
-                      method: "POST",
-                      body: formData,
-                    });
-                    const json = await res.json();
-                    if (json.success) {
-                      setSettings({ ...settings, barcodePath: json.data.barcodePath });
-                    } else {
-                      alert(json.error?.message ?? "Gagal upload barcode.");
+                    setUploading(true);
+                    setError(null);
+                    try {
+                      const formData = new FormData();
+                      formData.append("file", f);
+                      const res = await fetch("/api/settings/barcode", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      const json = await res.json();
+                      if (json.success) {
+                        setSettings({ ...settings, ...json.data });
+                        setSuccess(true);
+                      } else {
+                        setError({
+                          message:
+                            json.error?.message ?? "Gagal mengunggah barcode.",
+                          fields: json.error?.fields,
+                          requestId: json.error?.requestId,
+                        });
+                      }
+                    } catch {
+                      setError({ message: "Gagal terhubung ke server." });
+                    } finally {
+                      // Reset input supaya memilih file yang sama lagi
+                      // tetap memicu event onChange.
+                      input.value = "";
+                      setUploading(false);
                     }
                   }}
                 />

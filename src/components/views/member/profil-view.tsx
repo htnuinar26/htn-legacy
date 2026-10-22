@@ -9,7 +9,7 @@ import {
   LoadingState,
   ErrorBanner,
 } from "@/components/blocks/ui";
-import { formatPeriodLong, formatDateTime } from "@/lib/format";
+import { formatPeriodLong, formatDateTime, getBayarStatus } from "@/lib/format";
 
 type Profil = {
   id: string;
@@ -38,6 +38,7 @@ export function ProfilView({
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [saving, setSaving] = useState(false);
+  const [deadlineTanggal, setDeadlineTanggal] = useState(10);
   const [saveError, setSaveError] = useState<{
     message: string;
     fields?: Record<string, string>;
@@ -58,6 +59,20 @@ export function ProfilView({
       .catch(() => setError("Gagal terhubung ke server."))
       .finally(() => setLoading(false));
   }, [member.anggotaId]);
+
+  // Ambil deadline dari settings supaya label status di halaman Profil
+  // memakai aturan yang sama dengan Beranda.
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success) setDeadlineTanggal(json.data.deadlineTanggal);
+      })
+      .catch(() => {
+        // Deadline hanya memengaruhi label status. Bila gagal dimuat,
+        // gunakan nilai default tanpa mengganggu halaman.
+      });
+  }, []);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -99,6 +114,12 @@ export function ProfilView({
   if (loading) return <LoadingState />;
   if (error || !profil) return <ErrorBanner message={error ?? "Gagal memuat profil."} />;
 
+  // Tampilkan label status yang sama dengan Beranda, bukan kode enum mentah.
+  // `statusBayar` hanya menyimpan status periode berjalan, jadi anggota yang
+  // lewat deadline sebenarnya "Tertunggak" tetap melihat "BELUM_LUNAS" di
+  // halaman ini kalau label diambil apa adanya.
+  const statusLabel = getBayarStatus(profil.statusBayar, deadlineTanggal).label;
+
   return (
     <div className="space-y-6">
       <PageHeader title="Profil Saya" description="Kelola data pribadi dan password Anda." />
@@ -117,7 +138,7 @@ export function ProfilView({
               </p>
             </div>
             <div className="w-full space-y-2 border-t border-[var(--border-default)] pt-4 text-left text-sm">
-              <InfoRow label="Status Bayar" value={profil.statusBayar} />
+              <InfoRow label="Status Bayar" value={statusLabel} />
               <InfoRow label="Periode" value={formatPeriodLong(profil.periodeBerjalan)} />
               <InfoRow label="Bergabung" value={formatDateTime(profil.createdAt)} />
             </div>
@@ -130,8 +151,9 @@ export function ProfilView({
           <form onSubmit={handleSave} className="space-y-4 p-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-[var(--ink)]">NIM</label>
+                <label htmlFor="profil-nim" className="block text-sm font-medium text-[var(--ink)]">NIM</label>
                 <input
+                  id="profil-nim"
                   type="text"
                   value={nim}
                   onChange={(e) => setNim(e.target.value)}
@@ -144,8 +166,9 @@ export function ProfilView({
                 )}
               </div>
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-[var(--ink)]">Email</label>
+                <label htmlFor="profil-email" className="block text-sm font-medium text-[var(--ink)]">Email</label>
                 <input
+                  id="profil-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -160,10 +183,11 @@ export function ProfilView({
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-[var(--ink)]">
+              <label htmlFor="profil-telepon" className="block text-sm font-medium text-[var(--ink)]">
                 Nomor WhatsApp
               </label>
               <input
+                id="profil-telepon"
                 type="tel"
                 value={telepon}
                 onChange={(e) => setTelepon(e.target.value)}
@@ -178,10 +202,11 @@ export function ProfilView({
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-[var(--ink)]">
+                  <label htmlFor="profil-password-saat-ini" className="block text-sm font-medium text-[var(--ink)]">
                     Password Saat Ini
                   </label>
                   <input
+                    id="profil-password-saat-ini"
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
@@ -196,10 +221,11 @@ export function ProfilView({
                   )}
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-[var(--ink)]">
+                  <label htmlFor="profil-password-baru" className="block text-sm font-medium text-[var(--ink)]">
                     Password Baru
                   </label>
                   <input
+                    id="profil-password-baru"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -207,6 +233,11 @@ export function ProfilView({
                     className="input-editorial h-11"
                     autoComplete="new-password"
                   />
+                  {saveError?.fields?.password && (
+                    <p role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">
+                      {saveError.fields.password}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

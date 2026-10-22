@@ -191,6 +191,8 @@ export function StrukView({
               id="struk-period"
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
+              aria-invalid={!!uploadError?.fields?.periodeBulan}
+              aria-describedby={uploadError?.fields?.periodeBulan ? "struk-period-error" : undefined}
               className="input-editorial h-11"
             >
               {periods.map((p) => (
@@ -199,6 +201,15 @@ export function StrukView({
                 </option>
               ))}
             </select>
+            {uploadError?.fields?.periodeBulan && (
+              <p
+                id="struk-period-error"
+                role="alert"
+                className="text-xs font-medium text-[var(--status-tertunggak)]"
+              >
+                {uploadError.fields.periodeBulan}
+              </p>
+            )}
             <p className="text-xs text-[var(--ink-muted)]">
               Hanya 4 periode terbaru yang tersedia. Satu anggota hanya boleh
               memiliki satu receipt aktif per periode.
