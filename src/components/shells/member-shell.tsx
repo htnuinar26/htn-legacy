@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useModalFocus } from "@/hooks/use-modal-focus";
 import { useNav, type MemberView } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
 import { BerandaView } from "@/components/views/member/beranda-view";
@@ -52,10 +53,27 @@ export function MemberShell({
 }) {
   const { memberView, setMemberView } = useNav();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const drawerRef = useModalFocus<HTMLElement>(drawerOpen, () =>
+    setDrawerOpen(false)
+  );
 
   async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    window.dispatchEvent(new Event("htn-session-changed"));
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      const res = await fetch("/api/auth/logout", { method: "POST" });
+      if (!res.ok) {
+        // Sesi belum benar-benar berakhir, jadi jangan tampilkan shell
+        // sebagai sudah keluar.
+        return;
+      }
+      window.dispatchEvent(new Event("htn-session-changed"));
+    } catch {
+      // Jaringan gagal, sesi di server masih aktif.
+    } finally {
+      setLoggingOut(false);
+    }
   }
 
   function navigate(view: MemberView) {
@@ -72,7 +90,7 @@ export function MemberShell({
             type="button"
             aria-label="Buka navigasi"
             onClick={() => setDrawerOpen(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-[var(--ink-soft)] hover:bg-[var(--surface-alt)] lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-[var(--ink-soft)] hover:bg-[var(--surface-alt)] lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -91,7 +109,9 @@ export function MemberShell({
           <button
             type="button"
             onClick={logout}
-            className="flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-medium text-[var(--ink-muted)] hover:bg-[var(--surface-alt)]"
+            disabled={loggingOut}
+            aria-label="Keluar dari akun"
+            className="flex h-11 items-center gap-2 rounded-lg px-3 text-sm font-medium text-[var(--ink-muted)] hover:bg-[var(--surface-alt)] disabled:opacity-50"
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Keluar</span>
@@ -101,7 +121,7 @@ export function MemberShell({
 
       <div className="flex flex-1">
         {/* Sidebar desktop */}
-        <aside className="hidden w-64 shrink-0 border-r border-[var(--border-default)] bg-[var(--surface)] lg:block">
+        <aside className="hidden w-64 shrink-0 flex-col border-r border-[var(--border-default)] bg-[var(--surface)] lg:flex">
           <nav className="flex flex-col gap-1 p-4">
             {NAV_ITEMS.map((item) => (
               <button
@@ -139,6 +159,7 @@ export function MemberShell({
               aria-hidden="true"
             />
             <aside
+              ref={drawerRef}
               role="dialog"
               aria-modal="true"
               aria-label="Navigasi"
@@ -155,7 +176,7 @@ export function MemberShell({
                   type="button"
                   aria-label="Tutup navigasi"
                   onClick={() => setDrawerOpen(false)}
-                  className="flex h-10 w-10 items-center justify-center rounded-lg text-[var(--ink-soft)] hover:bg-[var(--surface-alt)]"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg text-[var(--ink-soft)] hover:bg-[var(--surface-alt)]"
                 >
                   <X className="h-5 w-5" />
                 </button>
