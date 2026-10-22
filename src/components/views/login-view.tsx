@@ -76,36 +76,36 @@ export function LoginView() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--bg-base)] lg:flex-row">
+    <div className="relative flex min-h-screen flex-col bg-[var(--bg-base)] lg:flex-row">
+      <header className="absolute inset-x-0 top-0 z-20 flex h-16 items-center justify-end border-b border-[var(--border-default)] bg-[var(--surface)] px-4 sm:px-6">
+        <ThemeToggle />
+      </header>
+
       {/* Panel kiri - branding (desktop) */}
-      <div className="relative hidden flex-col justify-between bg-[var(--accent-primary-strong)] p-12 text-white lg:flex lg:w-1/2">
+      <div className="relative hidden flex-col justify-between border-r border-[var(--auth-hero-border)] bg-[var(--auth-hero-bg)] p-12 pt-28 text-[var(--auth-hero-fg)] lg:flex lg:w-1/2">
         <div className="flex items-center gap-3">
           <Image src="/icon.svg" alt="HTN Legacy" width={48} height={48} />
           <div>
             <p className="text-lg font-extrabold leading-tight">HTN Legacy</p>
-            <p className="text-xs text-white/70">Constitutio et Iustitia</p>
+            <p className="text-xs text-[var(--auth-hero-muted)]">Constitutio et Iustitia</p>
           </div>
         </div>
         <div className="max-w-md">
           <h1 className="text-3xl font-extrabold leading-tight">
             Sistem Iuran &amp; Kas Organisasi
           </h1>
-          <p className="mt-3 text-sm text-white/80">
+          <p className="mt-3 text-sm leading-relaxed text-[var(--auth-hero-muted)]">
             Pencatatan iuran, verifikasi receipt manual, manajemen kas, dan
             audit log untuk pengurus dan anggota.
           </p>
         </div>
-        <p className="text-xs text-white/50">
+        <p className="text-xs text-[var(--auth-hero-muted)]">
           © {new Date().getFullYear()} HTN Legacy. Untuk penggunaan internal.
         </p>
       </div>
 
       {/* Panel kanan - form */}
-      <div className="relative flex flex-1 items-center justify-center p-6 sm:p-12">
-        {/* Theme toggle di pojok kanan atas panel form */}
-        <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
-          <ThemeToggle />
-        </div>
+      <div className="relative flex flex-1 items-center justify-center p-6 pt-24 sm:p-12 sm:pt-28">
         <div className="w-full max-w-md">
           {/* Logo mobile */}
           <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
@@ -114,7 +114,7 @@ export function LoginView() {
               <p className="text-base font-extrabold leading-tight text-[var(--ink)]">
                 HTN Legacy
               </p>
-              <p className="text-[10px] text-[var(--ink-muted)]">
+              <p className="text-[10px] text-[var(--ink-soft)]">
                 Constitutio et Iustitia
               </p>
             </div>
@@ -147,7 +147,7 @@ export function LoginView() {
             {mode === "signup" && "Daftar Anggota Baru"}
             {mode === "admin" && "Masuk Panel Admin"}
           </h2>
-          <p className="mb-6 text-sm text-[var(--ink-muted)]">
+          <p className="mb-6 text-sm text-[var(--ink-soft)]">
             {mode === "login" && "Gunakan nama dan password per aksi Anda."}
             {mode === "signup" && "Lengkapi data untuk membuat akun anggota."}
             {mode === "admin" && "Masukkan password Admin/Bendahara bersama."}
@@ -220,7 +220,7 @@ export function LoginView() {
             <button
               type="submit"
               disabled={loading}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[var(--button-primary-bg)] font-semibold text-white transition-all hover:bg-[var(--button-primary-hover)] active:scale-[0.98] disabled:opacity-50"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[var(--button-primary-bg)] font-semibold text-white transition-all hover:bg-[var(--button-primary-hover)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -260,10 +260,10 @@ function ModeButton({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+        className={`flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
         active
           ? "bg-[var(--accent-primary)] text-white"
-          : "text-[var(--ink-muted)] hover:bg-[var(--surface-alt)]"
+          : "text-[var(--ink-soft)] hover:bg-[var(--surface-alt)]"
       }`}
     >
       <Icon className="h-4 w-4" />
