@@ -70,7 +70,15 @@ export function LaporanView() {
     fetch(`/api/laporan?bulan=${bulan}`)
       .then((r) => r.json())
       .then((json) => {
-        if (json.success) setData(json.data);
+        if (json.success && json.data && typeof json.data === "object") {
+          setData({
+            ...json.data,
+            transaksi: Array.isArray(json.data.transaksi) ? json.data.transaksi : [],
+            strukApproved: Array.isArray(json.data.strukApproved)
+              ? json.data.strukApproved
+              : [],
+          });
+        }
         else setError(json.error);
       })
       .catch(() => setError({ message: "Gagal terhubung ke server." }))
