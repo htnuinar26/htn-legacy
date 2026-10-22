@@ -14,7 +14,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "HTN Legacy — Sistem Iuran & Kas Organisasi",
+  title: "HTN Legacy - Sistem Iuran & Kas Organisasi",
   description:
     "Sistem internal pencatatan iuran, receipt pembayaran, kas organisasi, laporan, dan audit log.",
   icons: {
