@@ -1,4 +1,4 @@
-// HTN Legacy — Crypto helpers
+// HTN Legacy - Crypto helpers
 // Enkripsi password anggota dengan AES-256-GCM sesuai ARCHITECTURE.md.
 // Kunci dari ENCRYPTION_KEY (64 hex chars = 32 bytes).
 
