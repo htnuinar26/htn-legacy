@@ -169,7 +169,7 @@ export function StrukView({
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Masukkan password"
                 autoComplete="current-password"
                 className="input-editorial h-11"
                 required
