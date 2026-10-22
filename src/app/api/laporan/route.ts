@@ -93,15 +93,15 @@ export async function GET(req: NextRequest) {
         strukId: t.strukId,
         createdAt: t.createdAt,
       })),
-      strukApproved: strukApproved.map((s) => ({
+      strukApproved: await Promise.all(strukApproved.map(async (s) => ({
         id: s.id,
         anggotaNama: s.anggota.nama,
         nominal: s.nominal,
-        url: getSignedUrl(s.filePath),
+        url: await getSignedUrl(s.filePath),
         createdAt: s.createdAt,
-      })),
+      }))),
     });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/laporan");
   }
 }
