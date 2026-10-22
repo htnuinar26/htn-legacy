@@ -60,6 +60,6 @@ export async function GET(_req: NextRequest) {
       })),
     });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/admin/struk-generator/anggota");
   }
 }
