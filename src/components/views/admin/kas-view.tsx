@@ -240,23 +240,33 @@ export function AdminKasView() {
       </Card>
 
       {showForm && (
-        <TransaksiForm
-          bulan={bulan}
-          onClose={() => setShowForm(false)}
-          onSaved={() => {
-            setShowForm(false);
-            load();
-          }}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-200">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowForm(false)} aria-hidden="true" />
+          <div className="relative z-10 animate-in fade-in-0 zoom-in-95 duration-200">
+            <TransaksiForm
+              bulan={bulan}
+              onClose={() => setShowForm(false)}
+              onSaved={() => {
+                setShowForm(false);
+                load();
+              }}
+            />
+          </div>
+        </div>
       )}
 
       {deleteTarget && (
-        <DeleteTransaksiDialog
-          transaksi={deleteTarget}
-          deleting={deleting}
-          onCancel={() => setDeleteTarget(null)}
-          onConfirm={handleDelete}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-200">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setDeleteTarget(null)} aria-hidden="true" />
+          <div className="relative z-10 animate-in fade-in-0 zoom-in-95 duration-200">
+            <DeleteTransaksiDialog
+              transaksi={deleteTarget}
+              deleting={deleting}
+              onCancel={() => setDeleteTarget(null)}
+              onConfirm={handleDelete}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
@@ -323,7 +333,7 @@ function TransaksiForm({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="relative z-10 w-full max-w-md rounded-xl bg-[var(--surface)] shadow-[var(--shadow-modal)] animate-in fade-in-0 zoom-in-95 duration-200">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
       <div
         role="dialog"
@@ -456,7 +466,7 @@ function DeleteTransaksiDialog({
   onConfirm: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="relative z-10 w-full max-w-md rounded-xl bg-[var(--surface)] p-6 shadow-[var(--shadow-modal)] animate-in fade-in-0 zoom-in-95 duration-200">
       <div className="absolute inset-0 bg-black/40" onClick={onCancel} aria-hidden="true" />
       <div
         role="dialog"
