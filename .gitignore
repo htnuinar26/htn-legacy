@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# Storage receipt dan barcode (berisi data anggota, tidak boleh masuk repo)
+public/storage/
 
 # vercel
 .vercel
