@@ -21,8 +21,19 @@ import {
   EmptyState,
 } from "@/components/blocks/ui";
 import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
   formatRupiahFull,
   formatPeriodLong,
+  formatPeriodLabel,
 } from "@/lib/format";
 
 type AdminDashboard = {
@@ -41,6 +52,11 @@ type AdminDashboard = {
     saldoPeriode: number;
     saldoTotal: number;
   };
+  trenKeuangan: Array<{
+    periodeBulan: string;
+    masuk: number;
+    keluar: number;
+  }>;
 };
 
 export function DashboardView() {
@@ -52,7 +68,14 @@ export function DashboardView() {
     fetch("/api/dashboard")
       .then((r) => r.json())
       .then((json) => {
-        if (json.success) setData(json.data);
+        if (json.success && json.data && typeof json.data === "object") {
+          setData({
+            ...json.data,
+            trenKeuangan: Array.isArray(json.data.trenKeuangan)
+              ? json.data.trenKeuangan
+              : [],
+          });
+        }
         else setError(json.error);
       })
       .catch(() => setError({ message: "Gagal memuat dashboard." }))
@@ -88,6 +111,41 @@ export function DashboardView() {
         <SummaryCard icon={TrendingDown} iconColor="red" value={formatRupiahFull(s.keluarPeriode)} label="Keluar (Periode)" />
         <SummaryCard icon={ReceiptText} iconColor="amber" value={String(s.pendingStruk)} label="Struk Pending" />
       </div>
+
+      <Card>
+        <CardHeader title="Tren Keuangan" description="Pemasukan dan pengeluaran enam periode terakhir" />
+        <div className="h-72 min-w-0 p-4 sm:p-5">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data.trenKeuangan} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+              <CartesianGrid stroke="var(--border-default)" strokeDasharray="3 3" />
+              <XAxis
+                dataKey="periodeBulan"
+                tickFormatter={formatPeriodLabel}
+                stroke="var(--ink-muted)"
+                tick={{ fill: "var(--ink-muted)", fontSize: 12 }}
+              />
+              <YAxis
+                tickFormatter={(value) => `Rp ${Number(value).toLocaleString("id-ID")}`}
+                stroke="var(--ink-muted)"
+                tick={{ fill: "var(--ink-muted)", fontSize: 11 }}
+                width={80}
+              />
+              <Tooltip
+                formatter={(value, name) => [formatRupiahFull(Number(value)), name === "masuk" ? "Pemasukan" : "Pengeluaran"]}
+                labelFormatter={(label) => formatPeriodLong(String(label))}
+                contentStyle={{
+                  background: "var(--surface)",
+                  borderColor: "var(--border-default)",
+                  color: "var(--ink)",
+                }}
+              />
+              <Legend formatter={(value) => value === "masuk" ? "Pemasukan" : "Pengeluaran"} />
+              <Bar dataKey="masuk" fill="var(--status-lunas)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="keluar" fill="var(--status-tertunggak)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
