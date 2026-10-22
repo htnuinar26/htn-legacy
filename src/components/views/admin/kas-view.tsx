@@ -71,7 +71,15 @@ export function AdminKasView() {
     try {
       const res = await fetch(`/api/transaksi?bulan=${bulan}`);
       const json = await res.json();
-      if (json.success) setData(json.data);
+      if (json.success && json.data && typeof json.data === "object") {
+        setData({
+          ...json.data,
+          transaksi: Array.isArray(json.data.transaksi) ? json.data.transaksi : [],
+          ringkasanPerPeriode: Array.isArray(json.data.ringkasanPerPeriode)
+            ? json.data.ringkasanPerPeriode
+            : [],
+        });
+      }
       else setError(json.error);
     } catch {
       setError({ message: "Gagal terhubung ke server." });
