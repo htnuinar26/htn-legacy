@@ -20,7 +20,8 @@ const GeneratorSchema = z.object({
   nominal: z
     .number({ message: "Nominal wajib diisi" })
     .int("Nominal harus bilangan bulat positif")
-    .positive("Nominal harus lebih dari 0"),
+    .positive("Nominal harus lebih dari 0")
+    .max(2_000_000_000, "Nominal maksimal 2.000.000.000"),
   catatan: z.string().max(500, "Catatan maksimal 500 karakter").optional(),
 });
 
