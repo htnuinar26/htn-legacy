@@ -41,3 +41,31 @@ Stage Summary:
 - Bug ENCRYPTION_KEY diperbaiki - signup anggota sekarang berfungsi.
 - Theme toggle tersedia di semua halaman (login, admin shell, member shell).
 - CSS variables tiga lisas memastikan konsistensi warna di kedua mode.
+
+---
+Task ID: AUDIT-1
+Agent: main
+Task: Audit menyeluruh terhadap seluruh codebase, lalu perbaikan 32 temuan dalam 4 Pull Request.
+
+Work Log:
+- MEMBACA SELURUH DOKUMEN: PRD.md, SPEC.md, ARCHITECTURE.md, DESIGN.md di docs/, plus docs/review/CODE_REVIEW.md, TODO.md, CHANGELOG.md, worklog.md, dan AGENTS.md. Membaca seluruh src/ (21 Route Handler, 16 view, 10 lib, komponen UI), prisma/schema.prisma, dan skrip build/test.
+- MENEMUKAN BUG KRITIS: prisma/schema.prisma memakai provider "sqlite" sementara .env menunjuk Neon PostgreSQL. Prisma menolak setiap koneksi ("the URL must start with the protocol 'file:'"), sehingga seluruh endpoint DB mengembalikan 500. Aplikasi praktis tidak bisa dipakai.
+- INSPEKSI NEON (read-only): 5 tabel sudah ada dengan schema LAMA (namaLengkap, noHpWa, gender, statusStruk, imageUrl), 2 anggota, 1 struk, 67 audit log, tanpa history migrasi Prisma.
+- MENGAMBIL BACKUP: dump JSON per tabel ke folder temp di luar repository.
+- MIGRASI: membuat migration baseline (ditandai applied tanpa dijalankan) plus 3 migration transformasi yang memetakan kolom lama ke kolom baru dengan ALTER TABLE ... RENAME COLUMN. Data legacy tetap utuh: 2 anggota, 1 struk, 67 audit log, 1 settings. prisma migrate diff melaporkan "empty migration", tidak ada drift.
+- MEMVERIFIKASI EMUPI: 401 AUTH_ERROR pada /api/transaksi, /api/anggota, /api/settings tanpa cookie. 200 dengan cookie.
+- MENGEMBALIKAN 500 KE 409: reject kedua pada periode sama kini CONFLICT dengan pesan spesifik, bukan INTERNAL_ERROR generik. Akar masalah: P2002 pada unique constraint [anggotaId, periodeBulan, status].
+- MENERIMA nominal:null pada approve dan memakai fallback, plus z.config(z.locales.id()) supaya semua pesan validasi berbahasa Indonesia.
+- MEMULIHKAN GATE VALIDASI: menghapus ignoreBuildErrors, mengecualikan examples dari tsconfig, menghapus scaffold examples/websocket, mengganti cp -r Unix dengan scripts/copy-standalone.mjs.
+- MEMPERBAIKI UI: caret RupiahInput, batas maksimum nominal, dropdown periode, barcodeUrl, fileUrl struk manual, label a11y, target sentuh 44px, trap fokus drawer, parser CSV, export laporan, paginasi audit log, dan lain-lain.
+- MEMVERIFIKASI DI BROWSER: label input punya nama aksesibel, shell Admin render dengan data Neon, Escape menutup drawer, upload barcode menghasilkan GET barcodeUrl 200 image/png.
+- MENYUSUN ULANG DOKUMENTASI: PRD.md, SPEC.md, ARCHITECTURE.md, DESIGN.md dipindahkan ke root repository sesuai AGENTS.md, duplikat di upload/ dihapus, dan rujukan di TODO.md serta CODE_REVIEW.md diperbarui.
+- MENORMALISASI EM-DASH: menghapus U+2014 dari seluruh file yang disentuh sesuai aturan AGENTS.md.
+
+Stage Summary:
+- 32 temuan diperbaiki dalam 4 Pull Request, satu commit per file.
+- Neon sudah berjalan di schema baru dengan data legacy utuh dan tanpa drift.
+- Semua gate validasi (tsc, lint, build) hijau.
+- RISIKO TERTINGGAL: password anggota versi lama memakai format iv:tag:ciphertext heksadesimal dengan IV 16 byte, sedangkan src/lib/crypto.ts memakai base64 iv(12 byte) || tag || ciphertext. Dua anggota yang ada belum bisa login dengan password lamanya dan perlu reset password oleh Admin.
+- RISIKO TERTINGGAL: JWT_SECRET, ENCRYPTION_KEY, dan ADMIN_PASSWORD versi lama masih ada di history git commit dfa0935 dan 88d6f99, wajib dirotasi sebelum deploy produksi.
+- CATATAN: file .zscripts/build.sh, scripts/dark-mode-verify.sh, scripts/regression-test.sh, scripts/ui-verify.sh, dan start-dev.sh masih mengandung em-dash karena memiliki perubahan lokal yang belum di-commit dan di luar cakupan 32 temuan.
