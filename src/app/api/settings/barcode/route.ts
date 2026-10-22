@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       return apiError(
         "STORAGE_ERROR",
         "Gagal mengunggah barcode ke storage. Detail dicatat di server log.",
-        { cause: storageErr }
+        { cause: storageErr, endpoint: "/api/settings/barcode" }
       );
     }
 
@@ -97,9 +97,9 @@ export async function POST(req: NextRequest) {
     return apiSuccess({
       barcodePath: uploaded.path,
       // URL siap pakai untuk ditampilkan dan diunduh oleh UI.
-      barcodeUrl: getSignedUrl(uploaded.path),
+      barcodeUrl: await getSignedUrl(uploaded.path),
     });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/settings/barcode");
   }
 }
