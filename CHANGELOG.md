@@ -8,6 +8,14 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 <!-- ENTRI-BARU-SISIPKAN-DI-SINI -->
 
+### Fixed - UI/UX Autentikasi Dark Mode dan Aksesibilitas (2026-10-22)
+
+- Memperbaiki panel hero autentikasi pada dark mode agar memakai latar netral gelap, dengan emas hanya sebagai aksen border dan kontrol aktif.
+- Memindahkan toggle tema ke top bar autentikasi yang konsisten dengan shell utama, tetap menyediakan tiga pilihan tema dan target sentuh minimal 44px.
+- Menambahkan focus-visible ring pada tab autentikasi, tombol submit, dan kontrol tema.
+- Memperkuat kontras placeholder serta teks sekunder melalui token semantic/component, tanpa menambah hex baru.
+- Menyamakan radius tombol submit autentikasi dengan aturan desain 6px dan mempertahankan layout mobile-first pada breakpoint sempit.
+
 ### Fixed - Console Log Autentikasi dan Preview Receipt (2026-10-22)
 
 - Menghapus `loading="lazy"` dari thumbnail receipt Admin agar browser tidak menunda gambar setelah preview dimuat.
