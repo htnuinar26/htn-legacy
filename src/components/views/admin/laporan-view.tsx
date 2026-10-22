@@ -79,24 +79,43 @@ export function LaporanView() {
 
   function exportCSV() {
     if (!data) return;
-    const rows = [
-      ["Tanggal", "Tipe", "Nominal", "Keterangan", "Anggota"],
+    // Export mencakup transaksi DAN receipt approved. PRD.md mensyaratkan
+    // laporan dapat diekspor bersama receipt approved sesuai periode.
+    const rows: string[][] = [
+      ["Tanggal", "Tipe", "Nominal", "Keterangan", "Anggota", "No Receipt"],
       ...data.transaksi.map((t) => [
         formatDateTime(t.createdAt),
         t.tipe,
         String(t.nominal),
         t.keterangan ?? "",
         t.anggotaNama ?? "",
+        "",
+      ]),
+      ...data.strukApproved.map((s) => [
+        formatDateTime(s.createdAt),
+        "RECEIPT",
+        String(s.nominal ?? 0),
+        "Receipt disetujui",
+        s.anggotaNama,
+        s.id,
       ]),
     ];
-    const csv = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    // Tanda kutip di dalam nilai harus digandakan supaya kolom CSV tidak
+    // bergeser saat dibuka di Excel.
+    const escapeCell = (cell: string) => `"${cell.replace(/"/g, '""')}"`;
+    const csv = rows.map((r) => r.map(escapeCell).join(",")).join("\n");
+    const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = `laporan-${bulan}.csv`;
+    // Anchor harus masuk DOM dulu, dan object URL baru boleh dicabut
+    // setelah browser mulai transfer. Mel revoc URL di tick yang sama
+    // dengan click() membatalkan unduhan di sebagian browser.
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   return (
@@ -110,14 +129,14 @@ export function LaporanView() {
               type="month"
               value={bulan}
               onChange={(e) => setBulan(e.target.value)}
-              className="input-editorial h-10 text-sm"
+              className="input-editorial h-11 text-sm"
               aria-label="Pilih periode"
             />
             <button
               type="button"
               onClick={exportCSV}
               disabled={!data}
-              className="flex h-10 items-center gap-2 rounded-lg border border-[var(--border-default)] px-3 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-alt)] disabled:opacity-50"
+              className="flex h-11 items-center gap-2 rounded-lg border border-[var(--border-default)] px-3 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-alt)] disabled:opacity-50"
             >
               <Download className="h-4 w-4" />
               Export CSV
