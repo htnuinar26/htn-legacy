@@ -39,26 +39,31 @@ teknis konfigurasi.
 Sumber: audit 2026-10-21, temuan CRITICAL #2, #3, #4, HIGH #5, #6, dan MEDIUM
 #20, #22, #23, #24, dan beberapa gugusan API.
 
-- [ ] `GET /api/transaksi`: wajib session anggota atau Admin (kini 200 tanpa login).
-- [ ] `GET /api/anggota`: wajib session anggota atau Admin (kini 200 tanpa login).
-- [ ] `GET /api/settings`: wajib session anggota atau Admin (kini 200 tanpa login).
-- [ ] `POST /api/struk/[id]/verify` jalur reject: bungkus klasifikasi error Prisma
+- [x] `GET /api/transaksi`: wajib session anggota atau Admin (kini 200 tanpa login).
+- [x] `GET /api/anggota`: wajib session anggota atau Admin (kini 200 tanpa login).
+- [x] `GET /api/settings`: wajib session anggota atau Admin (kini 200 tanpa login).
+- [x] `POST /api/struk/[id]/verify` jalur reject: bungkus klasifikasi error Prisma
       agar P2002 jadi `CONFLICT` dengan pesan spesifik, bukan 500 generik.
-- [ ] `POST /api/struk/[id]/verify`: terima `nominal` null secara eksplisit agar
+- [x] `POST /api/struk/[id]/verify`: terima `nominal` null secara eksplisit agar
       fallback `struk.nominal ?? settings.nominalIuran` terpakai.
-- [ ] `POST /api/struk/[id]/verify`: ikutkan `alasanReject` pada audit log reject.
-- [ ] `GET /api/laporan`: hitung status lunas/belum/tertunggak sesuai periode terpilih.
-- [ ] `GET /api/admin/audit-log`: validasi `limit` dan `offset` agar tidak negatif.
-- [ ] `POST /api/struk/upload`: kategori error rate limit disinkronkan dengan status 429.
-- [ ] `POST /api/auth/login`: pencocokan nama tahan huruf besar-kecil.
-- [ ] `POST /api/settings/barcode`: batas ukuran file, tolak SVG, kembalikan URL.
-- [ ] `PATCH /api/settings`: tambahkan audit log `UPDATE_SETTINGS`.
-- [ ] `PATCH /api/anggota/[id]`: cek duplikat nama dan kembalikan `createdAt`.
-- [ ] `POST /api/anggota`: simpan field `catatan`.
-- [ ] `POST /api/admin/struk-generator`: kembalikan URL file struk manual.
-- [ ] `DELETE /api/anggota/[id]`: bersihkan file receipt yang terlantar di storage.
-- [ ] `GET /api/settings` dan `POST /api/settings/barcode`: kembalikan `barcodeUrl`
+- [x] `POST /api/struk/[id]/verify`: ikutkan `alasanReject` pada audit log reject.
+- [x] `GET /api/laporan`: hitung status lunas/belum/tertunggak sesuai periode terpilih.
+- [x] `GET /api/admin/audit-log`: validasi `limit` dan `offset` agar tidak negatif.
+- [x] `POST /api/struk/upload`: kunci rate limit diubah dari `anggotaId` ke
+      kombinasi IP dan anggota supaya tidak bisa dipakai memblokir anggota lain.
+- [x] `POST /api/auth/login`: pencocokan nama tahan huruf besar-kecil.
+- [x] `POST /api/auth/signup`: cek duplikat nama tahan huruf besar-kecil.
+- [x] `POST /api/settings/barcode`: batas ukuran file, tolak SVG, kembalikan URL.
+- [x] `PATCH /api/settings`: tambahkan audit log `UPDATE_SETTINGS`.
+- [x] `PATCH /api/anggota/[id]`: cek duplikat nama dan kembalikan `createdAt`.
+- [x] `POST /api/anggota`: simpan field `catatan`.
+- [x] `POST /api/admin/struk-generator`: kembalikan URL file struk manual.
+- [x] `DELETE /api/anggota/[id]`: bersihkan file receipt yang terlantar di storage.
+- [x] `GET /api/settings` dan `POST /api/settings/barcode`: kembalikan `barcodeUrl`
       hasil `getSignedUrl`, bukan path objek mentah.
+- [x] `src/lib/api-response.ts`: aktifkan locale Indonesia untuk pesan Zod.
+- [x] `src/lib/auth.ts`: tambah guard `requireMemberOrAdmin` untuk route bersama.
+- [x] `src/lib/storage.ts`: perbaiki ekstensi file dari MIME type (`svg+xml` jadi `svg`).
 
 ### PR #3 - `fix/ui-input-and-views` - Input nominal, periode, dan tampilan rusak
 
