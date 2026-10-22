@@ -10,6 +10,15 @@ Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
 
 ## Active plans
 
+### Revisi 2026-10-22 - `fix/auth-topbar-scrollbar-mobile`
+
+Sumber: follow-up UI auth untuk top bar, scrollbar, pemisah panel, dan mobile 360px.
+
+- [x] Satukan top bar dengan panel form dan token `--bg-base` pada light/dark.
+- [x] Terapkan custom scrollbar global berbasis token tanpa mengubah behavior scroll.
+- [x] Satukan logo mobile dan toggle tema dalam satu header row serta kurangi ruang kosong.
+- [x] Verifikasi border hero/form, hero dark netral, kontras, target sentuh, typecheck, lint, dan build.
+
 ### Revisi 2026-10-22 - `fix/auth-ui-dark-mode-accessibility`
 
 Sumber: revisi UI/UX autentikasi untuk Masuk Anggota, Daftar Anggota Baru, dan Login Admin.
