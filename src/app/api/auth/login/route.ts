@@ -1,7 +1,13 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { apiSuccess, apiError, zodFields, apiUnexpected } from "@/lib/api-response";
+import {
+  apiSuccess,
+  apiError,
+  zodFields,
+  apiUnexpected,
+  classifyPrismaError,
+} from "@/lib/api-response";
 import { verifyPassword } from "@/lib/crypto";
 import { createMemberSession } from "@/lib/auth";
 
@@ -57,6 +63,28 @@ export async function POST(req: NextRequest) {
       nama: anggota.nama,
     });
   } catch (err) {
+    if (err instanceof Error && err.message.includes("JWT_SECRET")) {
+      return apiError(
+        "INTERNAL_ERROR",
+        "Login tidak dapat membuat sesi karena konfigurasi keamanan server belum lengkap. Hubungi pengurus dan sebutkan ID permintaan ini.",
+        { cause: err, endpoint: "/api/auth/login" }
+      );
+    }
+
+    if (
+      err !== null &&
+      typeof err === "object" &&
+      "code" in err &&
+      typeof err.code === "string" &&
+      err.code.startsWith("P")
+    ) {
+      const classified = classifyPrismaError(err);
+      return apiError(classified.category, classified.message, {
+        cause: err,
+        endpoint: "/api/auth/login",
+      });
+    }
+
     return apiUnexpected(err, "/api/auth/login");
   }
 }
