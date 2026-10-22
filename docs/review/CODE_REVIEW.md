@@ -115,7 +115,7 @@ Ringkasan review PR #25:
 
 ## PR baru - Responsif Mobile dan Aset Icon
 
-**PR:** menunggu nomor PR
+**PR:** 27
 **Repo:** htnuinar26/htn-legacy
 **Status:** [ ] belum dicopas
 
