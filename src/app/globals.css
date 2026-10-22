@@ -205,6 +205,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    min-width: 0;
   }
   .summary-card__icon {
     width: 44px;
@@ -318,6 +319,28 @@
     outline: none;
     border-color: var(--accent-primary);
     box-shadow: var(--focus-ring);
+  }
+}
+
+@media (max-width: 639px) {
+  .summary-card {
+    gap: 10px;
+    padding: 14px 12px;
+  }
+
+  .summary-card__icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .summary-card__value {
+    font-size: 20px;
+    overflow-wrap: anywhere;
+  }
+
+  .summary-card__label {
+    font-size: 12px;
+    line-height: 1.35;
   }
 }
 

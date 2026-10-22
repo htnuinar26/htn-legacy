@@ -161,7 +161,7 @@ export function ImportView() {
           description="Format: nama,password,nim,email,telepon,statusBayar"
         />
         <div className="space-y-4 p-5">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--surface-alt)] px-4 py-2.5 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface)]">
               <Upload className="h-4 w-4" />
               Pilih File CSV
@@ -218,7 +218,7 @@ export function ImportView() {
             type="button"
             onClick={handleImport}
             disabled={importing || !text.trim()}
-            className="flex h-11 items-center justify-center gap-2 rounded-lg bg-[var(--button-primary-bg)] px-6 font-semibold text-white hover:bg-[var(--button-primary-hover)] disabled:opacity-50"
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[var(--button-primary-bg)] px-6 font-semibold text-white hover:bg-[var(--button-primary-hover)] disabled:opacity-50 sm:w-auto"
           >
             {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSpreadsheet className="h-4 w-4" />}
             {importing ? "Mengimport..." : "Import Sekarang"}

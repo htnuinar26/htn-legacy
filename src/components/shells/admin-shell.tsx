@@ -92,8 +92,8 @@ export function AdminShell() {
   return (
     <div className="flex min-h-screen flex-col bg-[var(--bg-base)]">
       {/* Top bar */}
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[var(--border-default)] bg-[var(--surface)] px-4 lg:px-6">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-2 border-b border-[var(--border-default)] bg-[var(--surface)] px-3 sm:px-4 lg:px-6">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           <button
             type="button"
             aria-label="Buka navigasi"
@@ -103,15 +103,15 @@ export function AdminShell() {
             <Menu className="h-5 w-5" />
           </button>
           <Image src="/icon.svg" alt="HTN Legacy" width={32} height={32} className="hidden sm:block" />
-          <div>
-            <p className="text-sm font-bold leading-tight text-[var(--ink)]">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold leading-tight text-[var(--ink)]">
               {process.env.NEXT_PUBLIC_INSTANCE_NAME ?? "HTN Legacy"}{" "}
               <span className="text-[var(--accent-secondary)]">· Admin</span>
             </p>
-            <p className="text-xs text-[var(--ink-muted)]">{TITLES[adminView]}</p>
+            <p className="truncate text-xs text-[var(--ink-muted)]">{TITLES[adminView]}</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-3">
           <ThemeToggle />
           <button
             type="button"
@@ -221,7 +221,7 @@ export function AdminShell() {
         )}
 
         {/* Konten utama */}
-        <main className="min-w-0 flex-1 p-4 lg:p-8">
+        <main className="min-w-0 flex-1 overflow-x-clip p-3 sm:p-4 lg:p-8">
           <div className="mx-auto max-w-6xl">
             {adminView === "dashboard" && <DashboardView />}
             {adminView === "anggota" && <AnggotaView />}

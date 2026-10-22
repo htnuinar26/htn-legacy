@@ -82,7 +82,7 @@ export function StrukReviewView() {
       />
 
       {/* Filter tabs */}
-      <div className="flex gap-1 rounded-lg border border-[var(--border-default)] bg-[var(--surface)] p-1">
+      <div className="flex flex-wrap gap-1 rounded-lg border border-[var(--border-default)] bg-[var(--surface)] p-1">
         {([
           { v: "PENDING", label: "Pending" },
           { v: "APPROVED", label: "Disetujui" },
