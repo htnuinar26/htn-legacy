@@ -210,6 +210,7 @@ function ReviewDialog({
   onDone: () => void;
 }) {
   const [nominal, setNominal] = useState<number | null>(struk.nominal ?? null);
+  const [nominalIuran, setNominalIuran] = useState<number | null>(null);
   const [action, setAction] = useState<"approve" | "reject">("approve");
   const [alasan, setAlasan] = useState("");
   const [saving, setSaving] = useState(false);
@@ -218,6 +219,20 @@ function ReviewDialog({
     fields?: Record<string, string>;
     requestId?: string;
   } | null>(null);
+
+  // Ambil nominal iuran default supaya Admin langsung melihat nilai yang
+  // akan dipakai kalau field nominal dikosongkan.
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success) setNominalIuran(json.data.nominalIuran);
+      })
+      .catch(() => {
+        // Nilai default tidak wajib dimuat. Server sudah punya fallback
+        // sendiri kalau field nominal tidak dikirim.
+      });
+  }, []);
 
   async function handleSubmit() {
     setSaving(true);
@@ -231,7 +246,13 @@ function ReviewDialog({
 
     const payload: Record<string, unknown> = { action };
     if (action === "approve") {
-      payload.nominal = nominal;
+      // Hanya kirim nominal kalau Admin benar-benar mengisinya. Kalau
+      // dikosongkan, field tidak dikirim sama sekali supaya server memakai
+      // fallback ke nominal receipt lalu nominal iuran. Mengirim `null`
+      // sebelumnya membuat server menolak dengan 400.
+      if (nominal !== null && nominal > 0) {
+        payload.nominal = nominal;
+      }
     } else {
       payload.alasan = alasan.trim();
     }
@@ -346,7 +367,11 @@ function ReviewDialog({
                   value={nominal}
                   onChange={setNominal}
                   error={error?.fields?.nominal}
-                  hint="Nominal iuran yang dibayar anggota."
+                  hint={
+                    nominalIuran
+                      ? `Kosongkan untuk memakai nominal iuran bawaan ${formatRupiahFull(nominalIuran)}.`
+                      : "Kosongkan untuk memakai nominal iuran bawaan."
+                  }
                 />
               </div>
             ) : (
