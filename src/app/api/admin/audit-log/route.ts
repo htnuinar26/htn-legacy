@@ -55,6 +55,6 @@ export async function GET(req: NextRequest) {
       offset,
     });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/admin/audit-log");
   }
 }
