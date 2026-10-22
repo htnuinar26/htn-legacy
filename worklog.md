@@ -86,3 +86,14 @@ Work Log:
 Stage Summary:
 - Temuan audit aktif sudah diperbaiki dan diverifikasi ulang.
 - Deployment production membutuhkan konfigurasi Supabase Storage dan `JWT_SECRET` minimal 32 karakter.
+
+---
+Task ID: AUDIT-3
+Agent: main
+Task: Memperbaiki error log aset dan responsif mobile.
+
+Work Log:
+- Membaca ulang `logs/console.log` dan `logs/vercel.log`; 404 `icon.svg` berasal dari aset yang belum ikut ter-track, sedangkan 401/409 adalah respons bisnis yang valid.
+- Menyesuaikan shell Anggota/Admin, header kartu, ringkasan, pencarian, filter, upload barcode, import file, dan aksi laporan untuk layar mobile.
+- Menggunakan skill frontend lokal untuk memverifikasi pendekatan mobile-first, target sentuh, wrapping, dan pencegahan overflow.
+- Validasi akhir direncanakan melalui typecheck, lint, build, pemeriksaan regresi aset, pemeriksaan responsif statis, dan `git diff --check`.
