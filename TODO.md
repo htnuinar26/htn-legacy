@@ -117,15 +117,16 @@ terkait em-dash, target sentuh, dan fokus drawer.
 
 Sumber: audit 2026-10-21, LOW dan temuan dokumentasi.
 
-- [ ] Pindahkan `PRD.md`, `SPEC.md`, `ARCHITECTURE.md`, `DESIGN.md` ke root repository
+- [x] Pindahkan `PRD.md`, `SPEC.md`, `ARCHITECTURE.md`, `DESIGN.md` ke root repository
       sesuai `AGENTS.md` bagian Documentation Rules, dan hapus duplikat di `upload/`.
-- [ ] Perbarui seluruh rujukan dokumen di `TODO.md`, `CHANGELOG.md`,
+- [x] Perbarui seluruh rujukan dokumen di `TODO.md`, `CHANGELOG.md`,
       `docs/review/CODE_REVIEW.md`, dan `worklog.md`.
-- [ ] Sinkronkan `docs/SPEC.md` soal atribut `pattern` pada `RupiahInput`.
-- [ ] Perbarui `CHANGELOG.md` dengan entri versi baru.
-- [ ] Perbarui `worklog.md` dan `docs/review/CODE_REVIEW.md`.
-- [ ] Normalisasi em-dash di seluruh file yang disentuh.
-- [ ] Catat rotasi secret dan pembersihan git history sebagai Known Issue.
+- [x] Sinkronkan `SPEC.md` soal atribut `pattern` pada `RupiahInput`, batas maksimum
+      nominal, kontrak URL storage, dan pemetaan kategori rate limit.
+- [x] Perbarui `CHANGELOG.md` dengan entri versi baru.
+- [x] Perbarui `worklog.md` dan `docs/review/CODE_REVIEW.md`.
+- [x] Normalisasi em-dash di seluruh file yang disentuh.
+- [x] Catat rotasi secret dan pembersihan git history sebagai Known Issue.
 
 ---
 
@@ -159,8 +160,13 @@ rentang PR di atas.
   receipt `REJECTED` ganda pada periode sama, atau anggota tanpa receipt aktif
   periode berjalan) belum diperbaiki. Keputusan pemilik proyek: perbaiki kode dulu,
   data menyusul lewat script terpisah dengan backup penuh.
+- **Password anggota versi lama tidak bisa dipakai di kode baru.** Dua anggota yang
+  ada di Neon memakai format `iv:tag:ciphertext` heksadesimal dengan IV 16 byte,
+  sedangkan `src/lib/crypto.ts` memakai base64 `iv(12 byte) || tag || ciphertext`.
+  Keduanya tidak kompatibel. Admin perlu reset password kedua anggota tersebut.
 - Roti secret: `JWT_SECRET`, `ENCRYPTION_KEY`, dan `ADMIN_PASSWORD` versi lama masih
-  ada di history git. Wajib dirotasi sebelum deploy produksi.
+  ada di history git commit `dfa0935` dan `88d6f99`. Wajib dirotasi sebelum deploy
+  produksi, lalu history dibersihkan.
 - `src/lib/storage.ts` masih memakai local file storage. Berkas receipt dan barcode
   disajikan sebagai path publik di bawah `/storage`, belum signed URL seperti
   kontrak `ARCHITECTURE.md`. Sudah ada di Deferred work.
@@ -174,3 +180,9 @@ rentang PR di atas.
   untuk route API, jadi deployment standalone perlu diverifikasi ulang.
 - Tidak ada unit test framework. Yang ada hanya skrip shell `scripts/regression-test.sh`
   dan `scripts/ui-verify.sh` yang bergantung pada Agent Browser.
+- Lima file masih mengandung em-dash (U+2014) karena punya perubahan lokal yang
+  belum di-commit dan di luar cakupan 32 temuan: `.zscripts/build.sh`,
+  `scripts/dark-mode-verify.sh`, `scripts/regression-test.sh`, `scripts/ui-verify.sh`,
+  dan `start-dev.sh`. File tersebut perlu dibersihkan manual atau di-commit lebih dulu.
+- Folder `.opencode/.skills/` juga masih mengandung em-dash, tetapi isinya adalah
+  definisi skill dari luar repository dan tidak di-commit ke git.

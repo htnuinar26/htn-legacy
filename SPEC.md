@@ -31,6 +31,13 @@ NEXT_PUBLIC_INSTANCE_NAME  nama instance pada UI
 DEBUG_MW                   1 untuk debug proxy, 0 untuk normal
 ```
 
+Catatan tambahan:
+
+- `.env.example` memakai path database sandbox `file:../db/custom.db`. Path relatif
+  Prisma dihitung dari folder `prisma/`, bukan dari root repository.
+- `z.config(z.locales.id())` diaktifkan di `src/lib/api-response.ts` supaya pesan
+  validasi bawaan Zod berbahasa Indonesia.
+
 ## Status Receipt
 
 ```text
@@ -65,9 +72,16 @@ type RupiahInputProps = {
 
 Aturan implementasi:
 
-- Elemen dasar `<input type="text" inputMode="numeric" pattern="[0-9]*">`. **Dilarang** `type="number"`.
+- Elemen dasar `<input type="text" inputMode="numeric">`. **Dilarang** `type="number"`.
+- **Dilarang** atribut `pattern="[0-9]*"`. Nilai yang ditampilkan terformat mengandung
+  pemisah ribuan, jadi pattern native menolak nilai yang sebenarnya valid ("10.000")
+  dengan pesan "Please match the requested format." Itu kelas bug yang sama dengan bug
+  `step` yang menjadi alasan rebuild ini. Filter `onChange` sudah membuang non-digit,
+  dan validasi akhir tetap di server lewat Zod.
 - Filter `onChange`: buang semua karakter non-digit sebelum disimpan ke state.
 - Tampilkan nilai terformat (`Intl.NumberFormat('id-ID')`) di `value` input, simpan integer polos di state React.
+- Pulihkan posisi caret ke digit yang sama setelah nilai berubah, supaya nominal bisa diedit di tengah nilai terformat, bukan selalu melompat ke ujung.
+- Batas atas nilai adalah 2.000.000.000, mengikuti kapasitas kolom `Int` (32 bit) di PostgreSQL. Batas yang sama diverifikasi ulang di server lewat Zod.
 - Tampilkan prefiks `Rp` statis dan baris bantuan preview (contoh: "Preview: Rp 15.000") di bawah field.
 - Tidak ada `min`/`max`/`step` HTML native. Batas bawah (misal "harus lebih dari 0") divalidasi lewat Zod di server dan ditampilkan sebagai pesan error di bawah field, bukan lewat atribut HTML.
 - Dipakai di: form kas manual (`/admin/kas`), form struk generator (`/admin/struk-generator`), form nominal iuran (`/admin/settings`).
@@ -184,12 +198,25 @@ assets/barcode-{timestamp}.{extension}
 
 Database menyimpan path object. UI menerima signed URL. Jangan menggunakan secret Supabase di client component.
 
+Aturan tambahan:
+
+- Path objek storage **tidak boleh** dikirim apa adanya ke client sebagai URL. Selalu
+  kirim URL siap pakai hasil `getSignedUrl()`, misalnya `barcodeUrl` pada
+  `GET /api/settings` dan `fileUrl` pada `POST /api/admin/struk-generator`.
+- Ekstensi file diturunkan dari peta MIME type ke ekstensi. MIME type
+  `image/svg+xml` menghasilkan ekstensi `svg`, bukan `svg+xml`.
+
 ## Authorization
 
 - Route anggota memerlukan session anggota atau Admin sesuai kebutuhan.
 - Route Admin memerlukan `isAdmin()`.
+- Endpoint yang hanya dibaca (transaksi, anggota, settings) juga wajib memeriksa session.
+  Tanpa session, request ditolak dengan kategori `AUTH_ERROR` dan status 401.
 - Password per aksi tetap diverifikasi pada upload receipt.
 - Request stale tidak boleh membuat receipt aktif kedua.
+- Rate limit upload dikunci dengan kombinasi IP dan anggota, supaya tidak bisa dipakai
+  memblokir anggota lain. Batasnya memakai kategori `VALIDATION_ERROR` dengan status 429,
+  karena `ARCHITECTURE.md` menetapkan tujuh kategori error yang eksklusif.
 
 ## WhatsApp
 

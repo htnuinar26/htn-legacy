@@ -1,4 +1,4 @@
-// HTN Legacy — Seed script
+// HTN Legacy - Seed script
 // Mengisi data awal untuk demonstrasi: settings + beberapa anggota.
 // Jalankan: bun run seed
 

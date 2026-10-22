@@ -73,7 +73,7 @@ export function DashboardView() {
         description={`Periode berjalan: ${formatPeriodLong(data.periodeBerjalan)} · Iuran: ${formatRupiahFull(data.nominalIuran)}`}
       />
 
-      {/* Summary cards baris 1 — anggota */}
+      {/* Summary cards baris 1 - anggota */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <SummaryCard icon={Users} iconColor="primary" value={String(s.totalAnggota)} label="Total Anggota" />
         <SummaryCard icon={CheckCircle2} iconColor="green" value={String(s.lunas)} label="Lunas" />
@@ -81,7 +81,7 @@ export function DashboardView() {
         <SummaryCard icon={AlertTriangle} iconColor="red" value={String(s.tertunggak)} label="Tertunggak" />
       </div>
 
-      {/* Summary cards baris 2 — keuangan */}
+      {/* Summary cards baris 2 - keuangan */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <SummaryCard icon={Wallet} iconColor="primary" value={formatRupiahFull(s.saldoTotal)} label="Saldo Total" />
         <SummaryCard icon={TrendingUp} iconColor="green" value={formatRupiahFull(s.masukPeriode)} label="Masuk (Periode)" />

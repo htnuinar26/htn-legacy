@@ -10,6 +10,53 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 ### Unreleased Update
 
+### Fixed - Audit 2026-10-21 (32 temuan)
+
+Audit menyeluruh terhadap `PRD.md`, `SPEC.md`, `ARCHITECTURE.md`, `DESIGN.md`, seluruh Route Handler, view, dan komponen. Berikut perbaikan yang masuk ke branch `fix/production-config`, `fix/api-authorization`, `fix/ui-input-and-views`, dan `docs/sync-and-debt`.
+
+**Kritis**
+
+- **Prisma dipindahkan dari SQLite ke PostgreSQL Neon.** `prisma/schema.prisma` masih memakai `provider = "sqlite"` sementara environment menunjuk Neon, sehingga setiap operasi database gagal dengan `PrismaClientInitializationError` dan seluruh endpoint mengembalikan HTTP 500. Tiga migration baru memetakan kolom schema legacy ke schema baru memakai `ALTER TABLE ... RENAME COLUMN`, jadi data anggota, receipt, settings, dan audit log yang sudah ada di Neon tetap utuh.
+- **`GET /api/transaksi` sekarang wajib session.** Sebelumnya mengembalikan seluruh transaksi kas, saldo, dan nama anggota ke siapa pun tanpa login.
+- **`GET /api/anggota` sekarang wajib session.** Previously direktori anggota lengkap terbuka untuk tamu.
+- **`GET /api/settings` sekarang wajib session.** Nomor WhatsApp pengurus, nominal iuran, dan deadline tidak lagi bocor.
+
+**Tinggi**
+
+- **Penolakan receipt kedua pada periode yang sama mengembalikan 409 `CONFLICT`**, bukan HTTP 500 generik. Unique constraint `[anggotaId, periodeBulan, status]` membuat jalur `reject` menabrak P2002 dan jatuh ke generic error handler. Alur kirim-ulang anggota kini bisa dipakai berulang kali.
+- **Persetujuan receipt anggota tidak lagi gagal dengan 400.** Client mengirim `nominal: null` yang ditolak Zod dengan pesan Inggris. Sekarang `null` diperlakukan sebagai "tidak diisi" dan server memakai fallback ke nominal receipt lalu nominal iuran.
+- **Halaman barcode anggota dan Admin tidak lagi rusak.** `barcodePath` adalah path objek storage, bukan URL. Sekarang dikirim `barcodeUrl` siap pakai. Diverifikasi: `GET /storage/assets/barcode-*.png` mengembalikan 200 `image/png`, sedangkan path mentah menghasilkan URL tidak valid.
+- **Receipt manual bisa di-preview.** Response generator menyertakan `fileUrl`, dan tombol "Lihat" memakai URL itu tanpa `preventDefault`.
+- **Gate validasi dipulihkan.** `next.config.ts` tidak lagi memakai `ignoreBuildErrors: true`, `tsc --noEmit` kembali hijau setelah scaffold `examples/websocket` dihapus, dan script `build` memakai `scripts/copy-standalone.mjs` sehingga tidak gagal di Windows.
+- **File receipt yang berisi data anggota nyata dikeluarkan dari pelacakan git**, dan `public/storage` masuk `.gitignore`.
+
+**Menengah**
+
+- Pesan validasi Zod sekarang berbahasa Indonesia lewat `z.config(z.locales.id())`.
+- `RupiahInput` memulihkan posisi caret ke digit yang sama, sehingga nominal bisa diedit di tengah nilai terformat, bukan selalu melompat ke ujung. Batas maksimum 2.000.000.000 ditambahkan di client dan server, mengikuti kapasitas kolom `Int` di PostgreSQL.
+- Dropdown periode di halaman Kas Admin dan Anggota tidak lagi tampil kosong, dan mengikuti `settings.periodeBerjalan` dari server.
+- `catatan` anggota akhirnya disimpan saat menambah anggota. Sebelumnya Zod membuangnya diam-diam.
+- `createdAt` ikut dikembalikan pada `PATCH /api/anggota/[id]`, jadi tanggal bergabung tidak hilang setelah anggota menyimpan profil.
+- Nama anggota yang duplikat ditolak, dan pencarian nama tahan huruf besar-kecil.
+- Menghapus anggota juga menghapus file receipt-nya di storage.
+- `PATCH /api/settings` menulis audit log `UPDATE_SETTINGS` dan tidak lagi menghapus barcode dari tampilan.
+- Upload barcode dibatasi 2 MB, menolak SVG, dan punya state pending.
+- Halaman Audit Log punya paginasi dan tombol hapus transaksi sesuai `ARCHITECTURE.md`.
+- Export CSV laporan menyertakan receipt approved, meng-escape tanda kutip, dan unduhannya andal di semua browser.
+- Parser CSV import menangani tanda kutip, dan alasan kegagalan per baris ditampilkan.
+- Periode dan tanggal dihitung pada zona waktu organisasi (`Asia/Bangkok`), bukan waktu lokal browser.
+- Nomor WhatsApp lokal dinormalisasi ke format internasional sebelum link `wa.me` dibuat.
+- Ikon tren pemasukan dan pengeluaran di Beranda anggota dikembalikan ke arah yang benar.
+- Label input terasosiasi dengan `id` dan `htmlFor`, pesan error terhubung lewat `aria-describedby`, dan semua target sentuh diperbesar ke minimal 44x44px.
+- Drawer navigasi memindahkan fokus ke dalam drawer, menahan Tab, menutup dengan `Escape`, mengunci scroll, dan mengembalikan fokus ke tombol pemicu.
+- Tombol keluar di top bar sekarang punya `aria-label` dan tidak lagi mengirim request logout ganda.
+
+**Perbaikan teknis**
+
+- `.env.example` memakai path database sandbox yang benar dan mencantumkan seluruh environment variable yang dipakai aplikasi.
+- `reactStrictMode` diaktifkan.
+- Em-dash (U+2014) dihapus dari seluruh file yang disentuh, sesuai aturan `AGENTS.md`.
+
 ---
 
 ### Ringkasan

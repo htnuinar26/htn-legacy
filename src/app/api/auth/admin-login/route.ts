@@ -7,7 +7,7 @@ const AdminLoginSchema = z.object({
   password: z.string().min(1, "Password Admin wajib diisi"),
 });
 
-// POST /api/auth/admin-login — login Admin/Bendahara dengan password bersama.
+// POST /api/auth/admin-login - login Admin/Bendahara dengan password bersama.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => null);

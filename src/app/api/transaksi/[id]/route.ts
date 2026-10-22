@@ -71,7 +71,7 @@ export async function DELETE(
       });
 
       // Hapus object storage di luar transaksi DB (node M/M1).
-      // Jika gagal, LANJUTKAN — jangan blokir integritas data.
+      // Jika gagal, LANJUTKAN - jangan blokir integritas data.
       try {
         await deleteFile(struk.filePath);
       } catch (storageErr) {

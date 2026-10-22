@@ -1,6 +1,6 @@
 "use client";
 
-// HTN Legacy — Splash Screen
+// HTN Legacy - Splash Screen
 // Sesuai ARCHITECTURE.md "Splash Screen" dan DESIGN.md "Splash Screen".
 // Ditampilkan sekali saat aplikasi pertama dimuat, sebelum shell utama siap.
 // Logo + garis progres emas (0→100%), fade out 250ms begitu sesi siap.
