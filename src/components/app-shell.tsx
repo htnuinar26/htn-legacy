@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { fetchSession, clearSessionCache, type ClientSession } from "@/lib/auth-client";
 import { LoginView } from "@/components/views/login-view";
 import { MemberShell } from "@/components/shells/member-shell";
@@ -9,6 +10,9 @@ import { AdminShell } from "@/components/shells/admin-shell";
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<ClientSession | null>(null);
   const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
+  const router = useRouter();
+  const isAuthRoute = ["/login", "/signup", "/admin/login"].includes(pathname);
 
   useEffect(() => {
     let mounted = true;
@@ -21,7 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       })
       .catch(() => {
         if (mounted) {
-          setSession({ member: null, isAdmin: false });
+          setSession({ member: null, admin: null, isAdmin: false });
           setLoading(false);
         }
       });
@@ -29,6 +33,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (session && isAuthRoute && (session.member || session.isAdmin)) {
+      router.replace("/");
+    }
+  }, [isAuthRoute, router, session]);
 
   // Refresh session setelah login/logout.
   useEffect(() => {
@@ -54,9 +64,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
+  if (isAuthRoute) return <>{children}</>;
+
   // Admin session punya prioritas: bisa akses admin panel.
   if (session.isAdmin) {
-    return <AdminShell />;
+    return <AdminShell adminName={session.admin?.nama ?? "Bendahara"} />;
   }
 
   if (session.member) {
