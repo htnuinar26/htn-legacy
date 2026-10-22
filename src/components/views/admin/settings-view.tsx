@@ -208,7 +208,7 @@ export function SettingsView() {
                 Barcode Pembayaran
               </label>
               {settings.barcodePath ? (
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                   {settings.barcodeUrl ? (
                     <img
                       src={settings.barcodeUrl}
@@ -225,7 +225,7 @@ export function SettingsView() {
                   Belum ada barcode. Upload file gambar barcode pembayaran.
                 </p>
               )}
-              <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--surface-alt)] px-4 py-2.5 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface)]">
+              <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--surface-alt)] px-4 py-2.5 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface)] sm:w-fit">
                 {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                 {uploading ? "Mengunggah..." : "Upload Barcode"}
                 <input
