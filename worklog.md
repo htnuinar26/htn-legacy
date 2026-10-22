@@ -132,3 +132,15 @@ Work Log:
 - Menambahkan token component `auth-hero-*` dan `input-placeholder` pada `src/app/globals.css`; dark hero memakai `--bg-base`, light hero tetap memakai maroon.
 - Memindahkan toggle tema ke top bar auth, memperkuat focus-visible, kontras teks/placeholder, dan konsistensi radius tombol.
 - Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build`, scan token/hex/lazy-loading, dan `git diff --check`.
+
+---
+Task ID: UI-AUTH-2
+Agent: main
+Task: Menindaklanjuti top bar auth, scrollbar, dan layout mobile.
+
+Work Log:
+- Memindahkan header auth ke dalam panel form agar background `--bg-base` menyatu dengan body dan tidak memotong hero.
+- Menggabungkan logo mobile dan toggle tema dalam satu row header, tanpa mengubah ukuran target sentuh 44px.
+- Mengubah styling scrollbar yang sebelumnya hanya `.scroll-area-custom` menjadi styling global berbasis `--border-default`, tanpa mengubah behavior scroll.
+- Memastikan border vertikal hero/form tetap konsisten pada desktop dan hilang secara natural pada mobile karena hero disembunyikan.
+- Validasi lulus: typecheck, lint, build, scan struktur header/scrollbar, dan `git diff --check`.

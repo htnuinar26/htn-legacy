@@ -8,6 +8,13 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 <!-- ENTRI-BARU-SISIPKAN-DI-SINI -->
 
+### Fixed - Top Bar Auth dan Scrollbar Global (2026-10-22)
+
+- Menyatukan top bar autentikasi dengan panel form menggunakan `--bg-base`, sehingga tidak lagi muncul sebagai strip putih terpisah pada dark mode.
+- Menggabungkan logo mobile dan toggle tema dalam satu header row dengan jarak vertikal yang lebih proporsional.
+- Memperluas styling scrollbar tokenized dari area tertentu menjadi global, dengan thumb tipis yang konsisten pada tema terang dan gelap.
+- Mempertahankan pemisah hero/form berupa border vertikal tipis berbasis token pada desktop dan behavior scroll native pada mobile.
+
 ### Fixed - UI/UX Autentikasi Dark Mode dan Aksesibilitas (2026-10-22)
 
 - Memperbaiki panel hero autentikasi pada dark mode agar memakai latar netral gelap, dengan emas hanya sebagai aksen border dan kontrol aktif.
