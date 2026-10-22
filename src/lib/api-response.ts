@@ -74,7 +74,13 @@ export function apiSuccess<T>(data: T, init?: ResponseInit): Response {
 export function apiError(
   category: ApiErrorCategory,
   message: string,
-  options?: { fields?: Record<string, string>; status?: number; cause?: unknown }
+  options?: {
+    fields?: Record<string, string>;
+    status?: number;
+    cause?: unknown;
+    endpoint?: string;
+    payload?: Record<string, unknown>;
+  }
 ): Response {
   const requestId =
     typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -88,7 +94,9 @@ export function apiError(
     const logLine = {
       requestId,
       category,
+      endpoint: options?.endpoint ?? "unknown",
       message,
+      payload: options?.payload,
       timestamp: new Date().toISOString(),
       cause:
         options?.cause instanceof Error
@@ -134,12 +142,11 @@ export function zodFields(
  * Handler generik untuk error tak terduga di dalam try/catch Route Handler.
  * Mencegah error jatuh ke generic Next.js 500 tanpa detail.
  */
-export function apiUnexpected(error: unknown): Response {
+export function apiUnexpected(error: unknown, endpoint?: string): Response {
   return apiError(
     "INTERNAL_ERROR",
-    "Terjadi kesalahan tak terduga di server. Silakan coba beberapa saat lagi. " +
-      "Jika masalah berlanjut, hubungi pengurus dan sebutkan ID permintaan.",
-    { cause: error }
+    "Server gagal memproses permintaan karena kesalahan internal. Hubungi pengurus dan sebutkan ID permintaan ini.",
+    { cause: error, endpoint }
   );
 }
 
