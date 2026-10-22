@@ -51,13 +51,13 @@ Setiap Route Handler di `src/app/api/**` wajib mengikuti kontrak berikut:
 
 1. **Validasi input terstruktur**: setiap body/query/form divalidasi dengan skema Zod di awal handler. Kegagalan validasi mengembalikan `400` dengan daftar field yang gagal dan alasannya, bukan pesan generik.
 2. **Error terklasifikasi**: setiap kegagalan di luar validasi input diklasifikasikan ke salah satu kategori berikut sebelum dikembalikan ke client:
-   - `VALIDATION_ERROR` (400) — input tidak valid menurut skema atau aturan bisnis (contoh: periode sudah terisi).
-   - `AUTH_ERROR` (401/403) — sesi tidak valid atau tidak memiliki izin.
-   - `NOT_FOUND` (404) — entitas yang dirujuk tidak ada.
-   - `CONFLICT` (409) — race condition atau state yang sudah berubah (contoh: receipt aktif kedua pada periode sama).
-   - `STORAGE_ERROR` (502) — kegagalan upload/hapus ke Supabase Storage.
-   - `DATABASE_ERROR` (500) — kegagalan transaksi Prisma yang tidak terduga.
-   - `INTERNAL_ERROR` (500) — kegagalan lain yang tidak terklasifikasi; kategori ini adalah fallback terakhir, bukan default pertama.
+   - `VALIDATION_ERROR` (400) - input tidak valid menurut skema atau aturan bisnis (contoh: periode sudah terisi).
+   - `AUTH_ERROR` (401/403) - sesi tidak valid atau tidak memiliki izin.
+   - `NOT_FOUND` (404) - entitas yang dirujuk tidak ada.
+   - `CONFLICT` (409) - race condition atau state yang sudah berubah (contoh: receipt aktif kedua pada periode sama).
+   - `STORAGE_ERROR` (502) - kegagalan upload/hapus ke Supabase Storage.
+   - `DATABASE_ERROR` (500) - kegagalan transaksi Prisma yang tidak terduga.
+   - `INTERNAL_ERROR` (500) - kegagalan lain yang tidak terklasifikasi; kategori ini adalah fallback terakhir, bukan default pertama.
 3. **Pesan ke client selalu spesifik dan dalam Bahasa Indonesia**, menjelaskan apa yang gagal dan jika memungkinkan apa yang harus dilakukan user. Dilarang mengembalikan pesan generik seperti "Terjadi kesalahan" atau "Gagal membuat struk manual" tanpa konteks tambahan. Contoh pesan yang benar: "Gagal membuat struk manual: anggota ini sudah memiliki receipt PENDING pada periode 2026-10."
 4. **Logging server wajib** untuk setiap error kategori `STORAGE_ERROR`, `DATABASE_ERROR`, dan `INTERNAL_ERROR`: catat `requestId`, endpoint, kategori error, pesan error asli (termasuk stack trace di server log, tidak dikirim ke client), dan payload yang relevan (tanpa data sensitif seperti password). Ini memungkinkan penelusuran lewat Vercel Function Logs tanpa harus mereproduksi bug secara manual.
 5. Setiap Route Handler mengembalikan bentuk response yang konsisten:
@@ -129,7 +129,7 @@ flowchart TD
 Catatan non-visual yang tidak bisa diwakili diagram:
 
 - Server tidak membaca isi gambar. Receipt yang buram atau tidak terbaca tetap masuk antrean selama data dasar dan file valid.
-- Setiap langkah bertanda "gagal" di atas mengikuti kontrak error pada bagian "Standar Error Handling API" di atas — bukan pesan generik.
+- Setiap langkah bertanda "gagal" di atas mengikuti kontrak error pada bagian "Standar Error Handling API" di atas - bukan pesan generik.
 - `N1` dan `O1` adalah mekanisme kompensasi manual (bukan transaksi database, karena melibatkan storage eksternal): jika langkah setelah upload gagal, file yang sudah terlanjur terupload wajib dihapus agar tidak ada file yatim di Supabase Storage.
 
 Aturan periode:
@@ -178,7 +178,7 @@ Titik kegagalan spesifik yang **wajib** diuji sebelum dianggap selesai:
 
 - `H`/`K`: nominal bukan angka positif, nominal kosong, nominal mengandung karakter non-digit.
 - `L1`: `anggotaId` valid secara format tapi tidak ada di database (dihapus di antara load daftar dan submit).
-- `M1`: anggota sudah mendapat receipt aktif dari jalur lain (misal upload mandiri) tepat sebelum Admin submit — race condition yang sama polanya dengan alur anggota.
+- `M1`: anggota sudah mendapat receipt aktif dari jalur lain (misal upload mandiri) tepat sebelum Admin submit - race condition yang sama polanya dengan alur anggota.
 - `R1`/`R2`: ini yang sebelumnya muncul sebagai 500 tanpa detail. Dengan isolation level `Serializable`, konflik transaksi paralel harus eksplisit ditangkap dan diberi pesan "konflik data, silakan coba lagi" ke user, bukan dibiarkan jatuh ke generic error handler Next.js.
 
 ## Approval dan Rejection
@@ -218,7 +218,7 @@ flowchart TD
 - Admin dapat menghapus transaksi `MASUK` maupun `KELUAR` dari halaman kas.
 - Transaksi yang terkait receipt juga dapat dihapus; lihat node `M` di atas untuk urutan sinkronisasi.
 - Tombol penghapusan juga tersedia pada Audit Log untuk aktivitas transaksi yang memiliki referensi transaksi.
-- Audit log tidak ikut dihapus. Aksi penghapusan dicatat sebagai `DELETE_TRANSAKSI` agar tetap menjadi jejak audit, bahkan ketika penghapusan file storage gagal sebagian (node `M1`) — kegagalan storage tidak boleh memblokir integritas data transaksi/audit.
+- Audit log tidak ikut dihapus. Aksi penghapusan dicatat sebagai `DELETE_TRANSAKSI` agar tetap menjadi jejak audit, bahkan ketika penghapusan file storage gagal sebagian (node `M1`) - kegagalan storage tidak boleh memblokir integritas data transaksi/audit.
 
 ## Penyimpanan File
 
