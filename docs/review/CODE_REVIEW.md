@@ -180,22 +180,8 @@ Ringkasan review perubahan UI/UX autentikasi:
 - `src/app/globals.css` menambah token component `auth-hero-*` dan `input-placeholder` tanpa primitive hex baru. Kontras hero, deskripsi, motto, copyright, placeholder, dan teks sekunder diperkuat melalui token semantic.
 - `src/components/theme-toggle.tsx` tetap menjaga pola mounted check, menambahkan `suppressHydrationWarning`, target sentuh 44px, dan focus-visible ring; komponen ini juga dipakai oleh shell Admin dan Anggota sehingga perubahan berlaku konsisten.
 - Tab auth dan tombol submit memiliki focus-visible ring, radius tombol submit 6px, label input tetap terasosiasi, dan tidak ada perubahan logic submit atau validasi.
-- Typecheck, lint, build, scan shared component/token/hex/lazy-loading, dan `git diff --check` telah lulus. Risiko residual visual hanya memerlukan pengecekan manual pada device nyata di breakpoint 360px, 640px, 768px, dan 1024px.
-```
-
----
-
-## PR baru - Top Bar Auth dan Scrollbar Global
-
-**PR:** menunggu nomor PR
-**Repo:** htnuinar26/htn-legacy
-**Status:** [ ] belum dicopas
-
-```text
-Ringkasan review perubahan top bar auth dan scrollbar global:
-
 - `src/components/views/login-view.tsx` sekarang menempatkan header di dalam panel form. Header memakai `--bg-base`, sehingga tidak menjadi strip putih terpisah dan pada mobile menggabungkan logo kiri dengan toggle tema kanan.
-- `src/app/globals.css` memperluas aturan scrollbar yang sebelumnya hanya berlaku pada `.scroll-area-custom` menjadi global untuk root dan area scroll lain. Ukuran tetap tipis, warna memakai `--border-default`/`--ink-muted`, dan behavior scroll tidak diubah.
+- `src/app/globals.css` memperluas aturan scrollbar yang sebelumnya hanya berlaku pada `.scroll-area-custom` menjadi global. Ukuran tetap tipis, warna memakai token semantic, dan behavior scroll tidak diubah.
 - Border vertikal hero/form tetap memakai `--auth-hero-border` pada desktop; hero tetap disembunyikan pada mobile sehingga tidak ada garis panel yang mengganggu.
-- `CHANGELOG.md`, `TODO.md`, dan `worklog.md` mencatat follow-up ini. Typecheck, lint, build, scan header/scrollbar, dan `git diff --check` telah lulus.
+- Typecheck, lint, build, scan shared component/token/hex/lazy-loading, dan `git diff --check` telah lulus. Risiko residual visual hanya memerlukan pengecekan manual pada device nyata di breakpoint 360px, 640px, 768px, dan 1024px.
 ```
