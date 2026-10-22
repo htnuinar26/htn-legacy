@@ -95,7 +95,7 @@ Catatan untuk `docs/review/CODE_REVIEW.md`:
 
 **PR:** 25
 **Repo:** htnuinar26/htn-legacy
-**Status:** [ ] belum dicopas
+**Status:** [x] sudah dicopas
 
 ```
 Ringkasan review PR #25:
@@ -110,3 +110,21 @@ Ringkasan review PR #25:
 ```
 
 **Status**: [ ] belum dicopas
+
+---
+
+## PR baru - Responsif Mobile dan Aset Icon
+
+**PR:** menunggu nomor PR
+**Repo:** htnuinar26/htn-legacy
+**Status:** [ ] belum dicopas
+
+```text
+Ringkasan review perubahan responsif mobile dan aset icon:
+
+- `public/icon.svg` kini ikut ter-track sehingga referensi `/icon.svg` tidak lagi menghasilkan 404. Ukuran aset relatif besar, jadi deployment perlu tetap mengikutsertakan folder `public/` dalam proses build standalone.
+- `src/components/shells/admin-shell.tsx` dan `src/components/shells/member-shell.tsx` menambahkan batas lebar minimum, truncation, padding bertingkat, dan pencegahan overflow horizontal. Perlu regresi visual pada nama instance yang sangat panjang.
+- `src/components/blocks/ui.tsx`, `src/app/globals.css`, dan view Admin/Anggota menyesuaikan wrapping serta ukuran ringkasan untuk mobile. Tabel tetap menggunakan scroll lokal, sehingga perilaku sentuh perlu diperiksa pada perangkat nyata.
+- `CHANGELOG.md`, `TODO.md`, dan `worklog.md` sudah mencatat cakupan dan hasil validasi; status TODO ditandai selesai setelah typecheck, lint, build, scan aset, dan pemeriksaan responsive statis lulus.
+- Tidak ditemukan isu blocker pada review statis. Risiko residual adalah perbedaan rendering breakpoint dan overflow yang hanya muncul pada data sangat panjang atau perangkat tertentu.
+```
