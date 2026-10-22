@@ -18,15 +18,13 @@ export const metadata: Metadata = {
   description:
     "Sistem internal pencatatan iuran, receipt pembayaran, kas organisasi, laporan, dan audit log.",
   icons: {
-    // Ikon tab browser: pakai favicon.ico yang sudah disiapkan. Tidak boleh
-    // memakai logo.svg (3 MB) karena browser menolak atau gagal memuatnya
-    // dalam waktu wajar, sehingga platform deployment menampilkan ikon bawaan.
+    // Gunakan aset identitas aktif dari public/ untuk seluruh platform.
     icon: [
       { url: "/favicon.ico", sizes: "any" },
-      { url: "/assets/logo.png", type: "image/png", sizes: "512x512" },
+      { url: "/icon.svg", type: "image/svg+xml" },
     ],
     apple: [
-      { url: "/assets/logo.png", sizes: "512x512", type: "image/png" },
+      { url: "/icon.svg", type: "image/svg+xml" },
     ],
   },
 };
