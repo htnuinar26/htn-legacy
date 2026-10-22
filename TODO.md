@@ -10,6 +10,20 @@ Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
 
 ## Active plans
 
+### Audit 2026-10-22 - `fix/full-codebase-regression-audit`
+
+Sumber: audit `graphify-out/`, `docs/`, `logs/`, dan seluruh codebase. Cakupan
+meliputi branding, storage, auth, kontrak API, input nominal, dokumentasi, dan
+verifikasi build.
+
+- [x] Ganti seluruh referensi logo yang sudah dihapus dengan aset logo aktif di `public/`.
+- [x] Migrasikan adapter storage ke Supabase Storage dengan signed URL dan hapus fallback lokal production.
+- [x] Tolak konfigurasi JWT production yang memakai secret fallback.
+- [x] Pastikan seluruh Route Handler memakai kontrak `apiSuccess()`/`apiError()` dan logging memiliki endpoint serta requestId.
+- [x] Sinkronkan `RupiahInput` dengan kontrak nominal dan tambahkan regresi untuk nominal wajar.
+- [x] Sinkronkan dokumentasi aktif dan hapus kontradiksi dokumentasi yang ditemukan.
+- [x] Jalankan verifikasi typecheck, lint, build, pencarian regresi, dan `git diff --check`.
+
 ### PR #1 - `fix/production-config` - Konfigurasi produksi dan gate validasi
 
 Sumber: audit 2026-10-21, temuan CRITICAL #1, HIGH #9, #10, #11, #12, dan utang
@@ -135,9 +149,8 @@ Sumber: audit 2026-10-21, LOW dan temuan dokumentasi.
 Pekerjaan yang sudah dibahas dan disepakati tetapi **belum** boleh mulai pada
 rentang PR di atas.
 
-- [ ] Implementasi adapter Supabase Storage di `src/lib/storage.ts`. Kontrak
-  interface sudah siap dan lingkungan sudah punya kredensial, tetapi penggantian
-  adapter bukan bagian dari 32 temuan audit dan waved secara manual.
+- [x] Implementasi adapter Supabase Storage di `src/lib/storage.ts`, termasuk signed URL,
+  penghapusan object, dan penolakan fallback lokal pada production.
 - [ ] Pembersihan git history untuk secret lama (`JWT_SECRET`, `ENCRYPTION_KEY`,
   `ADMIN_PASSWORD`) di commit `dfa0935` dan `88d6f99`, lalu rotasi nilainya di Neon
   dan Supabase. Butuh keputusan pemilik proyek karena merusak history.
@@ -167,9 +180,6 @@ rentang PR di atas.
 - Roti secret: `JWT_SECRET`, `ENCRYPTION_KEY`, dan `ADMIN_PASSWORD` versi lama masih
   ada di history git commit `dfa0935` dan `88d6f99`. Wajib dirotasi sebelum deploy
   produksi, lalu history dibersihkan.
-- `src/lib/storage.ts` masih memakai local file storage. Berkas receipt dan barcode
-  disajikan sebagai path publik di bawah `/storage`, belum signed URL seperti
-  kontrak `ARCHITECTURE.md`. Sudah ada di Deferred work.
 - Aplikasi masih memakai routing SPA di route `/` (`src/lib/nav-store.ts`). URL view
   tidak bisa dibagikan dan tidak ada route `App Router` per halaman seperti daftar
   di `ARCHITECTURE.md`.

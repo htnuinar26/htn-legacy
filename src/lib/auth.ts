@@ -7,9 +7,17 @@ import { SignJWT, jwtVerify } from "jose";
 import { db } from "@/lib/db";
 import { apiError } from "@/lib/api-response";
 
-const JWT_SECRET = process.env.JWT_SECRET ?? "dev-jwt-secret";
+const JWT_SECRET = process.env.JWT_SECRET;
 const encoder = new TextEncoder();
-const key = encoder.encode(JWT_SECRET);
+
+function getJwtKey() {
+  if (!JWT_SECRET || JWT_SECRET.length < 32) {
+    throw new Error(
+      "JWT_SECRET wajib dikonfigurasi dan memiliki panjang minimal 32 karakter."
+    );
+  }
+  return encoder.encode(JWT_SECRET);
+}
 
 const SESSION_COOKIE = "htn-session";
 const ADMIN_COOKIE = "htn-admin";
@@ -33,12 +41,12 @@ async function signToken(
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_MAX_AGE}s`)
-    .sign(key);
+    .sign(getJwtKey());
 }
 
 async function verifyToken<T = unknown>(token: string): Promise<T | null> {
   try {
-    const { payload } = await jwtVerify(token, key);
+    const { payload } = await jwtVerify(token, getJwtKey());
     return payload as unknown as T;
   } catch {
     return null;

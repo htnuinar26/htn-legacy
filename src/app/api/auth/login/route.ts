@@ -57,6 +57,6 @@ export async function POST(req: NextRequest) {
       nama: anggota.nama,
     });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/auth/login");
   }
 }

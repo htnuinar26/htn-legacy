@@ -189,7 +189,7 @@ export async function POST(req: NextRequest) {
       return apiError(
         "STORAGE_ERROR",
         "Gagal mengunggah file receipt ke storage. Silakan coba lagi. Detail kegagalan telah dicatat di server log.",
-        { cause: storageErr }
+        { cause: storageErr, endpoint: "/api/struk/upload" }
       );
     }
 
@@ -247,10 +247,10 @@ export async function POST(req: NextRequest) {
       return apiError(
         classified.category === "CONFLICT" ? "CONFLICT" : "DATABASE_ERROR",
         classified.message,
-        { cause: dbErr }
+        { cause: dbErr, endpoint: "/api/struk/upload" }
       );
     }
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/struk/upload");
   }
 }

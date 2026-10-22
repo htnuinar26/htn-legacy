@@ -11,7 +11,7 @@
 
 **PR:** 22
 **Repo:** htnuinar26/htn-legacy
-**Status:** [ ] belum dicopas
+**Status:** [x] sudah dicopas
 
 ```
 Ringkasan perubahan PR #22:
@@ -88,5 +88,25 @@ Catatan untuk `docs/review/CODE_REVIEW.md`:
 ```
 
 ---
+
+---
+
+## PR #25
+
+**PR:** 25
+**Repo:** htnuinar26/htn-legacy
+**Status:** [ ] belum dicopas
+
+```
+Ringkasan review PR #25:
+
+- `src/lib/storage.ts` sekarang memakai Supabase Storage dan signed URL pada production. Pastikan deployment mengisi `SUPABASE_URL`, secret server-only, dan bucket yang benar; fallback lokal hanya aman untuk development.
+- `src/lib/auth.ts` menolak JWT secret kosong atau terlalu pendek. Ini aman untuk production, tetapi environment deployment lama akan gagal login sampai secret diperbarui.
+- Referensi logo lama sudah diganti ke `/icon.svg`; aset tersebut harus tetap tersedia di `public/` saat deployment.
+- `apiUnexpected()` kini menerima endpoint dan helper log menyimpan endpoint, requestId, serta payload opsional. Pemanggil baru harus terus menghindari payload sensitif seperti password.
+- `RupiahInput` memakai `pattern="[0-9]*"` dan form nominal memakai `noValidate`, sehingga separator ribuan tidak ditolak browser sementara validasi server tetap menjadi sumber kebenaran.
+- Approval, rejection, dan receipt generator mencatat audit dalam transaksi database yang sama, sehingga kegagalan audit tidak meninggalkan state receipt parsial.
+- Validasi typecheck, lint, build, regression scan, dan `git diff --check` telah lulus.
+```
 
 **Status**: [ ] belum dicopas

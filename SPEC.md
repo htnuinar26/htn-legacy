@@ -196,7 +196,7 @@ struk/{YYYY-MM}/{filename}
 assets/barcode-{timestamp}.{extension}
 ```
 
-Database menyimpan path object. UI menerima signed URL. Jangan menggunakan secret Supabase di client component.
+Database menyimpan path object. UI menerima signed URL yang berlaku terbatas. Jangan menggunakan secret Supabase di client component. Pada production, konfigurasi Supabase wajib tersedia dan adapter lokal tidak boleh dipakai sebagai fallback.
 
 Aturan tambahan:
 

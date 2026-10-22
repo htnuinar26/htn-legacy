@@ -25,11 +25,11 @@ export async function GET() {
       // Path objek storage BUKAN URL yang bisa dibuka browser. Selalu
       // kirimkan URL siap pakai supaya client tidak memakai path mentah
       // sebagai atribut src (menghasilkan 404 atau error next/image).
-      barcodeUrl: settings.barcodePath ? getSignedUrl(settings.barcodePath) : null,
+      barcodeUrl: settings.barcodePath ? await getSignedUrl(settings.barcodePath) : null,
       namaOrganisasi: settings.namaOrganisasi,
     });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/settings");
   }
 }
 
@@ -120,15 +120,16 @@ export async function PATCH(req: NextRequest) {
         // `setSettings(json.data)` setelah simpan, jadi bila field ini tidak
         // dikirim, barcode yang sudah terunggah akan hilang dari tampilan.
         barcodePath: updated.barcodePath,
-        barcodeUrl: updated.barcodePath ? getSignedUrl(updated.barcodePath) : null,
+      barcodeUrl: updated.barcodePath ? await getSignedUrl(updated.barcodePath) : null,
       });
     } catch (dbErr) {
       const classified = classifyPrismaError(dbErr);
       return apiError(classified.category, classified.message, {
         cause: dbErr,
+        endpoint: "/api/settings",
       });
     }
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/settings");
   }
 }

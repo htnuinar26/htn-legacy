@@ -31,6 +31,6 @@ export async function POST(req: NextRequest) {
 
     return apiSuccess({ nama: "Bendahara" });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/auth/admin-login");
   }
 }

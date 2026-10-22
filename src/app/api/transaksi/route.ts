@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
       periodeBerjalan: (await getSettings()).periodeBerjalan,
     });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/transaksi");
   }
 }
 
@@ -170,9 +170,10 @@ export async function POST(req: NextRequest) {
       const classified = classifyPrismaError(dbErr);
       return apiError(classified.category, classified.message, {
         cause: dbErr,
+        endpoint: "/api/transaksi",
       });
     }
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/transaksi");
   }
 }

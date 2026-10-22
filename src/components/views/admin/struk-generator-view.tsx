@@ -190,7 +190,7 @@ export function StrukGeneratorView() {
             title="Form Struk Manual"
             description="Pilih anggota tanpa receipt aktif, isi nominal, lalu generate."
           />
-          <form onSubmit={handleGenerate} className="space-y-5 p-5">
+          <form noValidate onSubmit={handleGenerate} className="space-y-5 p-5">
             <div className="space-y-1.5">
               <label htmlFor="gen-anggota" className="block text-sm font-medium text-[var(--ink)]">
                 Anggota *

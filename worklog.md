@@ -69,3 +69,20 @@ Stage Summary:
 - RISIKO TERTINGGAL: password anggota versi lama memakai format iv:tag:ciphertext heksadesimal dengan IV 16 byte, sedangkan src/lib/crypto.ts memakai base64 iv(12 byte) || tag || ciphertext. Dua anggota yang ada belum bisa login dengan password lamanya dan perlu reset password oleh Admin.
 - RISIKO TERTINGGAL: JWT_SECRET, ENCRYPTION_KEY, dan ADMIN_PASSWORD versi lama masih ada di history git commit dfa0935 dan 88d6f99, wajib dirotasi sebelum deploy produksi.
 - CATATAN: file .zscripts/build.sh, scripts/dark-mode-verify.sh, scripts/regression-test.sh, scripts/ui-verify.sh, dan start-dev.sh masih mengandung em-dash karena memiliki perubahan lokal yang belum di-commit dan di luar cakupan 32 temuan.
+
+---
+Task ID: AUDIT-2
+Agent: main
+Task: Menindaklanjuti audit codebase 2026-10-22 sampai validasi dan Pull Request.
+
+Work Log:
+- Mengganti referensi `/logo.svg` yang sudah dihapus dengan `public/icon.svg` pada splash, login, shell, dan metadata.
+- Mengubah adapter storage agar memakai Supabase Storage dan signed URL pada production, dengan fallback lokal hanya untuk development serta validasi object path.
+- Menghapus fallback JWT secret, memperkuat logging endpoint API, menangkap exception session/logout, dan menyeragamkan root API dengan `apiSuccess()`.
+- Menyelaraskan `RupiahInput`, form nominal, atomisitas audit receipt, dokumentasi root, dan `TODO.md`.
+- Verifikasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build`, regression scan, dan `git diff --check`.
+- Membuat Issue #24 dan Pull Request #25 pada branch `fix/full-codebase-regression-audit`; PR tidak di-merge.
+
+Stage Summary:
+- Temuan audit aktif sudah diperbaiki dan diverifikasi ulang.
+- Deployment production membutuhkan konfigurasi Supabase Storage dan `JWT_SECRET` minimal 32 karakter.

@@ -49,7 +49,7 @@ export function SplashProvider({ children }: { children: React.ReactNode }) {
       >
         <div className="flex flex-col items-center gap-6">
           <Image
-            src="/logo.svg"
+            src="/icon.svg"
             alt="HTN Legacy"
             width={96}
             height={96}

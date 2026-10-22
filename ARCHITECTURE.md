@@ -63,6 +63,7 @@ Setiap Route Handler di `src/app/api/**` wajib mengikuti kontrak berikut:
    - `INTERNAL_ERROR` (500) - kegagalan lain yang tidak terklasifikasi; kategori ini adalah fallback terakhir, bukan default pertama.
 3. **Pesan ke client selalu spesifik dan dalam Bahasa Indonesia**, menjelaskan apa yang gagal dan jika memungkinkan apa yang harus dilakukan user. Dilarang mengembalikan pesan generik seperti "Terjadi kesalahan" atau "Gagal membuat struk manual" tanpa konteks tambahan. Contoh pesan yang benar: "Gagal membuat struk manual: anggota ini sudah memiliki receipt PENDING pada periode 2026-10."
 4. **Logging server wajib** untuk setiap error kategori `STORAGE_ERROR`, `DATABASE_ERROR`, dan `INTERNAL_ERROR`: catat `requestId`, endpoint, kategori error, pesan error asli (termasuk stack trace di server log, tidak dikirim ke client), dan payload yang relevan (tanpa data sensitif seperti password). Ini memungkinkan penelusuran lewat Vercel Function Logs tanpa harus mereproduksi bug secara manual.
+   Helper menerima endpoint dan payload non-sensitif secara eksplisit agar setiap log dapat dikorelasikan tanpa mencatat password atau secret.
 5. Setiap Route Handler mengembalikan bentuk response yang konsisten:
 
 ```ts

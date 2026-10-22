@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     });
 
     return apiSuccess(
-      strukList.map((s) => ({
+      Promise.all(strukList.map(async (s) => ({
         id: s.id,
         anggotaId: s.anggotaId,
         anggotaNama: s.anggota.nama,
@@ -38,12 +38,12 @@ export async function GET(req: NextRequest) {
         sumber: s.sumber,
         alasanReject: s.alasanReject,
         catatan: s.catatan,
-        url: getSignedUrl(s.filePath),
+        url: await getSignedUrl(s.filePath),
         createdAt: s.createdAt,
         reviewedAt: s.reviewedAt,
-      }))
+      })))
     );
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/struk");
   }
 }
