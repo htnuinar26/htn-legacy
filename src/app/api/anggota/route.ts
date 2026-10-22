@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
 
     return apiSuccess(anggotaList);
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/anggota");
   }
 }
 
@@ -156,9 +156,10 @@ export async function POST(req: NextRequest) {
       const classified = classifyPrismaError(dbErr);
       return apiError(classified.category, classified.message, {
         cause: dbErr,
+        endpoint: "/api/anggota",
       });
     }
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/anggota");
   }
 }
