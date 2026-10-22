@@ -4,7 +4,7 @@ import { apiSuccess, apiError, apiUnexpected } from "@/lib/api-response";
 import { isAdmin } from "@/lib/auth";
 import { getSignedUrl } from "@/lib/storage";
 
-// GET /api/struk — daftar struk untuk review Admin.
+// GET /api/struk - daftar struk untuk review Admin.
 // Query: ?status=PENDING|APPROVED|REJECTED  (default: semua)
 export async function GET(req: NextRequest) {
   try {
