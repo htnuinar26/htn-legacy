@@ -5,7 +5,7 @@ import { getMemberSession, isAdmin } from "@/lib/auth";
 import { getSettings } from "@/lib/settings";
 import { currentPeriod, formatRupiah } from "@/lib/format";
 
-// GET /api/dashboard — statistik ringkasan.
+// GET /api/dashboard - statistik ringkasan.
 // Anggota: stats pribadi. Admin: stats organisasi.
 export async function GET(_req: NextRequest) {
   try {
