@@ -96,25 +96,28 @@ export async function POST(
       // kedua kali pada periode yang sama akan menabrak P2002. Error itu
       // harus diklasifikasi sebagai CONFLICT, bukan jatuh ke generic 500.
       try {
-        const updated = await db.struk.update({
-          where: { id },
-          data: {
-            status: "REJECTED",
-            alasanReject: alasan?.trim(),
-            reviewedAt: new Date(),
-            reviewedBy: "admin",
-          },
-        });
+        const updated = await db.$transaction(async (tx) => {
+          const nextStruk = await tx.struk.update({
+            where: { id },
+            data: {
+              status: "REJECTED",
+              alasanReject: alasan?.trim(),
+              reviewedAt: new Date(),
+              reviewedBy: "admin",
+            },
+          });
 
-        await db.auditLog.create({
-          data: {
-            aksi: "REJECT_STRUK",
-            actorNama: "Bendahara",
-            deskripsi: `Menolak struk ${struk.periodeBulan} milik ${struk.anggota.nama}. Alasan: ${alasan?.trim()}`,
-            refType: "Struk",
-            refId: struk.id,
-            detail: alasan?.trim(),
-          },
+          await tx.auditLog.create({
+            data: {
+              aksi: "REJECT_STRUK",
+              actorNama: "Bendahara",
+              deskripsi: `Menolak struk ${struk.periodeBulan} milik ${struk.anggota.nama}. Alasan: ${alasan?.trim()}`,
+              refType: "Struk",
+              refId: struk.id,
+              detail: alasan?.trim(),
+            },
+          });
+          return nextStruk;
         });
 
         return apiSuccess({
@@ -127,13 +130,13 @@ export async function POST(
           return apiError(
             "CONFLICT",
             `Struk ${struk.periodeBulan} milik ${struk.anggota.nama} sudah pernah ditolak pada periode ini. Gunakan periode lain atau hapus receipt lama dari daftar review.`,
-            { cause: rejectErr }
+            { cause: rejectErr, endpoint: "/api/struk/[id]/verify" }
           );
         }
         return apiError(
           "DATABASE_ERROR",
           "Gagal menyimpan penolakan struk: transaksi database gagal di tengah jalan, semua perubahan telah dibatalkan (rollback). Detail dicatat di server log. Silakan coba lagi.",
-          { cause: rejectErr }
+          { cause: rejectErr, endpoint: "/api/struk/[id]/verify" }
         );
       }
     }
@@ -175,18 +178,18 @@ export async function POST(
           });
         }
 
-        return updatedStruk;
-      });
+        await tx.auditLog.create({
+          data: {
+            aksi: "APPROVE_STRUK",
+            actorNama: "Bendahara",
+            deskripsi: `Menyetujui struk ${struk.periodeBulan} milik ${struk.anggota.nama}. Nominal: Rp ${nominalFinal.toLocaleString("id-ID")}.`,
+            refType: "Struk",
+            refId: struk.id,
+            detail: `nominal=${nominalFinal}`,
+          },
+        });
 
-      await db.auditLog.create({
-        data: {
-          aksi: "APPROVE_STRUK",
-          actorNama: "Bendahara",
-          deskripsi: `Menyetujui struk ${struk.periodeBulan} milik ${struk.anggota.nama}. Nominal: Rp ${nominalFinal.toLocaleString("id-ID")}.`,
-          refType: "Struk",
-          refId: struk.id,
-          detail: `nominal=${nominalFinal}`,
-        },
+        return updatedStruk;
       });
 
       return apiSuccess({
@@ -201,10 +204,10 @@ export async function POST(
         classified.category === "DATABASE_ERROR"
           ? "Gagal menyetujui struk: transaksi database gagal di tengah jalan, semua perubahan telah dibatalkan (rollback). Detail dicatat di server log. Silakan coba lagi."
           : classified.message,
-        { cause: txErr }
+        { cause: txErr, endpoint: "/api/struk/[id]/verify" }
       );
     }
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/struk/[id]/verify");
   }
 }
