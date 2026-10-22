@@ -1,4 +1,4 @@
-// HTN Legacy — Settings helper
+// HTN Legacy - Settings helper
 // Mengambil/membuat settings global tunggal.
 
 import { db } from "@/lib/db";
