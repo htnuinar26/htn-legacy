@@ -76,13 +76,9 @@ export function LoginView() {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-[var(--bg-base)] lg:flex-row">
-      <header className="absolute inset-x-0 top-0 z-20 flex h-16 items-center justify-end border-b border-[var(--border-default)] bg-[var(--surface)] px-4 sm:px-6">
-        <ThemeToggle />
-      </header>
-
+    <div className="flex min-h-screen flex-col bg-[var(--bg-base)] lg:flex-row">
       {/* Panel kiri - branding (desktop) */}
-      <div className="relative hidden flex-col justify-between border-r border-[var(--auth-hero-border)] bg-[var(--auth-hero-bg)] p-12 pt-28 text-[var(--auth-hero-fg)] lg:flex lg:w-1/2">
+      <div className="relative hidden flex-col justify-between border-r border-[var(--auth-hero-border)] bg-[var(--auth-hero-bg)] p-12 text-[var(--auth-hero-fg)] lg:flex lg:w-1/2">
         <div className="flex items-center gap-3">
           <Image src="/icon.svg" alt="HTN Legacy" width={48} height={48} />
           <div>
@@ -105,13 +101,12 @@ export function LoginView() {
       </div>
 
       {/* Panel kanan - form */}
-      <div className="relative flex flex-1 items-center justify-center p-6 pt-24 sm:p-12 sm:pt-28">
-        <div className="w-full max-w-md">
-          {/* Logo mobile */}
-          <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
-            <Image src="/icon.svg" alt="HTN Legacy" width={40} height={40} />
+      <div className="flex min-w-0 flex-1 flex-col bg-[var(--bg-base)]">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-[var(--border-default)] bg-[var(--bg-base)] px-4 sm:px-6 lg:justify-end">
+          <div className="flex items-center gap-3 lg:hidden">
+            <Image src="/icon.svg" alt="HTN Legacy" width={32} height={32} />
             <div>
-              <p className="text-base font-extrabold leading-tight text-[var(--ink)]">
+              <p className="text-sm font-extrabold leading-tight text-[var(--ink)]">
                 HTN Legacy
               </p>
               <p className="text-[10px] text-[var(--ink-soft)]">
@@ -119,9 +114,14 @@ export function LoginView() {
               </p>
             </div>
           </div>
+          <ThemeToggle />
+        </header>
 
-          {/* Tab mode */}
-          <div className="mb-6 flex gap-1 rounded-lg border border-[var(--border-default)] bg-[var(--surface)] p-1">
+        <div className="flex flex-1 items-start justify-center p-6 sm:p-12 lg:items-center">
+          <div className="w-full max-w-md">
+
+            {/* Tab mode */}
+            <div className="mb-6 flex gap-1 rounded-lg border border-[var(--border-default)] bg-[var(--surface)] p-1">
             <ModeButton
               active={mode === "login"}
               onClick={() => switchMode("login")}
@@ -140,20 +140,20 @@ export function LoginView() {
               icon={ShieldCheck}
               label="Admin"
             />
-          </div>
+            </div>
 
-          <h2 className="mb-1 text-xl font-bold text-[var(--ink)]">
+            <h2 className="mb-1 text-xl font-bold text-[var(--ink)]">
             {mode === "login" && "Masuk sebagai Anggota"}
             {mode === "signup" && "Daftar Anggota Baru"}
             {mode === "admin" && "Masuk Panel Admin"}
-          </h2>
-          <p className="mb-6 text-sm text-[var(--ink-soft)]">
+            </h2>
+            <p className="mb-6 text-sm text-[var(--ink-soft)]">
             {mode === "login" && "Gunakan nama dan password per aksi Anda."}
             {mode === "signup" && "Lengkapi data untuk membuat akun anggota."}
             {mode === "admin" && "Masukkan password Admin/Bendahara bersama."}
-          </p>
+            </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
             {mode !== "admin" && (
               <Field
                 id="login-nama"
@@ -237,7 +237,8 @@ export function LoginView() {
                 {mode === "admin" && "Masuk Admin"}
               </span>
             </button>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </div>
