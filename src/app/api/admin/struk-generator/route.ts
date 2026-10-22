@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
       return apiError(
         "STORAGE_ERROR",
         "Gagal menyimpan file struk manual ke storage. Detail dicatat di server log. Silakan coba lagi.",
-        { cause: storageErr }
+        { cause: storageErr, endpoint: "/api/admin/struk-generator" }
       );
     }
 
@@ -157,23 +157,23 @@ export async function POST(req: NextRequest) {
             data: { statusBayar: "LUNAS" },
           });
 
+          await tx.auditLog.create({
+            data: {
+              aksi: "CREATE_STRUK_MANUAL",
+              actorNama: "Bendahara",
+              deskripsi: `Membuat struk manual APPROVED untuk ${anggota.nama} periode ${periode}. Nominal: Rp ${nominalFinal.toLocaleString("id-ID")}.`,
+              refType: "Struk",
+              refId: struk.id,
+              detail: `nominal=${nominalFinal}, catatan=${catatan ?? ""}`,
+            },
+          });
+
           return struk;
         },
         {
           isolationLevel: "Serializable",
         }
       );
-
-      await db.auditLog.create({
-        data: {
-          aksi: "CREATE_STRUK_MANUAL",
-          actorNama: "Bendahara",
-          deskripsi: `Membuat struk manual APPROVED untuk ${anggota.nama} periode ${periode}. Nominal: Rp ${nominalFinal.toLocaleString("id-ID")}.`,
-          refType: "Struk",
-          refId: result.id,
-          detail: `nominal=${nominalFinal}, catatan=${catatan ?? ""}`,
-        },
-      });
 
       return apiSuccess({
         strukId: result.id,
@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
         // URL file struk manual siap pakai. Client tidak boleh menebak
         // path object dari strukId, karena nama file di storage adalah
         // UUID, bukan id database.
-        fileUrl: getSignedUrl(uploaded.path),
+        fileUrl: await getSignedUrl(uploaded.path),
         filePath: uploaded.path,
       });
     } catch (txErr) {
@@ -195,17 +195,17 @@ export async function POST(req: NextRequest) {
         return apiError(
           "CONFLICT",
           "Konflik data, silakan coba lagi. Anggota ini kemungkinan baru saja menerima receipt aktif dari jalur lain tepat sebelum submit.",
-          { cause: txErr }
+          { cause: txErr, endpoint: "/api/admin/struk-generator" }
         );
       }
       return apiError(
         "DATABASE_ERROR",
         "Gagal membuat struk manual: transaksi database gagal (kemungkinan konflik serialization atau constraint). Semua perubahan telah dibatalkan (rollback). Detail lengkap telah dicatat di server log dengan requestId. Silakan coba lagi.",
-        { cause: txErr }
+        { cause: txErr, endpoint: "/api/admin/struk-generator" }
       );
     }
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/admin/struk-generator");
   }
 }
 
