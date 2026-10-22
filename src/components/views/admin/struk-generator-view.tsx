@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import {
   FilePlus2,
   Loader2,
@@ -44,7 +45,20 @@ type GenResult = {
   nominal: number;
   periodeBulan: string;
   anggotaNama: string;
+  fileUrl: string;
+  filePath: string;
 } | null;
+
+// Skema validasi client sesuai ARCHITECTURE.md node H: "Client validasi Zod
+// sebelum submit, anggotaId wajib, nominal integer positif".
+const GeneratorClientSchema = z.object({
+  anggotaId: z.string().min(1, "Pilih anggota terlebih dahulu"),
+  nominal: z
+    .number({ message: "Nominal wajib diisi" })
+    .int("Nominal harus bilangan bulat positif")
+    .positive("Nominal harus lebih dari 0")
+    .max(2_000_000_000, "Nominal maksimal 2.000.000.000"),
+});
 
 export function StrukGeneratorView() {
   const [data, setData] = useState<GenData | null>(null);
@@ -81,13 +95,19 @@ export function StrukGeneratorView() {
     setError(null);
     setResult(null);
 
-    if (!selectedAnggota) {
-      setError({ message: "Pilih anggota terlebih dahulu.", fields: { anggotaId: "Wajib dipilih" } });
-      setSaving(false);
-      return;
-    }
-    if (!nominal || nominal <= 0) {
-      setError({ message: "Nominal harus bilangan bulat positif.", fields: { nominal: "Wajib diisi" } });
+    // Validasi client dengan Zod sebelum submit, sesuai node H pada
+    // ARCHITECTURE.md.
+    const parsed = GeneratorClientSchema.safeParse({
+      anggotaId: selectedAnggota,
+      nominal,
+    });
+    if (!parsed.success) {
+      setError({
+        message: "Data struk generator tidak valid.",
+        fields: Object.fromEntries(
+          parsed.error.issues.map((i) => [String(i.path[0] ?? "_"), i.message])
+        ),
+      });
       setSaving(false);
       return;
     }
@@ -152,8 +172,9 @@ export function StrukGeneratorView() {
             </p>
           </div>
           <a
-            href={`/storage/struk/${result.periodeBulan}/${result.strukId}.svg`}
-            onClick={(e) => e.preventDefault()}
+            href={result.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[var(--status-lunas)]/40 px-3 py-2 text-xs font-medium text-[var(--status-lunas)] hover:bg-white/20"
           >
             <Download className="h-3.5 w-3.5" />
@@ -181,7 +202,7 @@ export function StrukGeneratorView() {
                 className="input-editorial h-11"
                 required
               >
-                <option value="">— Pilih anggota —</option>
+                <option value="">- Pilih anggota -</option>
                 {data.anggota.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.nama}{a.nim ? ` (${a.nim})` : ""}
