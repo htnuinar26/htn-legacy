@@ -124,12 +124,12 @@ export function LaporanView() {
         title="Laporan"
         description={`Laporan keuangan dan status anggota per periode.`}
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <input
               type="month"
               value={bulan}
               onChange={(e) => setBulan(e.target.value)}
-              className="input-editorial h-11 text-sm"
+              className="input-editorial h-11 min-w-0 flex-1 text-sm sm:flex-none"
               aria-label="Pilih periode"
             />
             <button
