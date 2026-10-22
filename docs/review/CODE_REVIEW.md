@@ -203,3 +203,21 @@ Ringkasan review perubahan follow-up UI autentikasi:
 - `CHANGELOG.md`, `TODO.md`, dan `worklog.md` mencatat perubahan follow-up serta hasil validasi.
 - Typecheck, lint, build, dan `git diff --check` telah lulus. Tidak ada perubahan database, environment variable, storage, dependency, atau logic autentikasi.
 ```
+
+---
+
+## PR baru - Guard Payload Array dan Aset Above-the-fold
+
+**PR:** 37
+**Repo:** htnuinar26/htn-legacy
+**Status:** [ ] belum dicopas
+
+```text
+Ringkasan review perubahan tindak lanjut console log:
+
+- View anggota dan Admin menormalisasi payload array dari API sebelum memakai `.map` atau `.length`, termasuk array nested pada dashboard, kas, laporan, dan generator struk.
+- Logo yang tampil pada awal auth dan shell memakai `priority`, sehingga tidak ikut lazy loading dan tidak memicu intervensi placeholder untuk aset above-the-fold.
+- Status `401` login tetap dipertahankan sebagai `AUTH_ERROR`; perubahan tidak melemahkan kontrak autentikasi.
+- `CHANGELOG.md`, `TODO.md`, dan `worklog.md` mencatat cakupan serta validasi perubahan.
+- Typecheck, lint, build, dan `git diff --check` telah lulus. Tidak ada migration database, perubahan environment variable, storage, dependency, atau perubahan logic autentikasi.
+```

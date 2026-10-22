@@ -38,7 +38,7 @@ export function DaftarView() {
       .then((r) => r.json())
       .then((json) => {
         if (json.success) {
-          setList(json.data);
+          setList(Array.isArray(json.data) ? json.data : []);
         } else setError(json.error?.message ?? "Gagal memuat daftar.");
       })
       .catch(() => setError("Gagal terhubung ke server."))

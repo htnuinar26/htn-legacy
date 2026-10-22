@@ -63,6 +63,7 @@ export function BarcodeView() {
                   alt="Barcode pembayaran iuran"
                   width={240}
                   height={240}
+                  priority
                   className="h-60 w-60"
                 />
               </div>

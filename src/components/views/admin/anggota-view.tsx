@@ -58,7 +58,7 @@ export function AnggotaView() {
       const res = await fetch("/api/anggota");
       const json = await res.json();
       if (json.success) {
-        setList(json.data);
+        setList(Array.isArray(json.data) ? json.data : []);
       } else setError(json.error?.message ?? "Gagal memuat anggota.");
     } catch {
       setError("Gagal terhubung ke server.");

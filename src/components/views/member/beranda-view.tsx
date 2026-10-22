@@ -67,7 +67,17 @@ export function BerandaView({
     fetch("/api/dashboard")
       .then((r) => r.json())
       .then((json) => {
-        if (json.success) setData(json.data);
+        if (json.success && json.data && typeof json.data === "object") {
+          setData({
+            ...json.data,
+            strukTerbaru: Array.isArray(json.data.strukTerbaru)
+              ? json.data.strukTerbaru
+              : [],
+            transaksiTerbaru: Array.isArray(json.data.transaksiTerbaru)
+              ? json.data.transaksiTerbaru
+              : [],
+          });
+        }
         else setError(json.error);
       })
       .catch(() => setError({ message: "Gagal memuat data dashboard." }))

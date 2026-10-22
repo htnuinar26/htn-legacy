@@ -10,6 +10,15 @@ Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
 
 ## Active plans
 
+### Revisi 2026-10-22 - `fix/console-log-array-payload`
+
+Sumber: `logs/console.log` yang mencatat crash `.map` dan intervensi lazy-image pada aset identitas.
+
+- [x] Normalisasi payload array sebelum seluruh view memanggil `.map` atau memakai `.length`.
+- [x] Prioritaskan logo above-the-fold agar tidak dimuat lazy oleh Next Image.
+- [x] Verifikasi bahwa `401` login tetap diperlakukan sebagai error autentikasi terklasifikasi, bukan diubah menjadi sukses.
+- [x] Jalankan typecheck, lint, build, dan `git diff --check`.
+
 ### Revisi 2026-10-22 - `fix/auth-topbar-scrollbar-mobile`
 
 Sumber: follow-up UI auth untuk top bar, scrollbar, pemisah panel, dan mobile 360px.

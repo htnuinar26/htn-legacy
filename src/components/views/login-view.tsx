@@ -80,7 +80,7 @@ export function LoginView() {
       {/* Panel kiri - branding (desktop) */}
       <div className="relative hidden flex-col justify-between border-r border-[var(--auth-hero-border)] bg-[var(--auth-hero-bg)] p-12 text-[var(--auth-hero-fg)] lg:flex lg:w-1/2">
         <div className="flex items-center gap-3">
-          <Image src="/icon.svg" alt="HTN Legacy" width={48} height={48} />
+          <Image src="/icon.svg" alt="HTN Legacy" width={48} height={48} priority />
           <div>
             <p className="text-lg font-extrabold leading-tight">HTN Legacy</p>
             <p className="text-xs text-[var(--auth-hero-muted)]">Constitutio et Iustitia</p>
@@ -104,7 +104,7 @@ export function LoginView() {
       <div className="flex min-w-0 flex-1 flex-col bg-[var(--bg-base)]">
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-[var(--border-default)] bg-[var(--bg-base)] px-4 sm:px-6 lg:justify-end">
           <div className="flex items-center gap-3 lg:hidden">
-            <Image src="/icon.svg" alt="HTN Legacy" width={32} height={32} />
+            <Image src="/icon.svg" alt="HTN Legacy" width={32} height={32} priority />
             <div>
               <p className="text-sm font-extrabold leading-tight text-[var(--ink)]">
                 HTN Legacy

@@ -61,7 +61,7 @@ export function StrukReviewView() {
       const statusParam = filter === "ALL" ? "" : `?status=${filter}`;
       const res = await fetch(`/api/struk${statusParam}`);
       const json = await res.json();
-      if (json.success) setList(json.data);
+      if (json.success) setList(Array.isArray(json.data) ? json.data : []);
       else setError(json.error);
     } catch {
       setError({ message: "Gagal terhubung ke server." });
