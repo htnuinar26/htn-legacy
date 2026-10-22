@@ -146,3 +146,21 @@ Ringkasan review perubahan pelacakan dokumentasi proyek:
 - Artifact lokal `.agents/`, `.opencode/`, `graphify-out/`, dan `desktop.ini` sengaja tidak dimasukkan karena bukan sumber proyek yang layak dilacak.
 - Typecheck, lint, build, scan encoding, dan `git diff --check` telah lulus. Tidak ada migration database atau perubahan environment variable.
 ```
+
+---
+
+## PR baru - Perbaikan Console Log Autentikasi
+
+**PR:** menunggu nomor PR
+**Repo:** htnuinar26/htn-legacy
+**Status:** [ ] belum dicopas
+
+```text
+Ringkasan review perubahan console log autentikasi:
+
+- `src/app/api/auth/login/route.ts` sekarang mengklasifikasikan error konfigurasi JWT sebagai `INTERNAL_ERROR` dan error Prisma sebagai `DATABASE_ERROR`/`CONFLICT`, dengan endpoint dan cause untuk server log.
+- `src/components/views/login-view.tsx` tetap memproses response JSON pada status non-2xx, sehingga pesan kategori, field, dan request ID dapat ditampilkan kepada pengguna.
+- `src/components/views/admin/struk-review-view.tsx` tidak lagi menunda thumbnail receipt dengan `loading="lazy"`, sehingga intervensi lazy-image pada log browser dihilangkan dari sumbernya.
+- `CHANGELOG.md`, `TODO.md`, dan `worklog.md` mencatat cakupan serta hasil validasi. Konflik signup 409 tetap dipertahankan sesuai kontrak API.
+- Typecheck, lint, build, scan tidak adanya lazy loading, dan `git diff --check` telah lulus. Tidak ada migration database atau perubahan environment variable.
+```
