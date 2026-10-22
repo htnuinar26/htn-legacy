@@ -1,5 +1,5 @@
 #!/bin/bash
-# HTN Legacy — Final dark mode + member flow verification (single session)
+# HTN Legacy - Final dark mode + member flow verification (single session)
 set +e
 cd /home/z/my-project
 pkill -f "next" 2>/dev/null
