@@ -133,7 +133,7 @@ Ringkasan review perubahan responsif mobile dan aset icon:
 
 ## PR baru - Pelacakan Dokumentasi Proyek
 
-**PR:** menunggu nomor PR
+**PR:** 29
 **Repo:** htnuinar26/htn-legacy
 **Status:** [ ] belum dicopas
 
