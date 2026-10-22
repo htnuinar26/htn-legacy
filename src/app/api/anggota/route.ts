@@ -7,16 +7,21 @@ import {
   apiUnexpected,
   classifyPrismaError,
 } from "@/lib/api-response";
-import { isAdmin, getMemberSession } from "@/lib/auth";
+import { isAdmin, requireMemberOrAdmin } from "@/lib/auth";
 import { encryptPassword } from "@/lib/crypto";
 import { getSettings } from "@/lib/settings";
 
-// GET /api/anggota — daftar anggota (Admin: semua; Anggota: list ringkas publik).
+// GET /api/anggota - daftar anggota.
+// Admin melihat data lengkap, anggota melihat list ringkas (nama, NIM, status).
+// Tanpa session, request DITOLAK: direktori anggota tidak boleh bocor ke tamu.
 export async function GET(req: NextRequest) {
   try {
+    const guard = await requireMemberOrAdmin();
+    if (!guard.ok) return guard.response;
+    const admin = guard.isAdmin;
+
     const { searchParams } = new URL(req.url);
     const q = searchParams.get("q") ?? "";
-    const admin = await isAdmin();
 
     const where = q
       ? {
@@ -65,9 +70,10 @@ const CreateAnggotaSchema = z.object({
   telepon: z.string().optional(),
   password: z.string().min(4, "Password minimal 4 karakter"),
   statusBayar: z.enum(["LUNAS", "BELUM_LUNAS", "TERTUNGGAK"]).optional(),
+  catatan: z.string().optional(),
 });
 
-// POST /api/anggota — buat anggota baru (Admin).
+// POST /api/anggota - buat anggota baru (Admin).
 export async function POST(req: NextRequest) {
   try {
     const admin = await isAdmin();
@@ -93,14 +99,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { nama, nim, email, telepon, password, statusBayar } = parsed.data;
+    const { nama, nim, email, telepon, password, statusBayar, catatan } = parsed.data;
     const settings = await getSettings();
 
-    // Cek duplikat.
+    // Cek duplikat. Nama dicocokkan tanparegarding huruf besar-kecil.
     const existing = await db.anggota.findFirst({
       where: {
         OR: [
-          { nama: { equals: nama } },
+          { nama: { equals: nama, mode: "insensitive" } },
           ...(nim ? [{ nim: { equals: nim } }] : []),
           ...(email ? [{ email: { equals: email } }] : []),
         ],
@@ -108,7 +114,11 @@ export async function POST(req: NextRequest) {
     });
     if (existing) {
       const field =
-        existing.nama === nama ? "nama" : existing.nim === nim ? "nim" : "email";
+        existing.nama.toLowerCase() === nama.toLowerCase()
+          ? "nama"
+          : existing.nim === nim
+            ? "nim"
+            : "email";
       return apiError("CONFLICT", `${field} sudah terdaftar.`, {
         fields: { [field]: `${field} sudah terdaftar` },
       });
@@ -124,6 +134,7 @@ export async function POST(req: NextRequest) {
           passwordEnc: encryptPassword(password),
           periodeBerjalan: settings.periodeBerjalan,
           statusBayar: statusBayar ?? "BELUM_LUNAS",
+          catatan: catatan || null,
         },
       });
 

@@ -13,11 +13,15 @@ import { getSettings } from "@/lib/settings";
 const VerifySchema = z.object({
   action: z.enum(["approve", "reject"]),
   alasan: z.string().optional(),
-  nominal: z.number().int().positive().optional(),
+  // `null` diperbolehkan karena client mengirim `nominal: null` ketika Admin
+  // tidak mengisi nominal secara manual. Null diperlakukan sama seperti
+  // tidak dikirim, sehingga fallback ke nominal receipt atau nominal iuran
+  // tetap terpakai.
+  nominal: z.number().int().positive().nullable().optional(),
 });
 
 // POST /api/struk/[id]/verify
-// Approval: transaksi DB atomik — Struk APPROVED, simpan nominal,
+// Approval: transaksi DB atomik - Struk APPROVED, simpan nominal,
 //   buat Transaksi MASUK, Anggota periode berjalan jadi LUNAS.
 // Rejection: simpan alasan, buka kembali akses kirim ulang.
 export async function POST(
@@ -86,31 +90,52 @@ export async function POST(
 
     if (action === "reject") {
       // Rejection: simpan alasan, buka kembali akses kirim ulang.
-      const updated = await db.struk.update({
-        where: { id },
-        data: {
-          status: "REJECTED",
-          alasanReject: alasan?.trim(),
-          reviewedAt: new Date(),
-          reviewedBy: "admin",
-        },
-      });
+      // Catatan: anggota boleh mengirim ulang pada periode yang sama setelah
+      // ditolak. Karena `Struk` punya unique constraint
+      // [anggotaId, periodeBulan, status], setting status menjadi REJECTED
+      // kedua kali pada periode yang sama akan menabrak P2002. Error itu
+      // harus diklasifikasi sebagai CONFLICT, bukan jatuh ke generic 500.
+      try {
+        const updated = await db.struk.update({
+          where: { id },
+          data: {
+            status: "REJECTED",
+            alasanReject: alasan?.trim(),
+            reviewedAt: new Date(),
+            reviewedBy: "admin",
+          },
+        });
 
-      await db.auditLog.create({
-        data: {
-          aksi: "REJECT_STRUK",
-          actorNama: "Bendahara",
-          deskripsi: `Menolak struk ${struk.periodeBulan} milik ${struk.anggota.nama}. Alasan: ${alasan?.trim()}`,
-          refType: "Struk",
-          refId: struk.id,
-          detail: alasan?.trim(),
-        },
-      });
+        await db.auditLog.create({
+          data: {
+            aksi: "REJECT_STRUK",
+            actorNama: "Bendahara",
+            deskripsi: `Menolak struk ${struk.periodeBulan} milik ${struk.anggota.nama}. Alasan: ${alasan?.trim()}`,
+            refType: "Struk",
+            refId: struk.id,
+            detail: alasan?.trim(),
+          },
+        });
 
-      return apiSuccess({
-        strukId: updated.id,
-        status: updated.status,
-      });
+        return apiSuccess({
+          strukId: updated.id,
+          status: updated.status,
+        });
+      } catch (rejectErr) {
+        const classified = classifyPrismaError(rejectErr);
+        if (classified.category === "CONFLICT") {
+          return apiError(
+            "CONFLICT",
+            `Struk ${struk.periodeBulan} milik ${struk.anggota.nama} sudah pernah ditolak pada periode ini. Gunakan periode lain atau hapus receipt lama dari daftar review.`,
+            { cause: rejectErr }
+          );
+        }
+        return apiError(
+          "DATABASE_ERROR",
+          "Gagal menyimpan penolakan struk: transaksi database gagal di tengah jalan, semua perubahan telah dibatalkan (rollback). Detail dicatat di server log. Silakan coba lagi.",
+          { cause: rejectErr }
+        );
+      }
     }
 
     // Approval: transaksi DB atomik (node W).
@@ -135,7 +160,7 @@ export async function POST(
           data: {
             tipe: "MASUK",
             nominal: nominalFinal,
-            keterangan: `Iuran ${struk.periodeBulan} — ${struk.anggota.nama}`,
+            keterangan: `Iuran ${struk.periodeBulan} - ${struk.anggota.nama}`,
             periodeBulan: struk.periodeBulan,
             anggotaId: struk.anggotaId,
             strukId: struk.id,

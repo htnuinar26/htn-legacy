@@ -4,8 +4,9 @@ import { apiSuccess, apiError, apiUnexpected } from "@/lib/api-response";
 import { isAdmin } from "@/lib/auth";
 import { getSettings } from "@/lib/settings";
 import { getSignedUrl } from "@/lib/storage";
+import { isTertunggak } from "@/lib/format";
 
-// GET /api/laporan — data laporan per periode (Admin).
+// GET /api/laporan - data laporan per periode (Admin).
 // Query: ?bulan=YYYY-MM (default: periode berjalan)
 export async function GET(req: NextRequest) {
   try {
@@ -43,9 +44,32 @@ export async function GET(req: NextRequest) {
       .filter((t) => t.tipe === "KELUAR")
       .reduce((s, t) => s + t.nominal, 0);
 
-    const lunas = anggota.filter((a) => a.statusBayar === "LUNAS").length;
-    const belumLunas = anggota.filter((a) => a.statusBayar === "BELUM_LUNAS").length;
-    const tertunggak = anggota.filter((a) => a.statusBayar === "TERTUNGGAK").length;
+    // Status pembayaran anggota bersifat siklus bulanan dan `statusBayar`
+    // hanya menyimpan status periode berjalan. Untuk laporan periode
+    // berjalan, pakai `statusBayar` plus deadline. Untuk periode lampau,
+    // status dihitung dari receipt APPROVED pada periode tersebut, supaya
+    // laporan bulan lalu tidak menampilkan status bulan ini.
+    const periodeBerjalan = settings.periodeBerjalan;
+    let lunas: number;
+    let belumLunas: number;
+    let tertunggak: number;
+
+    if (bulan === periodeBerjalan) {
+      lunas = anggota.filter((a) => a.statusBayar === "LUNAS").length;
+      belumLunas = anggota.filter(
+        (a) => a.statusBayar === "BELUM_LUNAS" && !isTertunggak(a.statusBayar, settings.deadlineTanggal)
+      ).length;
+      tertunggak = anggota.filter((a) =>
+        isTertunggak(a.statusBayar, settings.deadlineTanggal)
+      ).length;
+    } else {
+      const anggotaLunas = new Set(strukApproved.map((s) => s.anggotaId));
+      lunas = anggotaLunas.size;
+      belumLunas = Math.max(anggota.length - lunas, 0);
+      // Riwayat tenggat deadline tidak disimpan per periode, jadi untuk
+      // periode lampau hanya ada dua status: lunas dan belum lunas.
+      tertunggak = 0;
+    }
 
     return apiSuccess({
       periodeBulan: bulan,

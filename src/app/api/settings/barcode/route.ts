@@ -1,11 +1,20 @@
 import { NextRequest } from "next/server";
 import { apiSuccess, apiError, apiUnexpected } from "@/lib/api-response";
 import { isAdmin } from "@/lib/auth";
-import { uploadFile, generateBarcodePath } from "@/lib/storage";
+import { uploadFile, generateBarcodePath, deleteFile, getSignedUrl } from "@/lib/storage";
 import { updateSettings, getSettings } from "@/lib/settings";
 import { db } from "@/lib/db";
 
-// POST /api/settings/barcode — upload barcode pembayaran (Admin only).
+// Batas ukuran barcode. 2 MB cukup untuk gambar barcode resolusi tinggi
+// dan mencegah unggahan file yang tidak masuk akal.
+const MAX_BARCODE_SIZE = 2 * 1024 * 1024;
+
+// Tipe file barcode yang diizinkan.
+// SVG TIDAK diizinkan: SVG bisa berisi skrip dan disajikan dari origin yang
+// sama, sehingga menjadi stored XSS. Barcode cukup dengan PNG atau JPG.
+const ALLOWED_BARCODE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+// POST /api/settings/barcode - upload barcode pembayaran (Admin only).
 export async function POST(req: NextRequest) {
   try {
     const admin = await isAdmin();
@@ -31,12 +40,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const allowed = ["image/jpeg", "image/png", "image/webp", "image/svg+xml"];
-    if (!allowed.includes(file.type)) {
+    if (!ALLOWED_BARCODE_TYPES.includes(file.type)) {
       return apiError(
         "VALIDATION_ERROR",
-        `Tipe file tidak didukung (${file.type}). Gunakan JPG, PNG, WebP, atau SVG.`,
+        `Tipe file tidak didukung (${file.type}). Gunakan JPG, PNG, atau WebP.`,
         { fields: { file: "Tipe tidak didukung" } }
+      );
+    }
+
+    if (file.size > MAX_BARCODE_SIZE) {
+      return apiError(
+        "VALIDATION_ERROR",
+        `Ukuran file melebihi 2 MB (ukuran: ${(file.size / (1024 * 1024)).toFixed(2)} MB).`,
+        { fields: { file: "Ukuran file melebihi 2 MB" } }
       );
     }
 
@@ -59,7 +75,6 @@ export async function POST(req: NextRequest) {
     const oldSettings = await getSettings();
     if (oldSettings.barcodePath) {
       try {
-        const { deleteFile } = await import("@/lib/storage");
         await deleteFile(oldSettings.barcodePath);
       } catch {
         // ignore cleanup error
@@ -79,7 +94,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return apiSuccess({ barcodePath: uploaded.path });
+    return apiSuccess({
+      barcodePath: uploaded.path,
+      // URL siap pakai untuk ditampilkan dan diunduh oleh UI.
+      barcodeUrl: getSignedUrl(uploaded.path),
+    });
   } catch (err) {
     return apiUnexpected(err);
   }

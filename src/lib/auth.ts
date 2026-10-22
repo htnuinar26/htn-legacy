@@ -1,10 +1,11 @@
-// HTN Legacy — Session & Auth helpers
+// HTN Legacy - Session & Auth helpers
 // JWT httpOnly cookie untuk sesi anggota dan Admin.
 // Sesuai ARCHITECTURE.md: JWT httpOnly cookie, password anggota AES-256-GCM.
 
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import { db } from "@/lib/db";
+import { apiError } from "@/lib/api-response";
 
 const JWT_SECRET = process.env.JWT_SECRET ?? "dev-jwt-secret";
 const encoder = new TextEncoder();
@@ -126,9 +127,41 @@ export async function getMemberOrAdmin(): Promise<{
   return { member, isAdmin: admin?.role === "admin" };
 }
 
-/** Helper untuk mengambil entitas Anggota dari sesi aktif. */
+/**
+ * Helper untuk mengambil entitas Anggota dari sesi aktif.
+ */
 export async function getCurrentAnggota() {
   const session = await getMemberSession();
   if (!session) return null;
   return db.anggota.findUnique({ where: { id: session.anggotaId } });
+}
+
+export type MemberOrAdminSession = {
+  member: SessionPayload | null;
+  isAdmin: boolean;
+};
+
+/**
+ * Guard untuk Route Handler yang boleh diakses anggota maupun Admin.
+ * Mengembalikan session bila request sah, atau Response error AUTH_ERROR
+ * yang langsung boleh dikembalikan oleh pemanggil.
+ *
+ * Aturan otorisasi Admin dan anggota tetap terpisah: pemanggil wajib
+ * mengecek `isAdmin()` sendiri untuk data yang hanya boleh dilihat Admin.
+ */
+export async function requireMemberOrAdmin(): Promise<
+  { ok: true } & MemberOrAdminSession | { ok: false; response: Response }
+> {
+  const { member, isAdmin } = await getMemberOrAdmin();
+  if (!member && !isAdmin) {
+    return {
+      ok: false,
+      response: apiError(
+        "AUTH_ERROR",
+        "Sesi tidak ditemukan atau sudah berakhir. Silakan login kembali.",
+        { status: 401 }
+      ),
+    };
+  }
+  return { ok: true, member, isAdmin };
 }
