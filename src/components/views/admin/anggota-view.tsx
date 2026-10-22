@@ -134,7 +134,7 @@ export function AnggotaView() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Cari nama, NIM, email..."
-                className="input-editorial h-11 w-56 pl-9 text-sm"
+                className="input-editorial h-11 w-full pl-9 text-sm sm:w-56"
                 aria-label="Cari anggota"
               />
             </div>
