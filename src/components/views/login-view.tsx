@@ -3,13 +3,22 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Loader2, LogIn, UserPlus, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 type Mode = "login" | "signup" | "admin";
 
-export function LoginView() {
-  const [mode, setMode] = useState<Mode>("login");
+export function LoginView({
+  initialMode = "login",
+  showModeTabs = true,
+  adminNames = [],
+}: {
+  initialMode?: Mode;
+  showModeTabs?: boolean;
+  adminNames?: string[];
+}) {
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -21,6 +30,7 @@ export function LoginView() {
   const [email, setEmail] = useState("");
   const [telepon, setTelepon] = useState("");
   const [password, setPassword] = useState("");
+  const [adminName, setAdminName] = useState(adminNames[0] ?? "");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,7 +45,7 @@ export function LoginView() {
       payload = { nama, nim, email, telepon, password };
     } else if (mode === "admin") {
       endpoint = "/api/auth/admin-login";
-      payload = { password };
+      payload = { nama: adminName, password };
     }
 
     try {
@@ -46,6 +56,10 @@ export function LoginView() {
       });
       const json = await res.json().catch(() => null);
       if (!res.ok || !json?.success) {
+        if (mode === "login" && json?.error?.category === "NOT_FOUND") {
+          router.replace("/signup");
+          return;
+        }
         const requestId = json?.error?.requestId
           ? ` ID permintaan: ${json.error.requestId}.`
           : "";
@@ -57,7 +71,7 @@ export function LoginView() {
         return;
       }
       window.dispatchEvent(new Event("htn-session-changed"));
-      router.refresh();
+      router.replace("/");
     } catch {
       setError(
         "Tidak dapat menghubungi server. Periksa koneksi Anda lalu coba lagi."
@@ -120,8 +134,8 @@ export function LoginView() {
         <div className="flex flex-1 items-start justify-center p-6 sm:p-12 lg:items-center">
           <div className="w-full max-w-md">
 
-            {/* Tab mode */}
-            <div className="mb-6 flex gap-1 rounded-lg border border-[var(--border-default)] bg-[var(--surface)] p-1">
+            {/* Tab mode anggota; login Admin memiliki route terpisah. */}
+            {showModeTabs && <div className="mb-6 flex gap-1 rounded-lg border border-[var(--border-default)] bg-[var(--surface)] p-1">
             <ModeButton
               active={mode === "login"}
               onClick={() => switchMode("login")}
@@ -134,13 +148,7 @@ export function LoginView() {
               icon={UserPlus}
               label="Daftar"
             />
-            <ModeButton
-              active={mode === "admin"}
-              onClick={() => switchMode("admin")}
-              icon={ShieldCheck}
-              label="Admin"
-            />
-            </div>
+            </div>}
 
             <h2 className="mb-1 text-xl font-bold text-[var(--ink)]">
             {mode === "login" && "Masuk sebagai Anggota"}
@@ -154,7 +162,28 @@ export function LoginView() {
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-            {mode !== "admin" && (
+            {mode === "admin" ? (
+              <div className="space-y-1.5">
+                <label htmlFor="login-admin-nama" className="block text-sm font-medium text-[var(--ink)]">
+                  Nama Admin
+                </label>
+                <select
+                  id="login-admin-nama"
+                  value={adminName}
+                  onChange={(e) => setAdminName(e.target.value)}
+                  className="input-editorial h-11"
+                  required
+                >
+                  <option value="">Pilih nama Admin</option>
+                  {adminNames.map((name) => (
+                    <option key={name} value={name}>{name}</option>
+                  ))}
+                </select>
+                {fieldErrors.nama && (
+                  <p role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">{fieldErrors.nama}</p>
+                )}
+              </div>
+            ) : (
               <Field
                 id="login-nama"
                 label="Nama Lengkap"
@@ -204,7 +233,7 @@ export function LoginView() {
               value={password}
               onChange={setPassword}
               error={fieldErrors.password}
-              placeholder="••••••••"
+              placeholder="Masukkan password"
               autoComplete={mode === "signup" ? "new-password" : "current-password"}
             />
 
@@ -238,6 +267,23 @@ export function LoginView() {
               </span>
             </button>
             </form>
+            {!showModeTabs && (
+              <button
+                type="button"
+                onClick={() => router.push(mode === "signup" ? "/login" : mode === "admin" ? "/login" : "/signup")}
+                className="mt-4 w-full text-center text-sm font-medium text-[var(--accent-primary)] hover:underline"
+              >
+                {mode === "signup" ? "Sudah punya akun? Masuk" : mode === "admin" ? "Masuk sebagai anggota" : "Belum punya akun? Daftar"}
+              </button>
+            )}
+            {showModeTabs && (
+              <Link
+                href="/admin/login"
+                className="mt-4 block text-center text-sm font-medium text-[var(--accent-primary)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2"
+              >
+                Masuk sebagai Admin
+              </Link>
+            )}
           </div>
         </div>
       </div>
