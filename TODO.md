@@ -15,10 +15,10 @@ Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
 Sumber: `logs/console.log` dan `logs/vercel.log`, serta audit responsive pada
 shell, drawer, view, modal, tabel, dan aset publik.
 
-- [ ] Pastikan aset `/icon.svg` ikut ter-track dan tidak lagi menghasilkan 404.
-- [ ] Perbaiki layout mobile pada shell Anggota/Admin, top bar, drawer, dan konten utama.
-- [ ] Perbaiki overflow tabel, card, form, modal, chart, dan tombol pada breakpoint 360px.
-- [ ] Verifikasi ulang dengan typecheck, lint, build, regression scan aset, dan pemeriksaan responsive statis.
+- [x] Pastikan aset `/icon.svg` ikut ter-track dan tidak lagi menghasilkan 404.
+- [x] Perbaiki layout mobile pada shell Anggota/Admin, top bar, drawer, dan konten utama.
+- [x] Perbaiki overflow tabel, card, form, modal, chart, dan tombol pada breakpoint 360px.
+- [x] Verifikasi ulang dengan typecheck, lint, build, regression scan aset, dan pemeriksaan responsive statis.
 
 ### Audit 2026-10-22 - `fix/full-codebase-regression-audit`
 
