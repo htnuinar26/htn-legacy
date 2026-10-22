@@ -7,14 +7,11 @@
 // Aturan teknis (non-negotiable):
 // - Elemen dasar <input type="text" inputMode="numeric">
 // - DILARANG type="number" (sumber bug native step validation).
-// - DILARANG pattern="[0-9]*" - nilai tampilan terformat mengandung pemisah
-//   ribuan (titik), sehingga pattern native menolak nilai wajar seperti
-//   "10.000" dengan pesan "Please match the requested format." Ini adalah
-//   kelas bug yang sama dengan bug step lama: native validation menolak
-//   input yang sebenarnya valid. Filter onChange sudah membuang non-digit,
-//   validasi final di server via Zod.
+// - pattern="[0-9]*" dipertahankan sesuai kontrak input proyek. Form yang
+//   memakai nilai tampilan terformat menggunakan noValidate agar validasi
+//   native tidak menolak separator ribuan; validasi final tetap di server.
 // - State menyimpan integer polos (15000), tampilan terformat (15.000).
-// - Tidak ada min/max/step/pattern HTML native.
+// - Tidak ada min/max/step HTML native.
 // - Validasi final di server via Zod (z.number().int().positive()).
 
 import { useId, useLayoutEffect, useRef } from "react";
@@ -175,6 +172,7 @@ export function RupiahInput({
           ref={inputRef}
           type="text"
           inputMode="numeric"
+          pattern="[0-9]*"
           autoComplete="off"
           className="rupiah-input"
           value={displayValue}
