@@ -8,6 +8,12 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 <!-- ENTRI-BARU-SISIPKAN-DI-SINI -->
 
+### Fixed - Guard Payload Array dan Aset Above-the-fold (2026-10-22)
+
+- Menormalisasi payload array dari endpoint sebelum dipakai oleh view anggota dan Admin agar respons tidak berbentuk object tidak lagi memicu crash `.map`.
+- Memprioritaskan pemuatan logo yang tampil pada awal halaman untuk menghindari intervensi lazy-image browser.
+- Tidak mengubah status `401` login karena status tersebut tetap merupakan respons autentikasi yang benar untuk kredensial tidak valid.
+
 ### Fixed - Top Bar Auth dan Scrollbar Global (2026-10-22)
 
 - Menyatukan top bar autentikasi dengan panel form menggunakan `--bg-base`, sehingga tidak lagi muncul sebagai strip putih terpisah pada dark mode.
