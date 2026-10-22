@@ -118,7 +118,7 @@ export async function GET(_req: NextRequest) {
       status: 401,
     });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/dashboard");
   }
 }
 
