@@ -8,6 +8,13 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 <!-- ENTRI-BARU-SISIPKAN-DI-SINI -->
 
+### Fixed - Responsif Mobile dan Aset Icon (2026-10-22)
+
+- Memperbaiki padding, truncation, header, drawer navigasi, dan area konten pada shell Anggota serta Admin agar tetap terbaca pada layar kecil.
+- Menyesuaikan header kartu, pencarian, filter, pemilih file, aksi laporan, dan formulir barcode agar dapat membungkus secara aman pada breakpoint mobile.
+- Menambahkan aturan ukuran ringkasan dan nilai nominal untuk mencegah teks meluber pada lebar layar sempit.
+- Menyertakan `public/icon.svg` dalam pelacakan git untuk menghilangkan 404 aset icon pada deployment.
+
 ### Unreleased Update
 
 ### Fixed - Audit 2026-10-21 (32 temuan)
