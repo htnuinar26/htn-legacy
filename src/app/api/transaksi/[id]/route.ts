@@ -4,6 +4,7 @@ import {
   apiSuccess,
   apiError,
   apiUnexpected,
+  classifyPrismaError,
 } from "@/lib/api-response";
 import { isAdmin } from "@/lib/auth";
 import { deleteFile } from "@/lib/storage";
@@ -114,6 +115,18 @@ export async function DELETE(
       storageCleanupErrors: storageErrors,
     });
   } catch (err) {
+    const prismaCode =
+      typeof err === "object" && err !== null && "code" in err
+        ? (err as { code?: unknown }).code
+        : undefined;
+    if (typeof prismaCode === "string" && prismaCode.startsWith("P")) {
+      const classified = classifyPrismaError(err);
+      return apiError(
+        classified.category,
+        `Transaksi tidak dapat dihapus: ${classified.message}`,
+        { cause: err, endpoint: "/api/transaksi/[id]" }
+      );
+    }
     return apiUnexpected(err, "/api/transaksi/[id]");
   }
 }
