@@ -111,7 +111,7 @@ export function MemberShell({
             onClick={logout}
             disabled={loggingOut}
             aria-label="Keluar dari akun"
-            className="flex h-11 items-center gap-2 rounded-lg px-3 text-sm font-medium text-[var(--ink-muted)] hover:bg-[var(--surface-alt)] disabled:opacity-50"
+            className="flex h-11 items-center gap-2 rounded-lg px-3 text-sm font-medium text-[var(--status-tertunggak)] hover:bg-[var(--status-tertunggak-bg)] disabled:opacity-50"
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Keluar</span>
@@ -204,7 +204,7 @@ export function MemberShell({
                 <button
                   type="button"
                   onClick={logout}
-                  className="mt-2 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[var(--ink-muted)] hover:bg-[var(--surface-alt)]"
+                  className="mt-2 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[var(--status-tertunggak)] hover:bg-[var(--status-tertunggak-bg)]"
                 >
                   <LogOut className="h-4 w-4" />
                   Keluar
