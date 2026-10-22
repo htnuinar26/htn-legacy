@@ -102,7 +102,7 @@ export function AdminShell() {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <Image src="/logo.svg" alt="HTN Legacy" width={32} height={32} className="hidden sm:block" />
+          <Image src="/icon.svg" alt="HTN Legacy" width={32} height={32} className="hidden sm:block" />
           <div>
             <p className="text-sm font-bold leading-tight text-[var(--ink)]">
               {process.env.NEXT_PUBLIC_INSTANCE_NAME ?? "HTN Legacy"}{" "}
@@ -174,7 +174,7 @@ export function AdminShell() {
             >
               <div className="flex h-16 items-center justify-between border-b border-[var(--border-default)] px-4">
                 <div className="flex items-center gap-2">
-                  <Image src="/logo.svg" alt="HTN Legacy" width={28} height={28} />
+                  <Image src="/icon.svg" alt="HTN Legacy" width={28} height={28} />
                   <span className="text-sm font-bold text-[var(--ink)]">
                     HTN Legacy · Admin
                   </span>
