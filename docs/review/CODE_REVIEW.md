@@ -128,3 +128,21 @@ Ringkasan review perubahan responsif mobile dan aset icon:
 - `CHANGELOG.md`, `TODO.md`, dan `worklog.md` sudah mencatat cakupan dan hasil validasi; status TODO ditandai selesai setelah typecheck, lint, build, scan aset, dan pemeriksaan responsive statis lulus.
 - Tidak ditemukan isu blocker pada review statis. Risiko residual adalah perbedaan rendering breakpoint dan overflow yang hanya muncul pada data sangat panjang atau perangkat tertentu.
 ```
+
+---
+
+## PR baru - Pelacakan Dokumentasi Proyek
+
+**PR:** menunggu nomor PR
+**Repo:** htnuinar26/htn-legacy
+**Status:** [ ] belum dicopas
+
+```text
+Ringkasan review perubahan pelacakan dokumentasi proyek:
+
+- `AGENTS.md` dan empat dokumen kanonik di `docs/` kini menjadi bagian dari repository sehingga instruksi operasional dan spesifikasi dapat direview bersama codebase.
+- `docs/ARCHITECTURE.md` dinormalisasi dari em-dash ke tanda hubung biasa untuk mematuhi aturan encoding repository.
+- `TODO.md`, `CHANGELOG.md`, dan `worklog.md` mencatat rencana, dampak, dan validasi perubahan.
+- Artifact lokal `.agents/`, `.opencode/`, `graphify-out/`, dan `desktop.ini` sengaja tidak dimasukkan karena bukan sumber proyek yang layak dilacak.
+- Typecheck, lint, build, scan encoding, dan `git diff --check` telah lulus. Tidak ada migration database atau perubahan environment variable.
+```
