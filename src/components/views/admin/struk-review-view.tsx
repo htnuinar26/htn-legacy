@@ -281,13 +281,13 @@ function ReviewDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-200">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Review struk"
-        className="relative z-10 max-h-[90vh] w-full max-w-3xl overflow-y-auto scroll-area-custom rounded-xl bg-[var(--surface)] shadow-[var(--shadow-modal)]"
+        className="relative z-10 max-h-[90vh] w-full max-w-3xl overflow-y-auto scroll-area-custom rounded-xl bg-[var(--surface)] shadow-[var(--shadow-modal)] animate-in fade-in-0 zoom-in-95 duration-200"
       >
         <div className="flex items-center justify-between border-b border-[var(--border-default)] px-5 py-4">
           <div>
