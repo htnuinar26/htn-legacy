@@ -10,6 +10,14 @@ Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
 
 ## Active plans
 
+### Revisi 2026-10-22 - `chore/track-project-documentation`
+
+Sumber: permintaan memasukkan file proyek yang masih untracked ke PR baru.
+
+- [x] Masukkan `AGENTS.md` dan dokumentasi kanonik di `docs/` ke pelacakan git.
+- [x] Pastikan artifact lokal seperti skill agent, cache graph, metadata desktop, dan output generated tetap tidak masuk repository.
+- [x] Verifikasi encoding, em-dash, diff, dan build setelah file proyek ditambahkan.
+
 ### Revisi 2026-10-22 - `fix/mobile-responsive-and-log-assets`
 
 Sumber: `logs/console.log` dan `logs/vercel.log`, serta audit responsive pada

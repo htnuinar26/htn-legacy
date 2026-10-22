@@ -97,3 +97,14 @@ Work Log:
 - Menyesuaikan shell Anggota/Admin, header kartu, ringkasan, pencarian, filter, upload barcode, import file, dan aksi laporan untuk layar mobile.
 - Menggunakan skill frontend lokal untuk memverifikasi pendekatan mobile-first, target sentuh, wrapping, dan pencegahan overflow.
 - Validasi akhir direncanakan melalui typecheck, lint, build, pemeriksaan regresi aset, pemeriksaan responsif statis, dan `git diff --check`.
+
+---
+Task ID: DOCS-1
+Agent: main
+Task: Memasukkan file dokumentasi proyek untracked ke PR baru.
+
+Work Log:
+- Menambahkan `AGENTS.md`, `docs/PRD.md`, `docs/SPEC.md`, `docs/ARCHITECTURE.md`, dan `docs/DESIGN.md` ke pelacakan git.
+- Menolak memasukkan `.agents/`, `.opencode/`, `graphify-out/`, dan `desktop.ini` karena merupakan artifact lokal/tooling sesuai aturan repository.
+- Menormalkan em-dash pada `docs/ARCHITECTURE.md` dan memverifikasi tidak ada mojibake pada file dokumentasi baru.
+- Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build`, scan encoding, dan `git diff --check`.
