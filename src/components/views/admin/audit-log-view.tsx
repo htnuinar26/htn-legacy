@@ -71,7 +71,7 @@ export function AuditLogView() {
       const res = await fetch(`/api/admin/audit-log?${params.toString()}`);
       const json = await res.json();
       if (json.success) {
-        setLogs(json.data.logs);
+        setLogs(Array.isArray(json.data.logs) ? json.data.logs : []);
         setTotal(json.data.total);
       } else setError(json.error);
     } catch {
