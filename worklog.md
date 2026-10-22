@@ -144,3 +144,15 @@ Work Log:
 - Mengubah styling scrollbar yang sebelumnya hanya `.scroll-area-custom` menjadi styling global berbasis `--border-default`, tanpa mengubah behavior scroll.
 - Memastikan border vertikal hero/form tetap konsisten pada desktop dan hilang secara natural pada mobile karena hero disembunyikan.
 - Validasi lulus: typecheck, lint, build, scan struktur header/scrollbar, dan `git diff --check`.
+
+---
+Task ID: CONSOLE-LOG-2
+Agent: main
+Task: Menindaklanjuti crash `.map` dan intervensi lazy-image pada `logs/console.log`.
+
+Work Log:
+- Menambahkan guard `Array.isArray` pada payload list di view anggota, kas, laporan, generator struk, review struk, daftar anggota, dan audit log.
+- Menormalisasi array nested pada dashboard, kas, laporan, dan generator struk sebelum render sehingga payload malformed tidak menjatuhkan halaman.
+- Menambahkan `priority` pada logo yang tampil di awal halaman auth dan shell.
+- Mempertahankan respons `401` login sebagai kategori `AUTH_ERROR` yang valid untuk kredensial tidak sesuai.
+- Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build`, dan `git diff --check`.
