@@ -13,8 +13,8 @@ export function PageHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div>
+    <div className="mb-6 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
         <h1 className="text-2xl font-extrabold tracking-tight text-[var(--ink)]">
           {title}
         </h1>
@@ -149,8 +149,8 @@ export function CardHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-[var(--border-default)] px-5 py-4">
-      <div>
+    <div className="flex flex-col items-start gap-3 border-b border-[var(--border-default)] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+      <div className="min-w-0">
         <h2 className="text-base font-bold text-[var(--ink)]">{title}</h2>
         {description && (
           <p className="mt-0.5 text-sm text-[var(--ink-muted)]">{description}</p>
