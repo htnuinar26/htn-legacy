@@ -154,7 +154,7 @@ export function MemberShell({
         {drawerOpen && (
           <div className="fixed inset-0 z-50 lg:hidden">
             <div
-              className="absolute inset-0 bg-black/40"
+              className="absolute inset-0 bg-black/40 animate-in fade-in-0 duration-200"
               onClick={() => setDrawerOpen(false)}
               aria-hidden="true"
             />
@@ -163,7 +163,7 @@ export function MemberShell({
               role="dialog"
               aria-modal="true"
               aria-label="Navigasi"
-              className="absolute left-0 top-0 flex h-full w-72 max-w-[85vw] flex-col bg-[var(--surface)] shadow-xl"
+              className="absolute left-0 top-0 flex h-full w-72 max-w-[85vw] flex-col bg-[var(--surface)] shadow-xl animate-in slide-in-from-left duration-300"
             >
               <div className="flex h-16 items-center justify-between border-b border-[var(--border-default)] px-4">
                 <div className="flex items-center gap-2">
