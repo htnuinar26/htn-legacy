@@ -151,7 +151,7 @@ Ringkasan review perubahan pelacakan dokumentasi proyek:
 
 ## PR baru - Perbaikan Console Log Autentikasi
 
-**PR:** menunggu nomor PR
+**PR:** 31
 **Repo:** htnuinar26/htn-legacy
 **Status:** [ ] belum dicopas
 
