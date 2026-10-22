@@ -10,6 +10,15 @@ Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
 
 ## Active plans
 
+### Revisi 2026-10-22 - `fix/auth-ui-dark-mode-accessibility`
+
+Sumber: revisi UI/UX autentikasi untuk Masuk Anggota, Daftar Anggota Baru, dan Login Admin.
+
+- [x] Perbaiki token hero dark mode tanpa mengubah hero light mode.
+- [x] Selaraskan top bar toggle tema, target sentuh, focus-visible, kontras, radius, dan responsive auth.
+- [x] Verifikasi shared component, tidak ada hex baru, dan tidak ada perubahan logic autentikasi.
+- [x] Jalankan typecheck, lint, build, scan regresi, dan `git diff --check`.
+
 ### Revisi 2026-10-22 - `fix/console-log-auth-and-image-noise`
 
 Sumber: `logs/console.log` yang mencatat intervensi lazy image, HTTP 500 login,

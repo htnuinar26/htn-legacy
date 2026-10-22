@@ -35,6 +35,7 @@ export function ThemeToggle() {
       className="flex items-center gap-1 rounded-lg border border-[var(--border-default)] bg-[var(--surface)] p-1"
       role="radiogroup"
       aria-label="Pilih tema"
+      suppressHydrationWarning
     >
       {options.map(({ value, label, icon: Icon }) => (
         <button
@@ -47,10 +48,10 @@ export function ThemeToggle() {
           onClick={() => setTheme(value)}
           className={cn(
             // Target sentuh minimal 44x44 px sesuai DESIGN.md bagian Button.
-            "flex h-11 w-11 items-center justify-center rounded-md transition-colors",
+            "flex h-11 w-11 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]",
             theme === value
               ? "bg-[var(--accent-primary)] text-white"
-              : "text-[var(--ink-muted)] hover:bg-[var(--surface-alt)]"
+              : "text-[var(--ink-soft)] hover:bg-[var(--surface-alt)]"
           )}
         >
           <Icon className="h-4 w-4" strokeWidth={2} />

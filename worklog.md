@@ -120,3 +120,15 @@ Work Log:
 - Memperbaiki client login agar response error non-2xx tetap dibaca dan ditampilkan bersama detail request ID bila tersedia.
 - Mempertahankan `409 CONFLICT` pada signup sebagai perilaku API yang benar, dengan handling form terkontrol di client.
 - Validasi lulus: scan tidak menemukan `loading="lazy"`, typecheck, lint, build, dan `git diff --check`.
+
+---
+Task ID: UI-AUTH-1
+Agent: main
+Task: Revisi UI/UX halaman autentikasi pada kedua tema.
+
+Work Log:
+- Membaca `DESIGN.md`, `ARCHITECTURE.md`, dan skill frontend sebelum mengubah UI.
+- Menemukan seluruh varian Masuk, Daftar, dan Admin berada pada `LoginView` shared; `ThemeToggle` juga digunakan bersama oleh auth, shell Anggota, dan shell Admin.
+- Menambahkan token component `auth-hero-*` dan `input-placeholder` pada `src/app/globals.css`; dark hero memakai `--bg-base`, light hero tetap memakai maroon.
+- Memindahkan toggle tema ke top bar auth, memperkuat focus-visible, kontras teks/placeholder, dan konsistensi radius tombol.
+- Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build`, scan token/hex/lazy-loading, dan `git diff --check`.
