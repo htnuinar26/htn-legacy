@@ -73,7 +73,7 @@ export function DaftarView() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Cari nama atau NIM..."
-                className="input-editorial h-9 w-56 pl-9 text-sm"
+                className="input-editorial h-11 w-56 pl-9 text-sm"
                 aria-label="Cari anggota"
               />
             </div>
@@ -85,7 +85,15 @@ export function DaftarView() {
           ) : error ? (
             <ErrorBanner message={error} />
           ) : filtered.length === 0 ? (
-            <EmptyState icon={Users} title="Tidak ada anggota" description="Belum ada anggota yang terdaftar." />
+            <EmptyState
+              icon={Users}
+              title={q.trim() ? "Tidak ada anggota yang cocok" : "Tidak ada anggota"}
+              description={
+                q.trim()
+                  ? `Tidak ada anggota yang cocok dengan pencarian "${q.trim()}".`
+                  : "Belum ada anggota yang terdaftar."
+              }
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="table-zebra w-full min-w-[480px] text-left text-sm">
