@@ -86,6 +86,6 @@ export async function POST(req: NextRequest) {
     if (classified.category === "CONFLICT") {
       return apiError("CONFLICT", classified.message);
     }
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/auth/signup");
   }
 }
