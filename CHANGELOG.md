@@ -8,6 +8,12 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 <!-- ENTRI-BARU-SISIPKAN-DI-SINI -->
 
+### Chore - Lacak Dokumentasi Proyek (2026-10-22)
+
+- Menambahkan `AGENTS.md` serta dokumentasi kanonik `PRD`, `SPEC`, `ARCHITECTURE`, dan `DESIGN` ke pelacakan git.
+- Menormalkan tanda baca em-dash pada dokumentasi arsitektur agar seluruh file baru mematuhi aturan encoding repository.
+- Artifact lokal skill agent, cache/output Graphify, dan metadata desktop tetap tidak dimasukkan ke repository.
+
 ### Fixed - Responsif Mobile dan Aset Icon (2026-10-22)
 
 - Memperbaiki padding, truncation, header, drawer navigasi, dan area konten pada shell Anggota serta Admin agar tetap terbaca pada layar kecil.
