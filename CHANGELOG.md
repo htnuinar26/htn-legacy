@@ -8,6 +8,13 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 <!-- ENTRI-BARU-SISIPKAN-DI-SINI -->
 
+### Fixed - Console Log Autentikasi dan Preview Receipt (2026-10-22)
+
+- Menghapus `loading="lazy"` dari thumbnail receipt Admin agar browser tidak menunda gambar setelah preview dimuat.
+- Memperjelas kegagalan login akibat konfigurasi `JWT_SECRET` dan error Prisma dengan kategori, endpoint, request ID, serta pesan Bahasa Indonesia yang dapat ditindaklanjuti.
+- Client login sekarang tetap membaca response JSON pada status HTTP non-2xx sehingga detail kategori, field, dan request ID tampil di form.
+- Konflik registrasi tetap dipertahankan sebagai `409 CONFLICT` sesuai kontrak API dan ditampilkan sebagai error form, bukan dianggap sukses.
+
 ### Chore - Lacak Dokumentasi Proyek (2026-10-22)
 
 - Menambahkan `AGENTS.md` serta dokumentasi kanonik `PRD`, `SPEC`, `ARCHITECTURE`, dan `DESIGN` ke pelacakan git.

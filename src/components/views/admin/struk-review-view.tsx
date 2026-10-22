@@ -144,7 +144,6 @@ export function StrukReviewView() {
                   src={s.url}
                   alt={`Receipt ${s.anggotaNama} ${s.periodeBulan}`}
                   className="h-full w-full object-contain"
-                  loading="lazy"
                 />
               </div>
               <div className="p-4">

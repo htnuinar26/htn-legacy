@@ -108,3 +108,15 @@ Work Log:
 - Menolak memasukkan `.agents/`, `.opencode/`, `graphify-out/`, dan `desktop.ini` karena merupakan artifact lokal/tooling sesuai aturan repository.
 - Menormalkan em-dash pada `docs/ARCHITECTURE.md` dan memverifikasi tidak ada mojibake pada file dokumentasi baru.
 - Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build`, scan encoding, dan `git diff --check`.
+
+---
+Task ID: LOGS-1
+Agent: main
+Task: Menindaklanjuti seluruh pesan pada `logs/console.log`.
+
+Work Log:
+- Menghapus `loading="lazy"` pada thumbnail receipt Admin yang memicu intervensi lazy-image browser.
+- Memperjelas jalur login untuk konfigurasi `JWT_SECRET` dan error Prisma agar tidak jatuh tanpa klasifikasi endpoint/request ID.
+- Memperbaiki client login agar response error non-2xx tetap dibaca dan ditampilkan bersama detail request ID bila tersedia.
+- Mempertahankan `409 CONFLICT` pada signup sebagai perilaku API yang benar, dengan handling form terkontrol di client.
+- Validasi lulus: scan tidak menemukan `loading="lazy"`, typecheck, lint, build, dan `git diff --check`.

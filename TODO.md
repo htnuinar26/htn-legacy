@@ -10,6 +10,16 @@ Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
 
 ## Active plans
 
+### Revisi 2026-10-22 - `fix/console-log-auth-and-image-noise`
+
+Sumber: `logs/console.log` yang mencatat intervensi lazy image, HTTP 500 login,
+dan HTTP 409 signup.
+
+- [x] Hilangkan sumber intervensi lazy image pada preview receipt yang sudah dibuka.
+- [x] Perjelas handling error login agar kegagalan database atau konfigurasi sesi terklasifikasi dan dapat ditindaklanjuti.
+- [x] Pastikan konflik signup tetap memakai `409 CONFLICT` tetapi ditampilkan sebagai error form yang terkontrol.
+- [x] Verifikasi ulang scan log/code, typecheck, lint, build, dan `git diff --check`.
+
 ### Revisi 2026-10-22 - `chore/track-project-documentation`
 
 Sumber: permintaan memasukkan file proyek yang masih untracked ke PR baru.

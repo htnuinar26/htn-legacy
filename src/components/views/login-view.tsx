@@ -44,10 +44,15 @@ export function LoginView() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const json = await res.json();
-      if (!json.success) {
-        setError(json.error?.message ?? "Gagal masuk. Periksa kembali data Anda.");
-        if (json.error?.fields) setFieldErrors(json.error.fields);
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.success) {
+        const requestId = json?.error?.requestId
+          ? ` ID permintaan: ${json.error.requestId}.`
+          : "";
+        setError(
+          `${json?.error?.message ?? "Server tidak memberikan detail kegagalan."}${requestId}`
+        );
+        if (json?.error?.fields) setFieldErrors(json.error.fields);
         setLoading(false);
         return;
       }
