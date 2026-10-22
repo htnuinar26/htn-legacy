@@ -81,6 +81,7 @@ export async function DELETE(
           "[STORAGE_ERROR] Gagal menghapus file storage saat hapus transaksi",
           JSON.stringify({
             requestId: `cleanup-${Date.now()}`,
+            endpoint: "/api/transaksi/[id]",
             category: "STORAGE_ERROR",
             filePath: struk.filePath,
             transaksiId: id,
@@ -113,6 +114,6 @@ export async function DELETE(
       storageCleanupErrors: storageErrors,
     });
   } catch (err) {
-    return apiUnexpected(err);
+    return apiUnexpected(err, "/api/transaksi/[id]");
   }
 }
