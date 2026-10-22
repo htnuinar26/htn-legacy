@@ -352,7 +352,7 @@ function TransaksiForm({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4 p-5">
+        <form noValidate onSubmit={handleSubmit} className="space-y-4 p-5">
           <div className="flex gap-2">
             <button
               type="button"
