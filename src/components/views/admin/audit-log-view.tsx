@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ScrollText,
   CheckCircle2,
@@ -54,23 +54,65 @@ export function AuditLogView() {
   const [error, setError] = useState<{ message: string; requestId?: string } | null>(null);
   const [aksiFilter, setAksiFilter] = useState("");
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const PAGE_SIZE = 50;
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const param = aksiFilter ? `?aksi=${aksiFilter}` : "";
-    fetch(`/api/admin/audit-log${param}`)
-      .then((r) => r.json())
-      .then((json) => {
-        if (json.success) {
-          setLogs(json.data.logs);
-          setTotal(json.data.total);
-        } else setError(json.error);
-      })
-      .catch(() => setError({ message: "Gagal terhubung ke server." }))
-      .finally(() => setLoading(false));
-  }, [aksiFilter]);
+    try {
+      const params = new URLSearchParams({
+        limit: String(PAGE_SIZE),
+        offset: String(page * PAGE_SIZE),
+      });
+      if (aksiFilter) params.set("aksi", aksiFilter);
+      const res = await fetch(`/api/admin/audit-log?${params.toString()}`);
+      const json = await res.json();
+      if (json.success) {
+        setLogs(json.data.logs);
+        setTotal(json.data.total);
+      } else setError(json.error);
+    } catch {
+      setError({ message: "Gagal terhubung ke server." });
+    } finally {
+      setLoading(false);
+    }
+  }, [aksiFilter, page]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1);
+
+  // Filter baru dimulai dari halaman pertama, supaya hasil filter tidak
+  // terlihat kosong karena sedang berada di halaman terakhir.
+  function changeFilter(value: string) {
+    setAksiFilter(value);
+    setPage(0);
+  }
+
+  async function handleDeleteTransaksi(id: string) {
+    if (deleting) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/transaksi/${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!json.success) {
+        setDeleteError(json.error?.message ?? "Gagal menghapus transaksi.");
+        return;
+      }
+      // Muat ulang audit log supaya entri hapus terbaru langsung terlihat.
+      await load();
+    } catch {
+      setDeleteError("Gagal terhubung ke server.");
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -80,8 +122,8 @@ export function AuditLogView() {
         action={
           <select
             value={aksiFilter}
-            onChange={(e) => setAksiFilter(e.target.value)}
-            className="input-editorial h-10 w-auto text-sm"
+            onChange={(e) => changeFilter(e.target.value)}
+            className="input-editorial h-11 w-auto text-sm"
             aria-label="Filter aksi"
           >
             <option value="">Semua Aksi</option>
@@ -98,7 +140,10 @@ export function AuditLogView() {
       />
 
       <Card>
-        <CardHeader title={`${logs.length} Entri`} />
+        <CardHeader
+          title={`${logs.length} dari ${total} Entri`}
+          description="Jejak audit permanen. Gunakan filter aksi atau pagination untuk menelusuri entri lama."
+        />
         <div className="p-5">
           {loading ? (
             <LoadingState />
@@ -160,12 +205,59 @@ export function AuditLogView() {
                         </p>
                       )}
                     </div>
+                    {/*
+                      ARCHITECTURE.md baris 220: "Tombol penghapusan juga
+                      tersedia pada Audit Log untuk aktivitas transaksi yang
+                      memiliki referensi transaksi." Hanya aksi yang
+                      merujuk Transaksi yang ditampilkan.
+                    */}
+                    {l.refType === "Transaksi" && l.refId ? (
+                      <button
+                        type="button"
+                        aria-label={`Hapus transaksi ${l.refId}`}
+                        disabled={deleting}
+                        onClick={() => handleDeleteTransaksi(l.refId!)}
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-[var(--ink-muted)] hover:bg-[var(--status-tertunggak-bg)] hover:text-[var(--status-tertunggak)] disabled:opacity-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    ) : null}
                   </li>
                 );
               })}
             </ul>
           )}
         </div>
+        {deleteError && (
+          <div className="border-t border-[var(--border-default)] px-5 py-3">
+            <ErrorBanner message={deleteError} />
+          </div>
+        )}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-[var(--border-default)] px-5 py-3">
+            <p className="text-xs text-[var(--ink-muted)]">
+              Halaman {page + 1} dari {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(p - 1, 0))}
+                disabled={page === 0 || loading}
+                className="flex h-11 items-center rounded-lg border border-[var(--border-default)] px-3 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-alt)] disabled:opacity-50"
+              >
+                Sebelumnya
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
+                disabled={page >= totalPages - 1 || loading}
+                className="flex h-11 items-center rounded-lg border border-[var(--border-default)] px-3 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-alt)] disabled:opacity-50"
+              >
+                Berikutnya
+              </button>
+            </div>
+          </div>
+        )}
       </Card>
     </div>
   );
