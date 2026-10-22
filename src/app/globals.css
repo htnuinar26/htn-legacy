@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* =========================================================================
-   HTN Legacy — Design System (Minimalist Editorial)
+   HTN Legacy - Design System (Minimalist Editorial)
    Three-layer token architecture: Primitive → Semantic → Component
    Colors derived from HTN Legacy logo (maroon + gold).
    ========================================================================= */
