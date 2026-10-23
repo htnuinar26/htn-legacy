@@ -31,6 +31,11 @@ NEXT_PUBLIC_INSTANCE_NAME  nama instance pada UI
 DEBUG_MW                   1 untuk debug proxy, 0 untuk normal
 ```
 
+Identitas Admin terdaftar ditetapkan di `src/lib/auth.ts`: Abdal, Inayah Dzil
+Izzati, Tasya Ulfa, dan Ahlul Fajrul Maulana. Session Admin menggunakan JWT
+httpOnly cookie dengan masa berlaku 30 menit; session anggota tetap berlaku
+selama 7 hari.
+
 Catatan tambahan:
 
 - `.env.example` memakai path database sandbox `file:../db/custom.db`. Path relatif
