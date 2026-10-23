@@ -18,7 +18,7 @@ Sumber: permintaan audit keamanan menggunakan tiga skill Trail of Bits tanpa men
 - [x] Tinjau perubahan lokal secara diferensial dan telusuri riwayat area auth berisiko.
 - [x] Audit workflow GitHub Actions untuk integrasi agent AI.
 - [x] Catat temuan, bukti, risiko, dan batasan di laporan audit keamanan.
-- [x] Kosongkan blok code review lama dan tegaskan aturan merge hanya oleh pemilik ke `main`.
+- [x] Pertahankan review terdahulu, tambahkan blok review khusus PR audit, dan tegaskan merge hanya oleh pemilik ke `main`.
 
 ### Revisi 2026-10-23 - `feat/admin-session-and-custom-select`
 
