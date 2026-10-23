@@ -153,6 +153,7 @@ These rules exist because a detailed plan agreed in conversation disappears as s
 - Never replace existing `CHANGELOG.md` entries; append each new entry below the existing content and separate it with a Markdown divider, respecting the marker rule above.
 - After every requested change is implemented, create the relevant focused GitHub Issue and Pull Request without waiting for a separate reminder.
 - Keep the Issue and Pull Request scoped to the implemented change, link them together, and never merge the Pull Request; the project owner performs the merge.
+- Merge adalah kewenangan pemilik proyek. Agen tidak boleh melakukan merge. Pastikan setiap PR memakai base `main`; merge ke `main` adalah jalur agar perubahan masuk ke deployment production Vercel.
 - Use real multiline Markdown for GitHub issues and pull requests; do not submit literal `\n` sequences.
 - Do not create a release unless explicitly requested.
 

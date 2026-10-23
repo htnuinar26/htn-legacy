@@ -8,6 +8,18 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 <!-- ENTRI-BARU-SISIPKAN-DI-SINI -->
 
+### Docs - Audit Keamanan dan Aturan Merge (2026-10-23)
+
+- Menambahkan laporan audit keamanan statis yang mencakup auth, session, password, pembatasan percobaan, secret historis, dan batasan audit.
+- Menegaskan pemilik proyek sebagai satu-satunya pihak yang melakukan merge dan menetapkan `main` sebagai target PR untuk jalur deployment production.
+- Mempertahankan blok review terdahulu dan menambahkan satu blok review khusus untuk PR audit keamanan.
+
+### Changed - Session Admin dan Dropdown Custom (2026-10-23)
+
+- Menetapkan empat identitas Admin di kode dan menghapus konfigurasi `ADMIN_NAMES` dari environment.
+- Membatasi session Admin menjadi 30 menit melalui JWT expiration dan cookie `maxAge`.
+- Mengganti seluruh native dropdown pada halaman login, kas, receipt, anggota, generator, dan audit log dengan komponen custom yang mendukung keyboard, focus ring, dan tema light/dark.
+
 ### Fixed - Auth, Receipt, Dashboard, dan Admin (2026-10-22)
 
 - Memisahkan route login Admin, mendukung deteksi akun anggota yang belum terdaftar, dan menyimpan identitas Admin pada session.

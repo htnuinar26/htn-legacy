@@ -10,6 +10,25 @@ Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
 
 ## Active plans
 
+### Audit 2026-10-23 - `docs/security-audit-and-merge-policy`
+
+Sumber: permintaan audit keamanan menggunakan tiga skill Trail of Bits tanpa mengubah source code.
+
+- [x] Petakan alur auth, otorisasi, session, receipt, transaksi, database, dan storage.
+- [x] Tinjau perubahan lokal secara diferensial dan telusuri riwayat area auth berisiko.
+- [x] Audit workflow GitHub Actions untuk integrasi agent AI.
+- [x] Catat temuan, bukti, risiko, dan batasan di laporan audit keamanan.
+- [x] Pertahankan review terdahulu, tambahkan blok review khusus PR audit, dan tegaskan merge hanya oleh pemilik ke `main`.
+
+### Revisi 2026-10-23 - `feat/admin-session-and-custom-select`
+
+Sumber: perubahan kebijakan daftar Admin, batas session Admin 30 menit, dan penggantian kontrol dropdown native.
+
+- [x] Pindahkan empat nama Admin terdaftar dari environment ke konstanta kode yang terpusat.
+- [x] Terapkan masa berlaku session Admin 30 menit dan pastikan session kedaluwarsa ditolak.
+- [x] Ganti seluruh native select pada UI dengan komponen dropdown custom yang accessible.
+- [x] Jalankan validasi typecheck, lint, build, dan pemeriksaan regresi kontrol interaktif.
+
 ### Revisi 2026-10-22 - `feat/auth-payment-admin-dashboard-revision`
 
 Sumber: pengajuan revisi 13 poin untuk route auth, pembayaran, receipt, dashboard, filter anggota, transaksi, dan identitas Admin.
