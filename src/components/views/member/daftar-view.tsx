@@ -11,6 +11,7 @@ import {
   EmptyState,
 } from "@/components/blocks/ui";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { CustomSelect } from "@/components/ui/custom-select";
 import { formatPeriodLong } from "@/lib/format";
 
 type Anggota = {
@@ -73,17 +74,18 @@ export function DaftarView() {
           title={`${filtered.length} Anggota`}
           action={
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-              <select
+              <CustomSelect
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-                className="input-editorial h-11 text-sm"
-                aria-label="Filter status pembayaran"
-              >
-                <option value="ALL">Semua status</option>
-                <option value="LUNAS">Sudah bayar</option>
-                <option value="BELUM_LUNAS">Belum bayar</option>
-                <option value="TERTUNGGAK">Tertunggak</option>
-              </select>
+                onChange={(value) => setStatusFilter(value as StatusFilter)}
+                className="w-full sm:w-48"
+                ariaLabel="Filter status pembayaran"
+                options={[
+                  { value: "ALL", label: "Semua status" },
+                  { value: "LUNAS", label: "Sudah bayar" },
+                  { value: "BELUM_LUNAS", label: "Belum bayar" },
+                  { value: "TERTUNGGAK", label: "Tertunggak" },
+                ]}
+              />
               <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--ink-muted)]" />
               <input
