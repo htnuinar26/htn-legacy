@@ -170,3 +170,16 @@ Work Log:
 - Menambahkan empat nama Admin dari `ADMIN_NAMES`, menyimpan nama terpilih pada JWT, dan menampilkannya pada shell Admin.
 - Menambahkan migrasi indeks receipt agar status REJECTED menjadi histori yang dapat berulang.
 - Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build` dengan akses jaringan untuk Google Fonts, dan `git diff --check`.
+
+---
+Task ID: ADMIN-SESSION-CUSTOM-SELECT-1
+Agent: main
+Task: Menetapkan identitas Admin di kode, membatasi session Admin, dan mengganti dropdown native.
+
+Work Log:
+- Menetapkan Abdal, Inayah Dzil Izzati, Tasya Ulfa, dan Ahlul Fajrul Maulana sebagai identitas Admin terdaftar di `src/lib/auth.ts`.
+- Membatasi JWT dan cookie Admin dengan masa berlaku 30 menit, tanpa mengubah masa berlaku session anggota.
+- Menambahkan `CustomSelect` accessible dengan keyboard navigation, focus-visible ring, listbox semantics, dan token tema.
+- Mengganti seluruh penggunaan native `<select>` pada view auth, anggota, kas, receipt, generator, dan audit log.
+- Memperbarui `SPEC.md`, `ARCHITECTURE.md`, `CHANGELOG.md`, dan `TODO.md` agar sesuai dengan perilaku aktual.
+- Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build`, pemeriksaan tidak adanya native select, dan `git diff --check`.
