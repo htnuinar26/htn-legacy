@@ -68,7 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   // Admin session punya prioritas: bisa akses admin panel.
   if (session.isAdmin) {
-    return <AdminShell adminName={session.admin?.nama ?? "Bendahara"} />;
+    return <AdminShell adminName={session.admin?.nama ?? "Admin"} />;
   }
 
   if (session.member) {
