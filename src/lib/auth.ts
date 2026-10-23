@@ -21,7 +21,15 @@ function getJwtKey() {
 
 const SESSION_COOKIE = "htn-session";
 const ADMIN_COOKIE = "htn-admin";
-const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 hari
+const MEMBER_SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 hari
+const ADMIN_SESSION_MAX_AGE = 60 * 30; // 30 menit
+
+const ADMIN_NAMES = [
+  "Abdal",
+  "Inayah Dzil Izzati",
+  "Tasya Ulfa",
+  "Ahlul Fajrul Maulana",
+] as const;
 
 export type SessionPayload = {
   anggotaId: string;
@@ -36,11 +44,7 @@ export type AdminPayload = {
 
 /** Daftar identitas Admin yang boleh dipilih saat login. */
 export function getConfiguredAdminNames(): string[] {
-  const configured = (process.env.ADMIN_NAMES ?? "")
-    .split(",")
-    .map((name) => name.trim())
-    .filter(Boolean);
-  return configured.length > 0 ? configured.slice(0, 4) : ["Bendahara"];
+  return [...ADMIN_NAMES];
 }
 
 export function isConfiguredAdminName(nama: string): boolean {
@@ -50,12 +54,13 @@ export function isConfiguredAdminName(nama: string): boolean {
 }
 
 async function signToken(
-  payload: SessionPayload | AdminPayload
+  payload: SessionPayload | AdminPayload,
+  maxAge: number
 ): Promise<string> {
   return await new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(`${SESSION_MAX_AGE}s`)
+    .setExpirationTime(`${maxAge}s`)
     .sign(getJwtKey());
 }
 
@@ -70,27 +75,27 @@ async function verifyToken<T = unknown>(token: string): Promise<T | null> {
 
 /** Membuat sesi anggota dan menyimpan di httpOnly cookie. */
 export async function createMemberSession(payload: SessionPayload): Promise<void> {
-  const token = await signToken(payload);
+  const token = await signToken(payload, MEMBER_SESSION_MAX_AGE);
   const store = await cookies();
   store.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: SESSION_MAX_AGE,
+    maxAge: MEMBER_SESSION_MAX_AGE,
   });
 }
 
 /** Membuat sesi Admin dan menyimpan di httpOnly cookie. */
 export async function createAdminSession(payload: AdminPayload): Promise<void> {
-  const token = await signToken(payload);
+  const token = await signToken(payload, ADMIN_SESSION_MAX_AGE);
   const store = await cookies();
   store.set(ADMIN_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: SESSION_MAX_AGE,
+    maxAge: ADMIN_SESSION_MAX_AGE,
   });
 }
 
