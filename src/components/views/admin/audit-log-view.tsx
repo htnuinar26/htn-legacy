@@ -21,6 +21,7 @@ import {
   EmptyState,
 } from "@/components/blocks/ui";
 import { formatDateTime } from "@/lib/format";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 type LogItem = {
   id: string;
@@ -120,22 +121,23 @@ export function AuditLogView() {
         title="Audit Log"
         description={`${total} entri aktivitas Admin. Jejak audit permanen.`}
         action={
-          <select
+          <CustomSelect
             value={aksiFilter}
-            onChange={(e) => changeFilter(e.target.value)}
-            className="input-editorial h-11 w-auto text-sm"
-            aria-label="Filter aksi"
-          >
-            <option value="">Semua Aksi</option>
-            <option value="APPROVE_STRUK">Approve Struk</option>
-            <option value="REJECT_STRUK">Reject Struk</option>
-            <option value="CREATE_TRANSAKSI">Catat Transaksi</option>
-            <option value="DELETE_TRANSAKSI">Hapus Transaksi</option>
-            <option value="CREATE_STRUK_MANUAL">Struk Manual</option>
-            <option value="UPDATE_ANGGOTA">Update Anggota</option>
-            <option value="DELETE_ANGGOTA">Hapus Anggota</option>
-            <option value="UPDATE_SETTINGS">Update Settings</option>
-          </select>
+            onChange={changeFilter}
+            className="w-full sm:w-56"
+            ariaLabel="Filter aksi"
+            options={[
+              { value: "", label: "Semua Aksi" },
+              { value: "APPROVE_STRUK", label: "Approve Struk" },
+              { value: "REJECT_STRUK", label: "Reject Struk" },
+              { value: "CREATE_TRANSAKSI", label: "Catat Transaksi" },
+              { value: "DELETE_TRANSAKSI", label: "Hapus Transaksi" },
+              { value: "CREATE_STRUK_MANUAL", label: "Struk Manual" },
+              { value: "UPDATE_ANGGOTA", label: "Update Anggota" },
+              { value: "DELETE_ANGGOTA", label: "Hapus Anggota" },
+              { value: "UPDATE_SETTINGS", label: "Update Settings" },
+            ]}
+          />
         }
       />
 
