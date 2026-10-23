@@ -8,6 +8,13 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 <!-- ENTRI-BARU-SISIPKAN-DI-SINI -->
 
+### Fixed - Identitas dan Session Admin serta Kontrol Form (2026-10-23)
+
+- Menetapkan identitas Admin di kode sebagai Abdal, Inayah Dzil Izzati, Tasya Ulfa, dan Ahlul Fajrul Maulana; login tidak lagi membaca nama Admin dari environment.
+- Membatasi JWT dan cookie Admin hingga 30 menit, termasuk menolak session lama saat usianya melewati batas. Masa session Anggota tetap seperti sebelumnya.
+- Menampilkan nama canonical pemegang Admin pada session dan shell Admin.
+- Mengganti sembilan dropdown native dan tampilan pemilih file pada import, barcode, serta upload receipt dengan kontrol custom berbasis token desain dan akses keyboard.
+
 ### Docs - Audit Keamanan dan Aturan Merge (2026-10-23)
 
 - Menambahkan laporan audit keamanan statis yang mencakup auth, session, password, pembatasan percobaan, secret historis, dan batasan audit.
