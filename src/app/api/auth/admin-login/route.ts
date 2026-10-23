@@ -4,8 +4,8 @@ import { apiSuccess, apiError, zodFields, apiUnexpected } from "@/lib/api-respon
 import {
   verifyAdminPassword,
   createAdminSession,
-  isConfiguredAdminName,
 } from "@/lib/auth";
+import { findAdminIdentity } from "@/lib/admin-identities";
 
 const AdminLoginSchema = z.object({
   nama: z.string().min(1, "Nama Admin wajib dipilih"),
@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { nama, password } = parsed.data;
-    if (!isConfiguredAdminName(nama)) {
+    const identity = findAdminIdentity(nama);
+    if (!identity) {
       return apiError(
         "AUTH_ERROR",
         "Nama Admin tidak terdaftar. Pilih nama Admin dari daftar yang tersedia.",
@@ -39,9 +40,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await createAdminSession({ role: "admin", nama });
+    await createAdminSession({ role: "admin", nama: identity.name });
 
-    return apiSuccess({ nama });
+    return apiSuccess({ nama: identity.name });
   } catch (err) {
     return apiUnexpected(err, "/api/auth/admin-login");
   }
