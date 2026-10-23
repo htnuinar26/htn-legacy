@@ -19,7 +19,7 @@ import {
   EmptyState,
 } from "@/components/blocks/ui";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { formatPeriodLong, formatDateTime } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 
 type Anggota = {
   id: string;
@@ -33,6 +33,8 @@ type Anggota = {
   createdAt: string;
 };
 
+type StatusFilter = "ALL" | "LUNAS" | "BELUM_LUNAS" | "TERTUNGGAK";
+
 function bayarVariant(s: string): "lunas" | "belum" | "tertunggak" {
   if (s === "LUNAS") return "lunas";
   if (s === "TERTUNGGAK") return "tertunggak";
@@ -42,6 +44,7 @@ function bayarVariant(s: string): "lunas" | "belum" | "tertunggak" {
 export function AnggotaView() {
   const [list, setList] = useState<Anggota[]>([]);
   const [q, setQ] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,15 +75,18 @@ export function AnggotaView() {
   }, [load]);
 
   const filtered = useMemo(() => {
-    if (!q) return list;
+    const byStatus = statusFilter === "ALL"
+      ? list
+      : list.filter((a) => a.statusBayar === statusFilter);
+    if (!q) return byStatus;
     const lower = q.toLowerCase();
-    return list.filter(
+    return byStatus.filter(
       (a) =>
         a.nama.toLowerCase().includes(lower) ||
         (a.nim ?? "").toLowerCase().includes(lower) ||
         (a.email ?? "").toLowerCase().includes(lower)
     );
-  }, [q, list]);
+  }, [q, list, statusFilter]);
 
   async function handleDelete() {
     if (!deleteTarget || deleting) return;
@@ -127,7 +133,19 @@ export function AnggotaView() {
         <CardHeader
           title={`${filtered.length} Anggota`}
           action={
-            <div className="relative">
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+                className="input-editorial h-11 text-sm"
+                aria-label="Filter status pembayaran"
+              >
+                <option value="ALL">Semua status</option>
+                <option value="LUNAS">Sudah bayar</option>
+                <option value="BELUM_LUNAS">Belum bayar</option>
+                <option value="TERTUNGGAK">Tertunggak</option>
+              </select>
+              <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--ink-muted)]" />
               <input
                 type="text"
@@ -137,6 +155,7 @@ export function AnggotaView() {
                 className="input-editorial h-11 w-full pl-9 text-sm sm:w-56"
                 aria-label="Cari anggota"
               />
+              </div>
             </div>
           }
         />
@@ -190,7 +209,7 @@ export function AnggotaView() {
                         />
                       </td>
                       <td className="px-3 py-3 text-xs text-[var(--ink-muted)]">
-                        {formatDateTime(a.createdAt)}
+                        {formatDate(a.createdAt)}
                       </td>
                       <td className="px-3 py-3">
                         <div className="flex items-center justify-end gap-1">
@@ -425,13 +444,13 @@ function AnggotaForm({
             </label>
             <input
               id="anggota-password"
-              type="text"
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required={!editing}
               placeholder={editing ? "Kosongkan jika tetap" : "Min. 4 karakter"}
               className="input-editorial h-11"
-              autoComplete="off"
+              autoComplete="new-password"
             />
             {error?.fields?.password && (
               <p role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">

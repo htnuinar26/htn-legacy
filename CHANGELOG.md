@@ -8,6 +8,13 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 <!-- ENTRI-BARU-SISIPKAN-DI-SINI -->
 
+### Fixed - Auth, Receipt, Dashboard, dan Admin (2026-10-22)
+
+- Memisahkan route login Admin, mendukung deteksi akun anggota yang belum terdaftar, dan menyimpan identitas Admin pada session.
+- Memperbaiki alur receipt review, generator PNG, delete transaksi, input field, mapping anggota, logout, filter status, dan grafik dashboard.
+- Menambahkan nomor rekening pembayaran serta mempertahankan barcode dari settings tanpa mengirim asset kosong ke repository.
+- Menambahkan migrasi agar histori receipt REJECTED dapat berulang tanpa mengganggu batas receipt aktif.
+
 ### Fixed - Guard Payload Array dan Aset Above-the-fold (2026-10-22)
 
 - Menormalisasi payload array dari endpoint sebelum dipakai oleh view anggota dan Admin agar respons tidak berbentuk object tidak lagi memicu crash `.map`.

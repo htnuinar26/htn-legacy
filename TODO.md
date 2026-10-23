@@ -10,6 +10,25 @@ Status terakhir: 2026-10-21 (hasil audit menyeluruh terhadap `docs/`, seluruh
 
 ## Active plans
 
+### Revisi 2026-10-22 - `feat/auth-payment-admin-dashboard-revision`
+
+Sumber: pengajuan revisi 13 poin untuk route auth, pembayaran, receipt, dashboard, filter anggota, transaksi, dan identitas Admin.
+
+- [x] Pisahkan route login Admin dari flow login/signup anggota.
+- [x] Deteksi akun anggota pada login dan arahkan akun yang belum terdaftar ke signup.
+- [x] Tampilkan barcode pembayaran dan nomor rekening dari sumber yang tersedia.
+- [x] Perbaiki placeholder dan tipe input agar sesuai konteks field.
+- [x] Sinkronkan mapping kolom Kontak dan Bergabung pada tabel Anggota.
+- [x] Ubah tombol logout menggunakan token warna danger.
+- [x] Perbaiki receipt upload anggota agar muncul pada review Admin berdasarkan log dan alur aktual.
+- [x] Perbaiki preview dan download struk agar menghasilkan PNG.
+- [x] Tambahkan grafik data pada dashboard menggunakan dependency chart yang sudah tersedia.
+- [x] Tambahkan filter status pembayaran pada daftar anggota Anggota dan Admin.
+- [x] Perbaiki DELETE transaksi berdasarkan error log dan alur otorisasi aktual.
+- [x] Perbaiki summary card untuk nominal besar tanpa line break atau overflow.
+- [x] Dukung empat nama Admin dari environment variable dan simpan nama Admin pada session.
+- [x] Jalankan validasi penuh dan review regresi lintas auth, receipt, transaksi, serta responsive.
+
 ### Revisi 2026-10-22 - `fix/console-log-array-payload`
 
 Sumber: `logs/console.log` yang mencatat crash `.map` dan intervensi lazy-image pada aset identitas.

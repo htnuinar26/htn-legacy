@@ -13,6 +13,7 @@ export async function GET(_req: NextRequest) {
       member: member
         ? { anggotaId: member.anggotaId, nama: member.nama }
         : null,
+      admin: admin?.role === "admin" ? { nama: admin.nama } : null,
       isAdmin: admin?.role === "admin",
     });
   } catch (err) {

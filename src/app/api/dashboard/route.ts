@@ -43,6 +43,24 @@ export async function GET(_req: NextRequest) {
           .filter((t) => t.tipe === "KELUAR")
           .reduce((s, t) => s + t.nominal, 0);
 
+      const trendPeriods = Array.from(
+        new Set([periode, ...allTransaksi.map((t) => t.periodeBulan)])
+      )
+        .sort()
+        .slice(-6);
+      const trenKeuangan = trendPeriods.map((periodeBulan) => {
+        const transaksi = allTransaksi.filter((t) => t.periodeBulan === periodeBulan);
+        return {
+          periodeBulan,
+          masuk: transaksi
+            .filter((t) => t.tipe === "MASUK")
+            .reduce((sum, t) => sum + t.nominal, 0),
+          keluar: transaksi
+            .filter((t) => t.tipe === "KELUAR")
+            .reduce((sum, t) => sum + t.nominal, 0),
+        };
+      });
+
       return apiSuccess({
         role: "admin",
         periodeBerjalan: periode,
@@ -59,6 +77,7 @@ export async function GET(_req: NextRequest) {
           saldoPeriode: masukPeriode - keluarPeriode,
           saldoTotal,
         },
+          trenKeuangan,
       });
     }
 

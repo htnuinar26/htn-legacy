@@ -156,3 +156,17 @@ Work Log:
 - Menambahkan `priority` pada logo yang tampil di awal halaman auth dan shell.
 - Mempertahankan respons `401` login sebagai kategori `AUTH_ERROR` yang valid untuk kredensial tidak sesuai.
 - Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build`, dan `git diff --check`.
+
+---
+Task ID: AUTH-PAYMENT-DASHBOARD-1
+Agent: main
+Task: Menindaklanjuti revisi route auth, pembayaran, receipt, dashboard, transaksi, dan identitas Admin.
+
+Work Log:
+- Memisahkan route `/login`, `/signup`, `/admin/login`, dan `/admin`, dengan guard session Anggota/Admin tetap terpisah.
+- Membedakan akun anggota yang tidak ditemukan dari password salah pada endpoint login.
+- Memperbaiki payload list receipt yang sebelumnya dikembalikan sebagai Promise, serta mengubah generator receipt menjadi PNG.
+- Menambahkan nomor rekening, grafik tren keuangan, filter status pembayaran, dan responsif nominal summary card.
+- Menambahkan empat nama Admin dari `ADMIN_NAMES`, menyimpan nama terpilih pada JWT, dan menampilkannya pada shell Admin.
+- Menambahkan migrasi indeks receipt agar status REJECTED menjadi histori yang dapat berulang.
+- Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build` dengan akses jaringan untuk Google Fonts, dan `git diff --check`.

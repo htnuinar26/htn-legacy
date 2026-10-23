@@ -34,6 +34,21 @@ export type AdminPayload = {
   nama: string;
 };
 
+/** Daftar identitas Admin yang boleh dipilih saat login. */
+export function getConfiguredAdminNames(): string[] {
+  const configured = (process.env.ADMIN_NAMES ?? "")
+    .split(",")
+    .map((name) => name.trim())
+    .filter(Boolean);
+  return configured.length > 0 ? configured.slice(0, 4) : ["Bendahara"];
+}
+
+export function isConfiguredAdminName(nama: string): boolean {
+  return getConfiguredAdminNames().some(
+    (configured) => configured.toLocaleLowerCase() === nama.toLocaleLowerCase()
+  );
+}
+
 async function signToken(
   payload: SessionPayload | AdminPayload
 ): Promise<string> {

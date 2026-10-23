@@ -58,7 +58,7 @@ const TITLES: Record<AdminView, string> = {
   laporan: "Laporan",
 };
 
-export function AdminShell() {
+export function AdminShell({ adminName = "Bendahara" }: { adminName?: string }) {
   const { adminView, setAdminView } = useNav();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -108,7 +108,9 @@ export function AdminShell() {
               {process.env.NEXT_PUBLIC_INSTANCE_NAME ?? "HTN Legacy"}{" "}
               <span className="text-[var(--accent-secondary)]">· Admin</span>
             </p>
-            <p className="truncate text-xs text-[var(--ink-muted)]">{TITLES[adminView]}</p>
+            <p className="truncate text-xs text-[var(--ink-muted)]">
+              {TITLES[adminView]} · {adminName}
+            </p>
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-1 sm:gap-3">
@@ -118,7 +120,7 @@ export function AdminShell() {
             onClick={logout}
             disabled={loggingOut}
             aria-label="Keluar dari panel Admin"
-            className="flex h-11 items-center gap-2 rounded-lg px-3 text-sm font-medium text-[var(--ink-muted)] hover:bg-[var(--surface-alt)] disabled:opacity-50"
+            className="flex h-11 items-center gap-2 rounded-lg px-3 text-sm font-medium text-[var(--status-tertunggak)] hover:bg-[var(--status-tertunggak-bg)] disabled:opacity-50"
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Keluar</span>
@@ -151,7 +153,7 @@ export function AdminShell() {
                 Sesi Admin
               </p>
               <p className="text-sm font-semibold text-[var(--ink)]">
-                Bendahara
+                {adminName}
               </p>
             </div>
           </div>
@@ -210,7 +212,7 @@ export function AdminShell() {
                 <button
                   type="button"
                   onClick={logout}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[var(--ink-muted)] hover:bg-[var(--surface-alt)]"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[var(--status-tertunggak)] hover:bg-[var(--status-tertunggak-bg)]"
                 >
                   <LogOut className="h-4 w-4" />
                   Keluar

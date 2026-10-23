@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
+import sharp from "sharp";
 import { db } from "@/lib/db";
 import {
   apiSuccess,
@@ -105,13 +106,16 @@ export async function POST(req: NextRequest) {
       nominalFinal,
       catatan
     );
-    const objectPath = generateStrukPath(periode, "image/svg+xml");
+    const objectPath = generateStrukPath(periode, "image/png");
     let uploaded;
     try {
+      const pngBuffer = await sharp(Buffer.from(svgContent, "utf-8"))
+        .png()
+        .toBuffer();
       uploaded = await uploadFile(
-        Buffer.from(svgContent, "utf-8"),
+        pngBuffer,
         objectPath,
-        "image/svg+xml"
+        "image/png"
       );
     } catch (storageErr) {
       return apiError(

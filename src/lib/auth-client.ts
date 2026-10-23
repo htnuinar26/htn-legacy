@@ -6,6 +6,7 @@
 
 export type ClientSession = {
   member: { anggotaId: string; nama: string } | null;
+  admin: { nama: string } | null;
   isAdmin: boolean;
 };
 
@@ -27,17 +28,18 @@ export async function fetchSession(force = false): Promise<ClientSession> {
   try {
     const res = await fetch("/api/auth/session", { cache: "no-store" });
     if (!res.ok) {
-      cachedSession = { member: null, isAdmin: false };
+      cachedSession = { member: null, admin: null, isAdmin: false };
       return cachedSession;
     }
     const json = await res.json();
     cachedSession = {
       member: json.data?.member ?? null,
+      admin: json.data?.admin ?? null,
       isAdmin: json.data?.isAdmin ?? false,
     };
     return cachedSession;
   } catch {
-    cachedSession = { member: null, isAdmin: false };
+    cachedSession = { member: null, admin: null, isAdmin: false };
     return cachedSession;
   }
 }

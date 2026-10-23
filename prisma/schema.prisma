@@ -64,7 +64,7 @@ model Struk {
 
   transaksi     Transaksi?
 
-  @@unique([anggotaId, periodeBulan, status])
+  @@index([anggotaId, periodeBulan, status])
   @@index([periodeBulan])
   @@index([status])
 }

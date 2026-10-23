@@ -37,9 +37,9 @@ export async function POST(req: NextRequest) {
 
     if (!anggota) {
       return apiError(
-        "AUTH_ERROR",
-        "Nama atau password tidak sesuai. Periksa kembali data Anda.",
-        { status: 401 }
+        "NOT_FOUND",
+        "Akun dengan nama tersebut belum terdaftar. Anda akan diarahkan ke halaman pendaftaran.",
+        { status: 404, fields: { nama: "Akun belum terdaftar" } }
       );
     }
 
@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
     if (!ok) {
       return apiError(
         "AUTH_ERROR",
-        "Nama atau password tidak sesuai. Periksa kembali data Anda.",
-        { status: 401 }
+        "Password salah. Periksa kembali password Anda.",
+        { status: 401, fields: { password: "Password salah" } }
       );
     }
 

@@ -221,3 +221,25 @@ Ringkasan review perubahan tindak lanjut console log:
 - `CHANGELOG.md`, `TODO.md`, dan `worklog.md` mencatat cakupan serta validasi perubahan.
 - Typecheck, lint, build, dan `git diff --check` telah lulus. Tidak ada migration database, perubahan environment variable, storage, dependency, atau perubahan logic autentikasi.
 ```
+
+---
+
+## PR #39
+
+**PR:** 39
+**Repo:** htnuinar26/htn-legacy
+**Status:** [ ] belum dicopas
+
+```
+Review terpadu revisi auth, receipt, dashboard, transaksi, dan Admin:
+
+- Route `/login`, `/signup`, `/admin/login`, dan `/admin` sudah dipisah. Guard pada `app-shell.tsx` tetap memprioritaskan session Admin tanpa mencampur otorisasi Anggota.
+- Login anggota membedakan nama yang tidak ditemukan dari password salah. Risiko residual: redirect ke `/signup` bergantung pada kategori `NOT_FOUND`, sehingga perubahan kontrak response perlu mempertahankan kategori tersebut.
+- `GET /api/struk` sekarang menunggu `Promise.all` sebelum `apiSuccess`, memperbaiki payload yang sebelumnya tidak dapat dipakai oleh review Admin.
+- Receipt generator dikonversi ke PNG melalui `sharp`; file hasil dan preview memakai `image/png`. Dependency `sharp` sudah tersedia, tidak ditambahkan baru.
+- Migrasi receipt mengganti unique constraint status menjadi index biasa agar histori `REJECTED` berulang tidak memicu konflik. Data lama tidak diubah; duplikasi aktif tetap dibatasi oleh logic aplikasi.
+- Dashboard memakai `recharts` yang sudah ada, dan filter Anggota/Admin menggunakan nilai status yang sama dengan summary.
+- `ADMIN_NAMES` wajib ditambahkan pada deployment. Fallback `Bendahara` dipertahankan untuk kompatibilitas environment lama, sehingga deployment baru perlu memverifikasi konfigurasi empat nama.
+- Barcode lokal `public/assets/barcode.webp` tidak dimasukkan karena file di working tree berukuran 0 byte. Komponen aman menampilkan empty state bila settings belum memiliki URL/path barcode yang valid.
+- `CHANGELOG.md`, `TODO.md`, dan `worklog.md` mencatat cakupan serta validasi. Typecheck, lint, build, dan `git diff --check` lulus.
+```

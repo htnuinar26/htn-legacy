@@ -38,6 +38,8 @@ export function BarcodeView() {
       .finally(() => setLoading(false));
   }, []);
 
+  const barcodeSource = settings?.barcodeUrl ?? settings?.barcodePath;
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -45,6 +47,7 @@ export function BarcodeView() {
         description="Gunakan barcode ini untuk pembayaran iuran."
       />
 
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <Card>
         <CardHeader
           title="Barcode Iuran"
@@ -55,11 +58,11 @@ export function BarcodeView() {
             <LoadingState label="Memuat barcode..." />
           ) : error ? (
             <ErrorBanner message={error} />
-          ) : settings?.barcodePath ? (
+          ) : barcodeSource ? (
             <>
               <div className="rounded-xl border border-[var(--border-default)] bg-white p-4">
                 <Image
-                  src={settings.barcodeUrl ?? settings.barcodePath}
+                  src={barcodeSource}
                   alt="Barcode pembayaran iuran"
                   width={240}
                   height={240}
@@ -68,7 +71,7 @@ export function BarcodeView() {
                 />
               </div>
               <a
-                href={settings.barcodeUrl ?? settings.barcodePath}
+                href={barcodeSource}
                 download
                 className="flex items-center gap-2 rounded-lg border border-[var(--border-default)] px-4 py-2 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface-alt)]"
               >
@@ -92,6 +95,20 @@ export function BarcodeView() {
           )}
         </div>
       </Card>
+
+      <Card>
+        <CardHeader title="Pembayaran Manual" description="Gunakan salah satu metode pembayaran berikut." />
+        <div className="space-y-4 p-5">
+          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--surface-alt)] p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--ink-muted)]">Nomor Rekening</p>
+            <p className="mt-1 text-2xl font-extrabold tabular-nums text-[var(--ink)]">7379420871</p>
+          </div>
+          <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
+            Setelah pembayaran, unggah bukti transfer pada menu Struk Iuran untuk ditinjau Admin.
+          </p>
+        </div>
+      </Card>
+      </div>
 
       {settings?.waPengurus && (
         <Card>
