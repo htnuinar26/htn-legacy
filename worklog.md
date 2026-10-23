@@ -193,5 +193,9 @@ Work Log:
 - Meninjau route auth, otorisasi anggota/Admin, upload receipt, mutasi transaksi, serta riwayat perubahan auth.
 - Menemukan risiko secret lama pada histori repo publik, autentikasi Admin ber-password bersama tanpa rate limit aplikasi, password anggota yang reversible, rate limiter upload lokal, identitas actor audit yang tetap, dan enumerasi nama anggota.
 - Memeriksa `.github/workflows/`; direktori workflow tidak ditemukan sehingga tidak ada konfigurasi agentic CI untuk dianalisis.
-- Menulis `docs/SECURITY_AUDIT_2026-10-23.md`, mengosongkan blok review internal, dan menegaskan merge hanya oleh pemilik ke `main`.
+- Menulis `docs/SECURITY_AUDIT_2026-10-23.md` dan menegaskan merge hanya oleh pemilik ke `main`.
 - Tidak mengubah source code dan tidak menjalankan tes. Validasi dokumentasi dilakukan dengan `git diff --check` dan scan encoding.
+
+Koreksi dokumentasi setelah klarifikasi pemilik:
+- Memulihkan seluruh riwayat review yang sudah ada di `docs/review/CODE_REVIEW.md` dan menambahkan blok review PR #41 di dalam code box.
+- Menyesuaikan `CHANGELOG.md` dan `TODO.md` agar akurat menyatakan review lama dipertahankan, bukan dikosongkan.
