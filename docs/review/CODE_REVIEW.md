@@ -2,23 +2,23 @@
 
 **Tanggal**: 2026-10-23
 **Reviewer**: Agent (self-review)
-**Scope**: PR #41 - audit keamanan statis dan kebijakan merge
+**Scope**: PR #43 - identitas Admin, sesi 30 menit, dan kontrol kustom
 
 ---
 
-## PR #41
+## PR #43
 
-**PR:** 41
+**PR:** 43
 **Repo:** htnuinar26/htn-legacy
 **Status:** [ ] belum dicopas
 
 ```
-Review terpadu audit keamanan statis dan dokumentasi kebijakan merge:
+Review terpadu untuk PR #43:
 
-- `docs/SECURITY_AUDIT_2026-10-23.md` memisahkan temuan dari batasan verifikasi dan tidak menyalin nilai secret. Temuan secret historis diberi tingkat kritis bersyarat karena status rotasi belum dapat dibuktikan dari source code.
-- Risiko autentikasi Admin memakai password bersama, penyimpanan password anggota yang dapat dipulihkan, rate limit upload dalam memori, dan atribusi audit statis dijelaskan beserta dampak dan langkah tindak lanjutnya.
-- Laporan membandingkan commit lokal dengan `main` dan menyebut perubahan lanjutan sesi Admin 30 menit serta dropdown custom belum termasuk di `main` yang diperiksa. Status branch dan deployment perlu diperiksa ulang sebelum dianggap sudah production.
-- `TODO.md` mencatat implementasi sesi Admin dan dropdown custom selesai, sedangkan laporan menyebut perubahan tersebut belum termasuk di `main`. Status TODO menunjukkan implementasi pada branch yang diaudit, bukan bukti merge atau deployment.
-- `AGENTS.md` menetapkan pemilik sebagai pihak yang melakukan merge dan `main` sebagai target PR. PR ini tidak mengubah source code, database, environment, atau storage.
-- `CHANGELOG.md` dan `worklog.md` mencatat lingkup audit serta batas validasinya. Audit bersifat statis dan tidak membuktikan bahwa temuan telah diperbaiki atau lolos pengujian dinamis.
+- `src/lib/admin-identities.ts`, endpoint login, dan `login-view.tsx` memakai daftar empat nama yang sama. Nilai nama dikirim sebagai bagian dari sesi admin dan divalidasi kembali ketika sesi dibaca, sehingga `ADMIN_NAMES` dari environment tidak lagi menentukan pilihan login.
+- `src/lib/auth.ts` menerapkan TTL 30 menit pada token dan cookie Admin serta membiarkan TTL sesi anggota tetap tujuh hari. Sesi Admin yang sudah aktif sebelum perubahan ini akan ditolak jika usia token melewati batas atau identitasnya tidak ada di daftar baru, sehingga Admin perlu login ulang setelah deploy.
+- Select kustom digunakan pada seluruh lokasi native select yang ditemukan. File picker menyamarkan input visual namun mempertahankan label keyboard-accessible; dialog pemilihan berkas tetap menggunakan dialog OS melalui input file, sesuai perilaku browser.
+- `README.md`, `.env.example`, `CHANGELOG.md`, `TODO.md`, dan `worklog.md` selaras dengan implementasi: empat nama ditetapkan di code, `ADMIN_NAMES` dihapus dari konfigurasi, dan rencana ditandai selesai. Tidak ada migrasi database atau perubahan storage.
+- Satu ketidakkonsistenan masih ada di luar cakupan perubahan: sejumlah handler audit mencatat actor Admin sebagai `Bendahara` tetap. Karena sesi sekarang memuat nama Admin aktual, log audit untuk tindakan tersebut belum tentu mengatribusikan tindakan ke nama yang login. Pertimbangkan tindak lanjut terpisah agar atribusi audit menggunakan identitas sesi.
+- TypeScript dan lint lulus. Build Webpack lulus dengan mock font lokal; build Turbopack normal belum terverifikasi karena resolver mock font gagal di sandbox. Pemeriksaan source menemukan tidak ada lagi tag select native atau pembacaan runtime `ADMIN_NAMES`.
 ```
