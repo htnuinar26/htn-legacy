@@ -6,17 +6,23 @@ import { Loader2, LogIn, UserPlus, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ADMIN_IDENTITIES } from "@/lib/admin-identities";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Mode = "login" | "signup" | "admin";
 
 export function LoginView({
   initialMode = "login",
   showModeTabs = true,
-  adminNames = [],
 }: {
   initialMode?: Mode;
   showModeTabs?: boolean;
-  adminNames?: string[];
 }) {
   const [mode, setMode] = useState<Mode>(initialMode);
   const [loading, setLoading] = useState(false);
@@ -30,7 +36,7 @@ export function LoginView({
   const [email, setEmail] = useState("");
   const [telepon, setTelepon] = useState("");
   const [password, setPassword] = useState("");
-  const [adminName, setAdminName] = useState(adminNames[0] ?? "");
+  const [adminName, setAdminName] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -164,23 +170,29 @@ export function LoginView({
             <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "admin" ? (
               <div className="space-y-1.5">
-                <label htmlFor="login-admin-nama" className="block text-sm font-medium text-[var(--ink)]">
+                <label id="login-admin-nama-label" htmlFor="login-admin-nama" className="block text-sm font-medium text-[var(--ink)]">
                   Nama Admin
                 </label>
-                <select
-                  id="login-admin-nama"
-                  value={adminName}
-                  onChange={(e) => setAdminName(e.target.value)}
-                  className="input-editorial h-11"
-                  required
-                >
-                  <option value="">Pilih nama Admin</option>
-                  {adminNames.map((name) => (
-                    <option key={name} value={name}>{name}</option>
-                  ))}
-                </select>
+                <Select value={adminName} onValueChange={setAdminName}>
+                  <SelectTrigger
+                    id="login-admin-nama"
+                    aria-labelledby="login-admin-nama-label"
+                    aria-invalid={!!fieldErrors.nama}
+                    aria-describedby={fieldErrors.nama ? "login-admin-nama-error" : undefined}
+                    className="w-full"
+                  >
+                    <SelectValue placeholder="Pilih nama Admin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ADMIN_IDENTITIES.map((identity) => (
+                      <SelectItem key={identity.name} value={identity.name}>
+                        {identity.position}: {identity.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {fieldErrors.nama && (
-                  <p role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">{fieldErrors.nama}</p>
+                  <p id="login-admin-nama-error" role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">{fieldErrors.nama}</p>
                 )}
               </div>
             ) : (
