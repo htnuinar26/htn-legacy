@@ -19,6 +19,13 @@ import {
   EmptyState,
 } from "@/components/blocks/ui";
 import { StatusBadge } from "@/components/ui/status-badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatDate } from "@/lib/format";
 
 type Anggota = {
@@ -134,17 +141,17 @@ export function AnggotaView() {
           title={`${filtered.length} Anggota`}
           action={
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-                className="input-editorial h-11 text-sm"
-                aria-label="Filter status pembayaran"
-              >
-                <option value="ALL">Semua status</option>
-                <option value="LUNAS">Sudah bayar</option>
-                <option value="BELUM_LUNAS">Belum bayar</option>
-                <option value="TERTUNGGAK">Tertunggak</option>
-              </select>
+              <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
+                <SelectTrigger className="w-full sm:w-auto" aria-label="Filter status pembayaran">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Semua status</SelectItem>
+                  <SelectItem value="LUNAS">Sudah bayar</SelectItem>
+                  <SelectItem value="BELUM_LUNAS">Belum bayar</SelectItem>
+                  <SelectItem value="TERTUNGGAK">Tertunggak</SelectItem>
+                </SelectContent>
+              </Select>
               <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--ink-muted)]" />
               <input
@@ -423,19 +430,19 @@ function AnggotaForm({
               />
             </div>
             <div className="space-y-1.5">
-              <label htmlFor="anggota-status" className="block text-sm font-medium text-[var(--ink)]">
+              <label id="anggota-status-label" htmlFor="anggota-status" className="block text-sm font-medium text-[var(--ink)]">
                 Status Bayar
               </label>
-              <select
-                id="anggota-status"
-                value={statusBayar}
-                onChange={(e) => setStatusBayar(e.target.value)}
-                className="input-editorial h-11"
-              >
-                <option value="BELUM_LUNAS">Belum Lunas</option>
-                <option value="LUNAS">Lunas</option>
-                <option value="TERTUNGGAK">Tertunggak</option>
-              </select>
+              <Select value={statusBayar} onValueChange={setStatusBayar}>
+                <SelectTrigger id="anggota-status" className="w-full" aria-labelledby="anggota-status-label">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="BELUM_LUNAS">Belum Lunas</SelectItem>
+                  <SelectItem value="LUNAS">Lunas</SelectItem>
+                  <SelectItem value="TERTUNGGAK">Tertunggak</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="space-y-1.5">
