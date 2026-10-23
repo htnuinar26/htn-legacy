@@ -20,6 +20,7 @@ import {
   EmptyState,
 } from "@/components/blocks/ui";
 import { StatusBadge, strukStatusVariant, strukStatusLabel } from "@/components/ui/status-badge";
+import { CustomSelect } from "@/components/ui/custom-select";
 import {
   recentPeriods,
   formatPeriodLong,
@@ -187,20 +188,14 @@ export function StrukView({
             <label htmlFor="struk-period" className="block text-sm font-medium text-[var(--ink)]">
               Periode Iuran
             </label>
-            <select
+            <CustomSelect
               id="struk-period"
               value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-              aria-invalid={!!uploadError?.fields?.periodeBulan}
-              aria-describedby={uploadError?.fields?.periodeBulan ? "struk-period-error" : undefined}
-              className="input-editorial h-11"
-            >
-              {periods.map((p) => (
-                <option key={p} value={p}>
-                  {formatPeriodLong(p)}
-                </option>
-              ))}
-            </select>
+              onChange={setSelectedPeriod}
+              ariaLabel="Pilih periode iuran"
+              ariaDescribedBy={uploadError?.fields?.periodeBulan ? "struk-period-error" : undefined}
+              options={periods.map((p) => ({ value: p, label: formatPeriodLong(p) }))}
+            />
             {uploadError?.fields?.periodeBulan && (
               <p
                 id="struk-period-error"
