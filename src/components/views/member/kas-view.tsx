@@ -17,6 +17,7 @@ import {
   formatDateTime,
   currentPeriod,
 } from "@/lib/format";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 type Transaksi = {
   id: string;
@@ -95,18 +96,13 @@ export function KasView() {
         title="Kas Organisasi"
         description="Riwayat transaksi kas dan saldo organisasi."
         action={
-          <select
+          <CustomSelect
             value={bulan}
-            onChange={(e) => setBulanDipilih(e.target.value)}
-            className="input-editorial h-11 w-auto"
-            aria-label="Pilih periode"
-          >
-            {periodeOptions.map((p) => (
-              <option key={p} value={p}>
-                {formatPeriodLong(p)}
-              </option>
-            ))}
-          </select>
+            onChange={setBulanDipilih}
+            className="w-full sm:w-52"
+            ariaLabel="Pilih periode"
+            options={periodeOptions.map((p) => ({ value: p, label: formatPeriodLong(p) }))}
+          />
         }
       />
 
