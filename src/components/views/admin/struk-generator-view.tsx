@@ -18,6 +18,7 @@ import {
   EmptyState,
 } from "@/components/blocks/ui";
 import { RupiahInput } from "@/components/ui/rupiah-input";
+import { CustomSelect } from "@/components/ui/custom-select";
 import {
   formatPeriodLong,
   formatRupiahFull,
@@ -218,20 +219,17 @@ export function StrukGeneratorView() {
               <label htmlFor="gen-anggota" className="block text-sm font-medium text-[var(--ink)]">
                 Anggota *
               </label>
-              <select
+              <CustomSelect
                 id="gen-anggota"
                 value={selectedAnggota}
-                onChange={(e) => setSelectedAnggota(e.target.value)}
-                className="input-editorial h-11"
-                required
-              >
-                <option value="">- Pilih anggota -</option>
-                {data.anggota.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.nama}{a.nim ? ` (${a.nim})` : ""}
-                  </option>
-                ))}
-              </select>
+                onChange={setSelectedAnggota}
+                ariaLabel="Pilih anggota"
+                placeholder="- Pilih anggota -"
+                options={data.anggota.map((a) => ({
+                  value: a.id,
+                  label: `${a.nama}${a.nim ? ` (${a.nim})` : ""}`,
+                }))}
+              />
               {error?.fields?.anggotaId && (
                 <p role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">
                   {error.fields.anggotaId}
