@@ -170,3 +170,28 @@ Work Log:
 - Menambahkan empat nama Admin dari `ADMIN_NAMES`, menyimpan nama terpilih pada JWT, dan menampilkannya pada shell Admin.
 - Menambahkan migrasi indeks receipt agar status REJECTED menjadi histori yang dapat berulang.
 - Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build` dengan akses jaringan untuk Google Fonts, dan `git diff --check`.
+---
+Task ID: ADMIN-SESSION-CUSTOM-SELECT-1
+Agent: main
+Task: Menetapkan identitas Admin di kode, membatasi session Admin, dan mengganti dropdown native.
+
+Work Log:
+- Menetapkan Abdal, Inayah Dzil Izzati, Tasya Ulfa, dan Ahlul Fajrul Maulana sebagai identitas Admin terdaftar di `src/lib/auth.ts`.
+- Membatasi JWT dan cookie Admin dengan masa berlaku 30 menit, tanpa mengubah masa berlaku session anggota.
+- Menambahkan `CustomSelect` accessible dengan keyboard navigation, focus-visible ring, listbox semantics, dan token tema.
+- Mengganti seluruh penggunaan native `<select>` pada view auth, anggota, kas, receipt, generator, dan audit log.
+- Memperbarui `SPEC.md`, `ARCHITECTURE.md`, `CHANGELOG.md`, dan `TODO.md` agar sesuai dengan perilaku aktual.
+- Validasi lulus: `bunx tsc --noEmit`, `bun run lint`, `bun run build`, pemeriksaan tidak adanya native select, dan `git diff --check`.
+
+---
+Task ID: SECURITY-AUDIT-TRAILOFBITS-1
+Agent: main
+Task: Audit keamanan statis menggunakan tiga skill Trail of Bits dan memperbarui dokumentasi kebijakan.
+
+Work Log:
+- Memetakan batas browser, Route Handler, cookie JWT, Prisma, dan Supabase Storage.
+- Meninjau route auth, otorisasi anggota/Admin, upload receipt, mutasi transaksi, serta riwayat perubahan auth.
+- Menemukan risiko secret lama pada histori repo publik, autentikasi Admin ber-password bersama tanpa rate limit aplikasi, password anggota yang reversible, rate limiter upload lokal, identitas actor audit yang tetap, dan enumerasi nama anggota.
+- Memeriksa `.github/workflows/`; direktori workflow tidak ditemukan sehingga tidak ada konfigurasi agentic CI untuk dianalisis.
+- Menulis `docs/SECURITY_AUDIT_2026-10-23.md`, mengosongkan blok review internal, dan menegaskan merge hanya oleh pemilik ke `main`.
+- Tidak mengubah source code dan tidak menjalankan tes. Validasi dokumentasi dilakukan dengan `git diff --check` dan scan encoding.
