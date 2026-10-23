@@ -241,5 +241,9 @@ Review terpadu revisi auth, receipt, dashboard, transaksi, dan Admin:
 - Dashboard memakai `recharts` yang sudah ada, dan filter Anggota/Admin menggunakan nilai status yang sama dengan summary.
 - `ADMIN_NAMES` wajib ditambahkan pada deployment. Fallback `Bendahara` dipertahankan untuk kompatibilitas environment lama, sehingga deployment baru perlu memverifikasi konfigurasi empat nama.
 - Barcode lokal `public/assets/barcode.webp` tidak dimasukkan karena file di working tree berukuran 0 byte. Komponen aman menampilkan empty state bila settings belum memiliki URL/path barcode yang valid.
+- Update lanjutan menetapkan empat nama Admin di `src/lib/auth.ts`, bukan environment variable. `ADMIN_PASSWORD` tetap server-only.
+- Session Admin kini memiliki JWT expiration dan cookie `maxAge` 30 menit. Session anggota tetap 7 hari.
+- `src/components/ui/custom-select.tsx` menggantikan seluruh native `<select>` yang ditemukan pada view auth, anggota, kas, receipt, generator, dan audit log. Keyboard Arrow/Home/End/Enter/Escape, focus ring, dan `aria-label` sudah ditangani.
+- `SPEC.md` dan `ARCHITECTURE.md` diperbarui agar masa session Admin dan daftar identitas sesuai implementasi.
 - `CHANGELOG.md`, `TODO.md`, dan `worklog.md` mencatat cakupan serta validasi. Typecheck, lint, build, dan `git diff --check` lulus.
 ```
