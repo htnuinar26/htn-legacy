@@ -21,6 +21,13 @@ import {
 } from "@/components/blocks/ui";
 import { RupiahInput } from "@/components/ui/rupiah-input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   formatRupiahFull,
   formatPeriodLong,
   formatDateTime,
@@ -160,18 +167,18 @@ export function AdminKasView() {
         <CardHeader
           title={`Transaksi ${formatPeriodLong(bulan)}`}
           action={
-            <select
-              value={bulan}
-              onChange={(e) => setBulanDipilih(e.target.value)}
-              className="input-editorial h-11 w-auto text-sm"
-              aria-label="Pilih periode"
-            >
-              {periodeOptions.map((p) => (
-                <option key={p} value={p}>
-                  {formatPeriodLong(p)}
-                </option>
-              ))}
-            </select>
+            <Select value={bulan} onValueChange={setBulanDipilih}>
+              <SelectTrigger className="w-full sm:w-auto" aria-label="Pilih periode">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {periodeOptions.map((periode) => (
+                  <SelectItem key={periode} value={periode}>
+                    {formatPeriodLong(periode)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           }
         />
         <div className="p-5">
