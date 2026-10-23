@@ -199,3 +199,12 @@ Work Log:
 Koreksi dokumentasi setelah klarifikasi pemilik:
 - Memulihkan seluruh riwayat review yang sudah ada di `docs/review/CODE_REVIEW.md` dan menambahkan blok review PR #41 di dalam code box.
 - Menyesuaikan `CHANGELOG.md` dan `TODO.md` agar akurat menyatakan review lama dipertahankan, bukan dikosongkan.
+
+## Koreksi login Admin dan kontrol browser (2026-10-23)
+
+- Mengganti sumber identitas login Admin dari `ADMIN_NAMES` dengan empat nama yang ditetapkan pemilik di `src/lib/admin-identities.ts`; API login menyimpan nama canonical pada JWT.
+- Membatasi JWT dan cookie Admin hingga 30 menit dan memvalidasi umur `iat`, termasuk untuk token lama yang sebelumnya masih memiliki masa berlaku lebih panjang. Session Anggota tetap tujuh hari.
+- Mengganti sembilan elemen select native pada login, filter Anggota, kas, upload receipt, generator, form Anggota, dan audit log dengan komponen Radix bersama bertoken semantic.
+- Membuat komponen `FilePicker` untuk pemicu file CSV, barcode, dan receipt; dialog pemilihan berkas tetap disediakan browser/OS, sedangkan kontrol halaman dapat diakses lewat keyboard.
+- Menyesuaikan README, `.env.example`, CHANGELOG, dan TODO dengan implementasi yang sebenarnya.
+- Typecheck dan lint lulus. `bun run build` dengan Turbopack terhalang resolver font sandbox; build Next.js penuh melalui Webpack lulus memakai mock font sementara. `bun install --frozen-lockfile --offline` dan `bun run db:generate` hanya menghasilkan dependency/client di `node_modules`, tanpa perubahan file tracked.
