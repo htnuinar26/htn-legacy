@@ -15,7 +15,8 @@ Aplikasi menggunakan Next.js App Router, Prisma dengan PostgreSQL Neon, dan Supa
 - TypeScript menjadi bahasa utama, `strict: true` di `tsconfig.json`.
 - Prisma Client terhubung ke PostgreSQL Neon melalui `DATABASE_URL` dan `DIRECT_URL`.
 - Supabase Storage menyimpan gambar receipt dan barcode. Database hanya menyimpan path object.
-- JWT httpOnly cookie digunakan untuk session anggota dan Admin.
+- JWT httpOnly cookie digunakan untuk session anggota dan Admin. Session Admin
+  kedaluwarsa setelah 30 menit, sedangkan session anggota berlaku 7 hari.
 - Password anggota dienkripsi dengan AES-256-GCM.
 - Zod digunakan sebagai satu-satunya mekanisme validasi skema di server, untuk setiap Route Handler yang menerima input.
 - `lucide-react` digunakan sebagai satu-satunya icon library fungsional; Bootstrap Icons khusus untuk brand mark sosial media (lihat `DESIGN.md`).
