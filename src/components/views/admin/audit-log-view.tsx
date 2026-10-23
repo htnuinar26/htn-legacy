@@ -20,6 +20,13 @@ import {
   ErrorBanner,
   EmptyState,
 } from "@/components/blocks/ui";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatDateTime } from "@/lib/format";
 
 type LogItem = {
@@ -120,22 +127,25 @@ export function AuditLogView() {
         title="Audit Log"
         description={`${total} entri aktivitas Admin. Jejak audit permanen.`}
         action={
-          <select
-            value={aksiFilter}
-            onChange={(e) => changeFilter(e.target.value)}
-            className="input-editorial h-11 w-auto text-sm"
-            aria-label="Filter aksi"
+          <Select
+            value={aksiFilter || "ALL"}
+            onValueChange={(value) => changeFilter(value === "ALL" ? "" : value)}
           >
-            <option value="">Semua Aksi</option>
-            <option value="APPROVE_STRUK">Approve Struk</option>
-            <option value="REJECT_STRUK">Reject Struk</option>
-            <option value="CREATE_TRANSAKSI">Catat Transaksi</option>
-            <option value="DELETE_TRANSAKSI">Hapus Transaksi</option>
-            <option value="CREATE_STRUK_MANUAL">Struk Manual</option>
-            <option value="UPDATE_ANGGOTA">Update Anggota</option>
-            <option value="DELETE_ANGGOTA">Hapus Anggota</option>
-            <option value="UPDATE_SETTINGS">Update Settings</option>
-          </select>
+            <SelectTrigger className="w-full sm:w-auto" aria-label="Filter aksi">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Semua Aksi</SelectItem>
+              <SelectItem value="APPROVE_STRUK">Approve Struk</SelectItem>
+              <SelectItem value="REJECT_STRUK">Reject Struk</SelectItem>
+              <SelectItem value="CREATE_TRANSAKSI">Catat Transaksi</SelectItem>
+              <SelectItem value="DELETE_TRANSAKSI">Hapus Transaksi</SelectItem>
+              <SelectItem value="CREATE_STRUK_MANUAL">Struk Manual</SelectItem>
+              <SelectItem value="UPDATE_ANGGOTA">Update Anggota</SelectItem>
+              <SelectItem value="DELETE_ANGGOTA">Hapus Anggota</SelectItem>
+              <SelectItem value="UPDATE_SETTINGS">Update Settings</SelectItem>
+            </SelectContent>
+          </Select>
         }
       />
 

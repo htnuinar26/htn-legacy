@@ -21,7 +21,7 @@ Pemeriksaan receipt dilakukan oleh manusia. Aplikasi tidak menjalankan OCR, Gemi
 - Bun untuk instalasi dependency dan perintah pengembangan.
 - Prisma dengan PostgreSQL.
 - Supabase Storage untuk file receipt dan barcode pada production. Adapter dapat memakai storage lokal untuk development. Database menyimpan path object, bukan isi file.
-- JWT bertanda tangan `jose` di cookie HTTP-only. Cookie dan pemeriksaan session Admin serta Anggota terpisah.
+- JWT bertanda tangan `jose` di cookie HTTP-only. Cookie dan pemeriksaan session Admin serta Anggota terpisah; session Admin kedaluwarsa setelah 30 menit.
 - Zod untuk validasi request server.
 - AES-256-GCM untuk penyimpanan password Anggota pada implementasi saat ini.
 - Tailwind CSS, `next-themes`, dan `lucide-react`.
@@ -71,7 +71,7 @@ sequenceDiagram
     else Admin masuk
         U->>UI: Pilih nama Admin dan masukkan password bersama
         UI->>API: POST /api/auth/admin-login
-        API->>API: Validasi nama pada ADMIN_NAMES dan password Admin
+        API->>API: Validasi nama pada daftar kode dan password Admin
         API-->>C: Set cookie htn-admin dengan role Admin
         API-->>UI: apiSuccess dan tujuan area Admin
     end
@@ -87,7 +87,7 @@ sequenceDiagram
     API-->>UI: Data yang diizinkan atau AUTH_ERROR
 ```
 
-Nama Admin yang tersedia dikonfigurasi melalui `ADMIN_NAMES`, dipisahkan koma, sesuai implementasi saat ini. Password Admin dipakai bersama. Hak akses Admin tidak dibedakan berdasarkan nama.
+Empat identitas Admin ditetapkan langsung di kode: Abdal (Admin utama), Inayah Dzil Izzati (Bendahara), Tasya Ulfa (Sekretaris), dan Ahlul Fajrul Maulana (Komting). Nama-nama tersebut bukan environment variable. Password Admin tetap dipakai bersama; hak akses tidak dibedakan berdasarkan nama.
 
 ### Upload dan review receipt Anggota
 
@@ -223,7 +223,6 @@ File receipt dan barcode yang berasal dari pengguna tidak boleh ditambahkan ke r
 | `DIRECT_URL` | Koneksi langsung PostgreSQL untuk migration |
 | `JWT_SECRET` | Kunci tanda tangan session JWT, minimal 32 karakter |
 | `ADMIN_PASSWORD` | Password bersama untuk login Admin |
-| `ADMIN_NAMES` | Maksimal empat nama Admin, dipisahkan koma |
 | `ENCRYPTION_KEY` | Kunci 32 byte dalam 64 karakter hex untuk data password Anggota |
 | `SUPABASE_URL` | URL project Supabase |
 | `SUPABASE_SECRET_KEY` atau `SUPABASE_SERVICE_ROLE_KEY` | Kredensial server untuk Storage sesuai konfigurasi deployment |

@@ -58,7 +58,7 @@ const TITLES: Record<AdminView, string> = {
   laporan: "Laporan",
 };
 
-export function AdminShell({ adminName = "Bendahara" }: { adminName?: string }) {
+export function AdminShell({ adminName = "Admin" }: { adminName?: string }) {
   const { adminView, setAdminView } = useNav();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);

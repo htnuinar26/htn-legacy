@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, Loader2, FileSpreadsheet, CheckCircle2 } from "lucide-react";
+import { Loader2, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 import {
   PageHeader,
   Card,
   CardHeader,
   ErrorBanner,
 } from "@/components/blocks/ui";
+import { FilePicker } from "@/components/ui/file-picker";
 
 type Row = {
   nama: string;
@@ -161,18 +162,12 @@ export function ImportView() {
           description="Format: nama,password,nim,email,telepon,statusBayar"
         />
         <div className="space-y-4 p-5">
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--surface-alt)] px-4 py-2.5 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface)]">
-              <Upload className="h-4 w-4" />
-              Pilih File CSV
-              <input
-                type="file"
-                accept=".csv,text/csv"
-                onChange={handleFile}
-                className="hidden"
-              />
-            </label>
-          </div>
+          <FilePicker
+            id="anggota-csv-file"
+            label="Pilih File CSV"
+            accept=".csv,text/csv"
+            onChange={handleFile}
+          />
 
           <div className="space-y-1.5">
             <label htmlFor="import-text" className="block text-sm font-medium text-[var(--ink)]">

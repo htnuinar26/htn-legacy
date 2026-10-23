@@ -235,6 +235,19 @@ Sumber: audit 2026-10-21, LOW dan temuan dokumentasi.
 - [x] Normalisasi em-dash di seluruh file yang disentuh.
 - [x] Catat rotasi secret dan pembersihan git history sebagai Known Issue.
 
+### Revisi 2026-10-23 - `fix/admin-hardcoded-names-session-custom-select`
+
+Sumber: koreksi pemilik setelah halaman login Admin pada preview masih menampilkan opsi `Bendahara` dari konfigurasi dan kontrol select native.
+
+- [x] Tetapkan empat nama pemegang Admin di kode dan validasi nama yang sama di UI serta API: Abdal, Inayah Dzil Izzati, Tasya Ulfa, dan Ahlul Fajrul Maulana.
+- [x] Hapus `ADMIN_NAMES` dari environment example dan dokumentasi; pertahankan password Admin bersama sesuai desain autentikasi saat ini.
+- [x] Pisahkan masa berlaku JWT dan cookie Admin menjadi 30 menit tanpa mengubah durasi session Anggota; tolak juga token Admin lama setelah berumur 30 menit.
+- [x] Pastikan nama Admin dari session tampil pada shell/dashboard Admin.
+- [x] Ganti sembilan select native pada login, daftar Anggota, kas Anggota/Admin, upload receipt, generator, pengelolaan Anggota, dan audit log menggunakan komponen custom bersama.
+- [x] Ganti tampilan tiga kontrol pemilih file di import Anggota, settings barcode, dan upload receipt dengan pemicu custom yang tetap aksesibel.
+- [x] Perbarui CHANGELOG, README, worklog, dan satu blok CODE_REVIEW khusus PR ini.
+- [x] Luluskan typecheck dan lint; build penuh lulus dengan Webpack dan mock font lokal. Audit native controls dan `git diff --check` juga lulus. Build Turbopack lokal terkendala resolver mock font pada sandbox.
+
 ---
 
 ## Deferred work

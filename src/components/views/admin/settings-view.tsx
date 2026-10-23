@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Settings as SettingsIcon, Loader2, Save, Upload } from "lucide-react";
+import { Settings as SettingsIcon, Loader2, Save } from "lucide-react";
 import {
   PageHeader,
   Card,
@@ -10,6 +10,7 @@ import {
   ErrorBanner,
 } from "@/components/blocks/ui";
 import { RupiahInput } from "@/components/ui/rupiah-input";
+import { FilePicker } from "@/components/ui/file-picker";
 import { currentPeriod, formatPeriodLong } from "@/lib/format";
 
 type Settings = {
@@ -225,15 +226,12 @@ export function SettingsView() {
                   Belum ada barcode. Upload file gambar barcode pembayaran.
                 </p>
               )}
-              <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--surface-alt)] px-4 py-2.5 text-sm font-medium text-[var(--ink-soft)] hover:bg-[var(--surface)] sm:w-fit">
-                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                {uploading ? "Mengunggah..." : "Upload Barcode"}
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  disabled={uploading}
-                  className="hidden"
-                  onChange={async (e) => {
+              <FilePicker
+                id="settings-barcode-file"
+                label={uploading ? "Mengunggah..." : "Upload Barcode"}
+                accept="image/jpeg,image/png,image/webp"
+                disabled={uploading}
+                onChange={async (e) => {
                     const input = e.target;
                     const f = input.files?.[0];
                     if (!f) return;
@@ -266,9 +264,8 @@ export function SettingsView() {
                       input.value = "";
                       setUploading(false);
                     }
-                  }}
-                />
-              </label>
+                }}
+              />
             </div>
           </div>
         </Card>

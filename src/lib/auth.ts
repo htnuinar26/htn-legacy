@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import { db } from "@/lib/db";
 import { apiError } from "@/lib/api-response";
+import { findAdminIdentity } from "@/lib/admin-identities";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const encoder = new TextEncoder();
@@ -21,7 +22,8 @@ function getJwtKey() {
 
 const SESSION_COOKIE = "htn-session";
 const ADMIN_COOKIE = "htn-admin";
-const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 hari
+const MEMBER_SESSION_MAX_AGE = 60 * 60 * 24 * 7;
+const ADMIN_SESSION_MAX_AGE = 30 * 60;
 
 export type SessionPayload = {
   anggotaId: string;
@@ -34,34 +36,34 @@ export type AdminPayload = {
   nama: string;
 };
 
-/** Daftar identitas Admin yang boleh dipilih saat login. */
-export function getConfiguredAdminNames(): string[] {
-  const configured = (process.env.ADMIN_NAMES ?? "")
-    .split(",")
-    .map((name) => name.trim())
-    .filter(Boolean);
-  return configured.length > 0 ? configured.slice(0, 4) : ["Bendahara"];
-}
-
-export function isConfiguredAdminName(nama: string): boolean {
-  return getConfiguredAdminNames().some(
-    (configured) => configured.toLocaleLowerCase() === nama.toLocaleLowerCase()
-  );
-}
-
 async function signToken(
-  payload: SessionPayload | AdminPayload
+  payload: SessionPayload | AdminPayload,
+  maxAgeSeconds: number
 ): Promise<string> {
   return await new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(`${SESSION_MAX_AGE}s`)
+    .setExpirationTime(`${maxAgeSeconds}s`)
     .sign(getJwtKey());
 }
 
-async function verifyToken<T = unknown>(token: string): Promise<T | null> {
+async function verifyToken<T = unknown>(
+  token: string,
+  maxAgeSeconds?: number
+): Promise<T | null> {
   try {
     const { payload } = await jwtVerify(token, getJwtKey());
+    if (maxAgeSeconds !== undefined) {
+      const now = Math.floor(Date.now() / 1000);
+      const issuedAt = payload.iat;
+      if (
+        typeof issuedAt !== "number" ||
+        now < issuedAt ||
+        now - issuedAt >= maxAgeSeconds
+      ) {
+        return null;
+      }
+    }
     return payload as unknown as T;
   } catch {
     return null;
@@ -70,27 +72,27 @@ async function verifyToken<T = unknown>(token: string): Promise<T | null> {
 
 /** Membuat sesi anggota dan menyimpan di httpOnly cookie. */
 export async function createMemberSession(payload: SessionPayload): Promise<void> {
-  const token = await signToken(payload);
+  const token = await signToken(payload, MEMBER_SESSION_MAX_AGE);
   const store = await cookies();
   store.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: SESSION_MAX_AGE,
+    maxAge: MEMBER_SESSION_MAX_AGE,
   });
 }
 
 /** Membuat sesi Admin dan menyimpan di httpOnly cookie. */
 export async function createAdminSession(payload: AdminPayload): Promise<void> {
-  const token = await signToken(payload);
+  const token = await signToken(payload, ADMIN_SESSION_MAX_AGE);
   const store = await cookies();
   store.set(ADMIN_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: SESSION_MAX_AGE,
+    maxAge: ADMIN_SESSION_MAX_AGE,
   });
 }
 
@@ -107,7 +109,12 @@ export async function getAdminSession(): Promise<AdminPayload | null> {
   const store = await cookies();
   const token = store.get(ADMIN_COOKIE)?.value;
   if (!token) return null;
-  return await verifyToken<AdminPayload>(token);
+  const admin = await verifyToken<AdminPayload>(token, ADMIN_SESSION_MAX_AGE);
+  if (!admin || admin.role !== "admin" || !findAdminIdentity(admin.nama)) {
+    return null;
+  }
+  const identity = findAdminIdentity(admin.nama);
+  return identity ? { ...admin, nama: identity.name } : null;
 }
 
 /** Menghancurkan sesi anggota. */

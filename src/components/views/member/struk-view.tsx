@@ -20,6 +20,14 @@ import {
   EmptyState,
 } from "@/components/blocks/ui";
 import { StatusBadge, strukStatusVariant, strukStatusLabel } from "@/components/ui/status-badge";
+import { FilePicker } from "@/components/ui/file-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   recentPeriods,
   formatPeriodLong,
@@ -88,7 +96,14 @@ export function StrukView({
 
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault();
-    if (!file || !password || !selectedPeriod) return;
+    if (!password || !selectedPeriod) return;
+    if (!file) {
+      setUploadError({
+        message: "File receipt wajib dipilih sebelum dikirim.",
+        fields: { file: "Pilih file receipt terlebih dahulu." },
+      });
+      return;
+    }
 
     setUploading(true);
     setUploadError(null);
@@ -184,23 +199,27 @@ export function StrukView({
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="struk-period" className="block text-sm font-medium text-[var(--ink)]">
+            <label id="struk-period-label" htmlFor="struk-period" className="block text-sm font-medium text-[var(--ink)]">
               Periode Iuran
             </label>
-            <select
-              id="struk-period"
-              value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-              aria-invalid={!!uploadError?.fields?.periodeBulan}
-              aria-describedby={uploadError?.fields?.periodeBulan ? "struk-period-error" : undefined}
-              className="input-editorial h-11"
-            >
-              {periods.map((p) => (
-                <option key={p} value={p}>
-                  {formatPeriodLong(p)}
-                </option>
-              ))}
-            </select>
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger
+                id="struk-period"
+                className="w-full"
+                aria-labelledby="struk-period-label"
+                aria-invalid={!!uploadError?.fields?.periodeBulan}
+                aria-describedby={uploadError?.fields?.periodeBulan ? "struk-period-error" : undefined}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {periods.map((periode) => (
+                  <SelectItem key={periode} value={periode}>
+                    {formatPeriodLong(periode)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {uploadError?.fields?.periodeBulan && (
               <p
                 id="struk-period-error"
@@ -220,16 +239,14 @@ export function StrukView({
             <label htmlFor="struk-file" className="block text-sm font-medium text-[var(--ink)]">
               File Receipt
             </label>
-            <div className="flex items-center gap-3">
-              <input
-                id="struk-file"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleFileChange}
-                className="block w-full text-sm text-[var(--ink-muted)] file:mr-4 file:rounded-md file:border-0 file:bg-[var(--accent-primary)] file:px-4 file:py-2 file:font-medium file:text-white hover:file:bg-[var(--button-primary-hover)]"
-                required
-              />
-            </div>
+            <FilePicker
+              id="struk-file"
+              label="Pilih file receipt"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileChange}
+              ariaDescribedBy={uploadError?.fields?.file ? "struk-file-error" : undefined}
+              ariaInvalid={!!uploadError?.fields?.file}
+            />
             {file && (
               <p className="flex items-center gap-1.5 text-xs text-[var(--ink-muted)]">
                 <FileImage className="h-3.5 w-3.5" />
@@ -240,7 +257,7 @@ export function StrukView({
               Format: JPG, PNG, atau WebP. Maksimal 5 MB.
             </p>
             {uploadError?.fields?.file && (
-              <p role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">
+              <p id="struk-file-error" role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">
                 {uploadError.fields.file}
               </p>
             )}
@@ -261,7 +278,7 @@ export function StrukView({
 
           <button
             type="submit"
-            disabled={uploading || !file || !password || !selectedPeriod}
+            disabled={uploading || !password || !selectedPeriod}
             className="flex h-11 items-center justify-center gap-2 rounded-lg bg-[var(--button-primary-bg)] px-6 font-semibold text-white transition-all hover:bg-[var(--button-primary-hover)] active:scale-[0.98] disabled:opacity-50"
           >
             {uploading ? (
