@@ -6,6 +6,7 @@ import { Loader2, LogIn, UserPlus, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 type Mode = "login" | "signup" | "admin";
 
@@ -167,18 +168,14 @@ export function LoginView({
                 <label htmlFor="login-admin-nama" className="block text-sm font-medium text-[var(--ink)]">
                   Nama Admin
                 </label>
-                <select
-                  id="login-admin-nama"
+                <CustomSelect
                   value={adminName}
-                  onChange={(e) => setAdminName(e.target.value)}
-                  className="input-editorial h-11"
-                  required
-                >
-                  <option value="">Pilih nama Admin</option>
-                  {adminNames.map((name) => (
-                    <option key={name} value={name}>{name}</option>
-                  ))}
-                </select>
+                  onChange={setAdminName}
+                  id="login-admin-nama"
+                  ariaLabel="Pilih nama Admin"
+                  placeholder="Pilih nama Admin"
+                  options={adminNames.map((name) => ({ value: name, label: name }))}
+                />
                 {fieldErrors.nama && (
                   <p role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">{fieldErrors.nama}</p>
                 )}
