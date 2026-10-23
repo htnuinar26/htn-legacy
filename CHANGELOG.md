@@ -12,7 +12,7 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 - Menambahkan laporan audit keamanan statis yang mencakup auth, session, password, pembatasan percobaan, secret historis, dan batasan audit.
 - Menegaskan pemilik proyek sebagai satu-satunya pihak yang melakukan merge dan menetapkan `main` sebagai target PR untuk jalur deployment production.
-- Mengosongkan riwayat blok review internal dan menyisakan satu blok kosong sesuai permintaan.
+- Mempertahankan blok review terdahulu dan menambahkan satu blok review khusus untuk PR audit keamanan.
 
 ### Changed - Session Admin dan Dropdown Custom (2026-10-23)
 
