@@ -19,6 +19,13 @@ import {
 } from "@/components/blocks/ui";
 import { RupiahInput } from "@/components/ui/rupiah-input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   formatPeriodLong,
   formatRupiahFull,
   formatDateTime,
@@ -215,23 +222,21 @@ export function StrukGeneratorView() {
           />
           <form noValidate onSubmit={handleGenerate} className="space-y-5 p-5">
             <div className="space-y-1.5">
-              <label htmlFor="gen-anggota" className="block text-sm font-medium text-[var(--ink)]">
+              <label id="gen-anggota-label" htmlFor="gen-anggota" className="block text-sm font-medium text-[var(--ink)]">
                 Anggota *
               </label>
-              <select
-                id="gen-anggota"
-                value={selectedAnggota}
-                onChange={(e) => setSelectedAnggota(e.target.value)}
-                className="input-editorial h-11"
-                required
-              >
-                <option value="">- Pilih anggota -</option>
-                {data.anggota.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.nama}{a.nim ? ` (${a.nim})` : ""}
-                  </option>
-                ))}
-              </select>
+              <Select value={selectedAnggota} onValueChange={setSelectedAnggota}>
+                <SelectTrigger id="gen-anggota" className="w-full" aria-labelledby="gen-anggota-label">
+                  <SelectValue placeholder="Pilih anggota" />
+                </SelectTrigger>
+                <SelectContent>
+                  {data.anggota.map((anggota) => (
+                    <SelectItem key={anggota.id} value={anggota.id}>
+                      {anggota.nama}{anggota.nim ? ` (${anggota.nim})` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {error?.fields?.anggotaId && (
                 <p role="alert" className="text-xs font-medium text-[var(--status-tertunggak)]">
                   {error.fields.anggotaId}
