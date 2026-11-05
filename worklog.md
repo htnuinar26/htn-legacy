@@ -208,3 +208,11 @@ Koreksi dokumentasi setelah klarifikasi pemilik:
 - Membuat komponen `FilePicker` untuk pemicu file CSV, barcode, dan receipt; dialog pemilihan berkas tetap disediakan browser/OS, sedangkan kontrol halaman dapat diakses lewat keyboard.
 - Menyesuaikan README, `.env.example`, CHANGELOG, dan TODO dengan implementasi yang sebenarnya.
 - Typecheck dan lint lulus. `bun run build` dengan Turbopack terhalang resolver font sandbox; build Next.js penuh melalui Webpack lulus memakai mock font sementara. `bun install --frozen-lockfile --offline` dan `bun run db:generate` hanya menghasilkan dependency/client di `node_modules`, tanpa perubahan file tracked.
+
+## Perbaikan rendering font generator struk (2026-11-05)
+
+- Menelusuri log production `Fontconfig error: Cannot load default config file` ke proses Sharp yang merasterisasi SVG generator menjadi PNG tanpa font/config Linux.
+- Menambahkan font Plus Jakarta Sans variable TTF berlisensi SIL OFL dan konfigurasi Fontconfig khusus dengan cache di `/tmp`.
+- Mengatur `FONTCONFIG_PATH` sebelum modul Sharp dimuat pada runtime Linux, dan menambahkan aset font/config ke output tracing route `/api/admin/struk-generator`.
+- Memperbarui spesifikasi renderer PNG. Alur API, transaksi `Serializable`, status receipt, dan schema database tidak diubah.
+- `bunx tsc --noEmit` dan `bun run lint` lulus. `bun run build` dicoba tetapi terhenti saat Next.js mengunduh Plus Jakarta Sans untuk `next/font/google`, karena akses `fonts.googleapis.com` tidak tersedia pada sandbox. Build dan rendering aktual di runtime Vercel masih harus diverifikasi oleh CI/deployment.
