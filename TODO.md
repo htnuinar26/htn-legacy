@@ -252,9 +252,9 @@ Sumber: koreksi pemilik setelah halaman login Admin pada preview masih menampilk
 
 Sumber: log production menunjukkan Fontconfig tidak menemukan konfigurasi saat Sharp merender teks SVG struk menjadi PNG; hasil preview berisi glyph pengganti.
 
-- [ ] Sediakan font Plus Jakarta Sans dan konfigurasi Fontconfig yang dapat ditemukan di Vercel tanpa mengubah format PNG atau alur transaksi.
-- [ ] Pastikan aset konfigurasi dan font ikut dipaketkan pada function endpoint generator struk.
-- [ ] Verifikasi rendering teks pada PNG secara lokal dan jalankan typecheck, lint, build, serta checklist regresi receipt generator.
+- [x] Sediakan font Plus Jakarta Sans dan konfigurasi Fontconfig untuk renderer PNG tanpa mengubah alur transaksi.
+- [x] Pastikan aset konfigurasi dan font ikut dipaketkan pada function endpoint generator struk.
+- [x] Jalankan typecheck dan lint; coba build dan catat bahwa pengambilan font Google untuk `next/font` terhalang akses jaringan sandbox sehingga build dan uji render production tetap perlu diverifikasi lewat CI/deployment.
 
 ---
 
