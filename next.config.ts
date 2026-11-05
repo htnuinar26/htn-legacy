@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   output: "standalone",
   outputFileTracingIncludes: {
     "/api/admin/struk-generator": [
-      "./assets/fontconfig/*",
+      "./assets/fontconfig/fonts.conf",
+      "./assets/fontconfig/fonts.dtd",
       "./assets/fonts/plus-jakarta-sans/*.ttf",
     ],
   },
