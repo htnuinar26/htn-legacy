@@ -172,6 +172,7 @@ Admin dapat menghapus transaksi manual maupun transaksi yang memiliki `strukId`.
 - `GET /api/admin/struk-generator/anggota`: daftar anggota tanpa receipt aktif periode berjalan.
 - `POST /api/admin/struk-generator`: menerima `anggotaId`, nominal (lewat `RupiahInput`), dan catatan.
 - Receipt manual langsung `APPROVED`.
+- File PNG struk dirender oleh Sharp dari SVG. Runtime Linux harus memakai `assets/fontconfig/fonts.conf` dan font Plus Jakarta Sans TTF yang dipaketkan bersama function `/api/admin/struk-generator`; jangan bergantung pada font atau konfigurasi Fontconfig bawaan host.
 - Transaksi pemasukan dan receipt dibuat atomik dengan isolation level `Serializable`.
 - Kegagalan serialization conflict dikembalikan sebagai `DATABASE_ERROR` dengan pesan "konflik data, silakan coba lagi", bukan 500 tanpa keterangan. Lihat `ARCHITECTURE.md` bagian "Alur Receipt Generator Admin" untuk daftar titik kegagalan yang wajib diuji.
 

@@ -1,3 +1,4 @@
+import "@/lib/fontconfig";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import sharp from "sharp";

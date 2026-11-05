@@ -8,6 +8,11 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/), dan p
 
 <!-- ENTRI-BARU-SISIPKAN-DI-SINI -->
 
+### Fixed - Rendering Font Struk Generator (2026-11-05)
+
+- Memaketkan font Plus Jakarta Sans dan konfigurasi Fontconfig untuk function generator struk agar teks pada PNG tetap terbaca di runtime Linux Vercel.
+- Menambahkan aset font ke file tracing endpoint tanpa mengubah alur receipt, transaksi, atau schema database.
+
 ### Fixed - Identitas dan Session Admin serta Kontrol Form (2026-10-23)
 
 - Menetapkan identitas Admin di kode sebagai Abdal, Inayah Dzil Izzati, Tasya Ulfa, dan Ahlul Fajrul Maulana; login tidak lagi membaca nama Admin dari environment.
