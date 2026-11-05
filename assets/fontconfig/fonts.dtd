@@ -1,14 +1,14 @@
 <!-- This is the Document Type Definition for font configuration files -->
-<!ELEMENT fontconfig (dir | 
-		      cache | 
+<!ELEMENT fontconfig (dir |
+		      cache |
 		      cachedir |
-		      include | 
+		      include |
 		      config |
 		      selectfont |
-		      match | 
+		      match |
 		      alias)* >
 
-<!-- 
+<!--
     Add a directory that provides fonts
 -->
 <!ELEMENT dir (#PCDATA)>
@@ -155,7 +155,7 @@
     if 'qual' is 'all', then the match succeeds only if all values match.
     if 'qual' is 'first', then the match succeeds only if the first value matches.
     if 'qual' is 'not_first', then the match succeeds only if any value other than
-    	the first matches.
+	the first matches.
     For match elements with target=font, if test 'target' is 'pattern',
     then the test is applied to the pattern used in matching rather than
     to the resulting font.
@@ -165,7 +165,7 @@
     what the fontconfig database contains.
 -->
 <!ELEMENT test (%expr;)*>
-<!ATTLIST test 
+<!ATTLIST test
 	  qual (any|all|first|not_first)    "any"
 	  name CDATA	    #REQUIRED
 	  target (pattern|font|default)		"default"
