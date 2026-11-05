@@ -248,6 +248,14 @@ Sumber: koreksi pemilik setelah halaman login Admin pada preview masih menampilk
 - [x] Perbarui CHANGELOG, README, worklog, dan satu blok CODE_REVIEW khusus PR ini.
 - [x] Luluskan typecheck dan lint; build penuh lulus dengan Webpack dan mock font lokal. Audit native controls dan `git diff --check` juga lulus. Build Turbopack lokal terkendala resolver mock font pada sandbox.
 
+### Revisi 2026-11-05 - `fix/struk-generator-fontconfig`
+
+Sumber: log production menunjukkan Fontconfig tidak menemukan konfigurasi saat Sharp merender teks SVG struk menjadi PNG; hasil preview berisi glyph pengganti.
+
+- [ ] Sediakan font Plus Jakarta Sans dan konfigurasi Fontconfig yang dapat ditemukan di Vercel tanpa mengubah format PNG atau alur transaksi.
+- [ ] Pastikan aset konfigurasi dan font ikut dipaketkan pada function endpoint generator struk.
+- [ ] Verifikasi rendering teks pada PNG secara lokal dan jalankan typecheck, lint, build, serta checklist regresi receipt generator.
+
 ---
 
 ## Deferred work
